@@ -47,7 +47,8 @@ public class GameManager : MonoBehaviour
 			instance = this;
 		} else {
 			//XXX: hack singleton
-			throw new System.Exception("Two instances of GameManager");
+			Debug.LogError("Two instances of GameManager. Destroying.");
+            Destroy(gameObject);
 		}
 
 		WorldBounds bounds = new WorldBounds();
