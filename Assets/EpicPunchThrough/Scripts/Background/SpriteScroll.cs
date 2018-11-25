@@ -5,15 +5,22 @@ using UnityEngine;
 
 public class SpriteScroll : MonoBehaviour
 {
+    #region Parameters
+
+    // External
+    [Header("Sprite")]
 	public Sprite sprite;
+    [Tooltip("Size of sprite, leave 0 for automatic")]
 	public Vector2 size = Vector2.zero;
 
+    [Header("Scroll Settings")]
 	public bool scrollX = true;
 	public bool scrollY = true;
 	public float parallaxRatio = 1;
 	public string sortingLayerName;
 	public int sortingOrder;
 
+    // Internal
 	private GameObject tile;
 	private Vector2 spriteScale = Vector2.one;
 	private Vector2 _spriteSize;
@@ -27,8 +34,22 @@ public class SpriteScroll : MonoBehaviour
 		}
 	}
 	private GameObject[,] sections;
-	
-	void Start ()
+
+    #endregion
+
+    #region Fields
+
+    public float inverseRatio
+    {
+        get {
+            return 1 - parallaxRatio;
+        }
+    }
+
+    #endregion
+
+
+    void Start ()
 	{
 		// Track camera movement by event
 		GameManager.Instance.activeCamera.Moved += CameraMoved;
@@ -58,7 +79,7 @@ public class SpriteScroll : MonoBehaviour
 		TileField();
 	}
 
-	void CalcFieldSize()
+	bool CalcFieldSize()
 	{
 		Vector2 cameraSize = new Vector2(GameManager.Instance.activeCamera.Camera.orthographicSize * GameManager.Instance.activeCamera.Camera.aspect * 2,
 										GameManager.Instance.activeCamera.Camera.orthographicSize * 2);
@@ -67,14 +88,27 @@ public class SpriteScroll : MonoBehaviour
 		float widthRatio = cameraSize.x / spriteSize.x;
 		float heightRatio = cameraSize.y / spriteSize.y;
 
-        // Only calc for directions this background tiles in
-        int numWidth = (scrollX ? 1 : 1);
-        int numHeight = (scrollY ? 1 : 1); ;
-		//int numWidth = ( scrollX ? Mathf.CeilToInt(widthRatio) + 3 : 1 );
-		//int numHeight = ( scrollY ? Mathf.CeilToInt(heightRatio) + 3 : 1 );
+        // Only calc for directions this background tiles in // + 2 adds covers past screen size to cover movement
+		int numWidth = ( scrollX ? Mathf.CeilToInt(widthRatio) + 2 : 1 );
+		int numHeight = ( scrollY ? Mathf.CeilToInt(heightRatio) + 2 : 1 );
+
+        // Guarentee uneven to prevent skipping on zooms
+        if( numWidth != 1 && numWidth % 2 == 0 ) {
+            numWidth++;
+        }
+        if( numHeight != 1 && numHeight % 2 == 0  ) {
+            numHeight++;
+        }
 
 		if( sections != null ) {
-			for( int y = sections.GetLength(1)-1; y >= 0; y-- ) {
+            // No retiling if number of tiles hasn't changed
+            if( sections.GetLength(0) == numWidth
+                    && sections.GetLength(1) == numHeight ) {
+                return false;
+            }
+
+            // Clear previous collection
+            for( int y = sections.GetLength(1)-1; y >= 0; y-- ) {
 				for( int x = sections.GetLength(0)-1; x >= 0; x-- ) {
 					Destroy(sections[x,y]);
 				}
@@ -82,14 +116,17 @@ public class SpriteScroll : MonoBehaviour
 		}
 
 		sections = new GameObject[numWidth, numHeight];
+        return true;
 	}
 	
 	void TileField()
 	{
-		CalcFieldSize();
+		bool retile = CalcFieldSize();
+        if( !retile ) { return; }
 
-		Vector2 tileOffset = new Vector2(spriteSize.x * (sections.GetLength(0)-1)/2f,
-										spriteSize.y * (sections.GetLength(1)-1)/2f);
+        // Offset so that the first tiles will be in negative quadrants of screen then proceed evenly in positive quadrants
+		Vector2 tileOffset = new Vector2(spriteSize.x * (sections.GetLength(0) - 1) / 2f,
+										spriteSize.y * (sections.GetLength(1) - 1) / 2f);
 		for( int y=0; y < sections.GetLength(1); y++ ) {
 			for( int x=0; x < sections.GetLength(0); x++ ) {
 				Vector3 pos = new Vector3( (spriteSize.x * x) - tileOffset.x, (spriteSize.y * y) - tileOffset.y );
@@ -102,16 +139,22 @@ public class SpriteScroll : MonoBehaviour
 
 	void CameraMoved(Vector3 translation)
 	{
-		float inverseRatio = 1 - parallaxRatio;
 		transform.Translate(-(translation) * inverseRatio);
 	}
-	void CameraZoomed(float zoomInput)
+	void CameraZoomed(float zoomDelta)
 	{
 		TileField();
 	}
 
-	void Update ()
+	void Update()
 	{
+        WrapField();
+	}
+
+    void WrapField()
+    {
+        // Translate spritefield based on offset from camera
+
 		Vector2 offsetFromCamera = GameManager.Instance.activeCamera.transform.position - transform.position;
 
 		if( scrollX ) {
@@ -134,5 +177,5 @@ public class SpriteScroll : MonoBehaviour
 				offsetFromCamera = GameManager.Instance.activeCamera.transform.position - transform.position;
 			}
 		}
-	}
+    }
 }

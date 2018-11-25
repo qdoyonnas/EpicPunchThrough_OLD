@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SpectatorCamera : CameraBase
 {
+    // External
+    [Header("Camera Settings")]
 	public float speed = 1;
     public float zoomSpeed = 2;
 	public float minimumSize = 4;
