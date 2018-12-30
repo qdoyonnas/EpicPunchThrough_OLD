@@ -1,4 +1,7 @@
 sceneSetups:
-- path: Assets/EpicPunchThrough/Scenes/Main.unity
+- path: Assets/EpicPunchThrough/Scenes/Base.unity
   isLoaded: 1
   isActive: 1
+- path: Assets/EpicPunchThrough/Scenes/Menu.unity
+  isLoaded: 1
+  isActive: 0

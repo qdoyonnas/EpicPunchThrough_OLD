@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MotionCamera : MonoBehaviour {
+public class MotionCamera : CameraControl
+{
+    public Vector2 motion;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    protected override void DoFixedUpdate( GameManager.UpdateData data )
+    {
+        Vector2 fixedMotion = motion * Time.fixedDeltaTime;
+
+        cameraBase.Move(fixedMotion, true);
+    }
 }

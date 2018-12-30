@@ -2,52 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpectatorCamera : CameraBase
+public class SpectatorCamera : CameraControl
 {
     // External
-    [Header("Camera Settings")]
 	public float speed = 1;
     public float zoomSpeed = 2;
-	public float minimumSize = 4;
-	public float maximumSize = 8;
 
-	void FixedUpdate ()
+    protected override void DoFixedUpdate( GameManager.UpdateData data )
 	{
         HandleZoom();
         HandleMovement();
 	}
-
     void HandleZoom()
     {
         float zoomInput = Input.GetAxis( "Mouse ScrollWheel" ) * zoomSpeed;
-        if( Mathf.Abs( zoomInput ) > 0 ) {
-            Camera.orthographicSize += zoomInput;
-            ConfineZoom();
-
-            OnZoom( zoomInput );
-        }
+        cameraBase.Zoom(zoomInput, true);
     }
-    void ConfineZoom()
-    {
-        if( Camera.orthographicSize < minimumSize ) {
-            Camera.orthographicSize = minimumSize;
-        } else if( Camera.orthographicSize > maximumSize ) {
-            Camera.orthographicSize = maximumSize;
-        }
-    }
-
     void HandleMovement()
     {
-        Vector3 oldPos = transform.position;
-
-        transform.Translate( new Vector3( Input.GetAxis( "Horizontal" ),
-                                        Input.GetAxis( "Vertical" ), 0 ).normalized * speed * Time.fixedDeltaTime );
-
-        CheckWorldBounds();
-
-        if( transform.position != oldPos ) {
-            Vector3 translation = oldPos - transform.position;
-            OnMove( translation );
-        }
+        cameraBase.Move( new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized * speed * Time.fixedDeltaTime, true );
     }
 }

@@ -77,15 +77,26 @@
     <Compile Include="Assets\Anima2D\Scripts\SpriteMesh.cs" />
     <Compile Include="Assets\Anima2D\Scripts\SpriteMeshAnimation.cs" />
     <Compile Include="Assets\Anima2D\Scripts\SpriteMeshInstance.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleAudio.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics2D.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleSprite.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUI.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUtils.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Background\SpriteScroll.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\CameraBase.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\CameraControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\FollowCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\MotionCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\SpectatorCamera.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Game\GameManager.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Game\GameOptions.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\GenericObject.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Menu.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\SceneEntrance.cs" />
     <None Include="Assets\Anima2D\Version.txt" />
+    <None Include="Assets\Demigiant\DOTween\readme.txt" />
     <None Include="Assets\Anima2D\Licenses.txt" />
     <None Include="Assets\Anima2D\Readme.txt" />
     <Reference Include="UnityEditor.StandardEvents">
@@ -300,6 +311,9 @@
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Program Files/Unity 2018.2.11/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
       <HintPath>C:/Users/Ivor Darsil/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
