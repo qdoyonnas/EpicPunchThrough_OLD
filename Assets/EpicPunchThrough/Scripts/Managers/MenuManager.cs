@@ -25,6 +25,7 @@ public class MenuManager
         get {
             if( instance == null ) {
                 instance = new MenuManager();
+                instance.Initialize(new MenuSettings());
             }
             return instance;
         }
@@ -33,19 +34,37 @@ public class MenuManager
     #endregion
 
     public MenuSettings settings;
-    public Menu[] menues;
+    private List<Menu> menues = new List<Menu>();
 
     private bool isInitialized = false;
-
     public bool Initialize(MenuSettings settings)
     {
         this.settings = settings;
 
         GameManager.Instance.stateChanged += GameStateChanged;
-        GameManager.Instance.updated += DoUpdate;
+        GameManager.Instance.fixedUpdated += DoUpdate;
 
         isInitialized = true;
         return isInitialized;
+    }
+
+    public void RegisterMenu(Menu menu)
+    {
+        menues.Add(menu);
+    }
+    public void UnregisterMenu(Menu menu)
+    {
+        menues.Remove(menu);
+    }
+    public Menu GetMenu(string name)
+    {
+        foreach( Menu menu in menues ) {
+            if( menu.gameObject.name == name ) {
+                return menu;
+            }
+        }
+
+        return null;
     }
 
     void GameStateChanged(GameManager.GameState previousState, GameManager.GameState newState)
@@ -57,6 +76,14 @@ public class MenuManager
 
                     GameManager.Instance.activeCamera.Fade(1, 0);
                     GameManager.Instance.activeCamera.Fade(0, settings.fadeInDuration);
+                    GameManager.Instance.activeCamera.EndedFade += (x) => {
+                        Menu introBar = GetMenu("IntroBar");
+                        if( introBar != null ) {
+                            introBar.TransitionIn();
+                        } else {
+                            Debug.LogError("MenuManager could not find IntroBar");
+                        }
+                    };
                 }
                 break;
             case GameManager.GameState.pause:
@@ -64,16 +91,13 @@ public class MenuManager
                 break;
         }
     }
-
+    
     void DoUpdate(GameManager.UpdateData data)
     {
-        switch( data.state ) {
-            case GameManager.GameState.menu:
-                // update game menu
-                break;
-            case GameManager.GameState.pause:
-                // update pause menu
-                break;
+        if( data.state != GameManager.GameState.menu && data.state != GameManager.GameState.pause ) { return; }
+
+        foreach( Menu menu in menues ) {
+            menu.DoUpdate(data);
         }
     }
 }

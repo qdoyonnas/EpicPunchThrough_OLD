@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 	    public float maximumSpeed;
 	    public WorldBounds worldBounds;
         public MenuManager.MenuSettings menuSettings;
+        public InputManager.InputSettings inputSettings;
     }
 
     [Serializable]
@@ -99,6 +100,7 @@ public class GameManager : MonoBehaviour
 
     void InitializeManagers()
     {
+        InputManager.Instance.Initialize(settings.inputSettings);
         MenuManager.Instance.Initialize(settings.menuSettings);
     }
 

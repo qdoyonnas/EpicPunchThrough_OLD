@@ -262,6 +262,13 @@ MonoBehaviour:
     menuSettings:
       useController: 0
       fadeInDuration: 2
+    inputSettings:
+      upKey: 0
+      rightKey: 0
+      downKey: 0
+      leftKey: 0
+      confirmKey: 0
+      cancelKey: 0
   activeCamera: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
