@@ -261,7 +261,7 @@ MonoBehaviour:
       maxY: 0
     menuSettings:
       useController: 0
-      fadeInDuration: 2
+      fadeInDuration: 1
     inputSettings:
       upKey: 7700000011010000
       rightKey: 6400000013010000

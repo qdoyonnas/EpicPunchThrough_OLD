@@ -6,6 +6,8 @@ using DG.Tweening;
 
 public class MainMenu : Menu
 {
+    public float selectorTweenDuration = 0.2f;
+
     Vector3 startPosition;
     Vector3 outPosition {
         get {
@@ -88,6 +90,18 @@ public class MainMenu : Menu
         }
     }
 
+    public override void DoUpdate( GameManager.UpdateData data )
+    {
+        GraphicRaycaster raycaster = GetComponentInParent<GraphicRaycaster>();
+        if( raycaster == null ) { return; }
+
+        PointerEventData
+
+        for( int i = 0; i < buttons.Length; i++ ) {
+            raycaster.Raycast(
+        }
+    }
+
     #region Input Actions
 
     void Back(bool isDown)
@@ -113,30 +127,27 @@ public class MainMenu : Menu
             if( selectorLocation < 0 ) {
                 selectorLocation = buttons.Length - 1;
             }
-            selector.transform.DOMove(buttons[selectorLocation].transform.position, 0.2f).SetEase(Ease.InOutCirc);
+            selector.transform.DOMove(buttons[selectorLocation].transform.position, selectorTweenDuration).SetEase(Ease.InOutCirc);
         }
     }
     void SelectorDown(bool isDown)
     {
         if( !inFocus ) { return; }
-
-        // XXX: This is happening 4 times every time the key is pressed. That coincides with the number keys * two states.
-        //      might have to pass key values along KeyActions (second time needed). Not solution though.
-
+        
         if( isDown ) {
-            Debug.Log("Selector moved down");
             selectorLocation += 1;
             if( selectorLocation >= buttons.Length ) {
                 selectorLocation = 0;
             }
-            selector.transform.DOMove(buttons[selectorLocation].transform.position, 0.2f).SetEase(Ease.InOutCirc);
+            selector.transform.DOMove(buttons[selectorLocation].transform.position, selectorTweenDuration).SetEase(Ease.InOutCirc);
         }
     }
     void Select(bool isDown)
     {
-        if( !isDown ) {
-            Debug.Log("Selected: " + buttons[selectorLocation].gameObject.name);
-        }
+        if( isDown ) { return; }
+
+        Debug.Log("Selected: " + buttons[selectorLocation].gameObject.name);
+        buttons[selectorLocation].onClick.Invoke();
     }
 
 

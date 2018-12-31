@@ -144,7 +144,7 @@ public class CameraBase : MonoBehaviour
             c.a = value;
             screenFade.color = c;
         } else {
-            screenFade.DOFade(value, duration)
+            screenFade.DOFade(value, duration).SetEase(Ease.InCubic)
                 .OnStart(() => { StartedFade(screenFade.color.a); })
                 .OnUpdate(() => { UpdatedFade(screenFade.color.a); })
                 .OnComplete(() => { EndedFade(screenFade.color.a); });

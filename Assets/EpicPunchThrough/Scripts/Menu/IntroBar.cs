@@ -66,8 +66,6 @@ public class IntroBar : Menu
 
     void Exit(bool isDown)
     {
-        // XXX: Currently not working due to OnAnyKey firing first
-
         if( !isDown ) { return; }
 
         Application.Quit();
@@ -75,6 +73,9 @@ public class IntroBar : Menu
     }
     void OnAnyKey( bool isDown )
     {
+        if( !isDown ) { return; }
+        if( InputManager.Instance.GetInput("cancel") ) { return; }
+
         TransitionOut();
 
         Menu mainMenu = MenuManager.Instance.GetMenu("MainMenu");

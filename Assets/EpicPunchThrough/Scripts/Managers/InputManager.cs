@@ -58,44 +58,60 @@ public class InputManager
     {
         this.settings = settings;
         
+        GameManager.Instance.updated -= DoUpdate;
         GameManager.Instance.updated += DoUpdate;
 
         isInitialized = true;
         return isInitialized;
     }
 
+    public bool GetInput(string input)
+    {
+        input = input.ToLower();
+
+        switch( input ) {
+            case "up":
+                return GetInput(settings.upKey);
+            case "right":
+                return GetInput(settings.rightKey);
+            case "down":
+                return GetInput(settings.downKey);
+            case "left":
+                return GetInput(settings.leftKey);
+            case "confirm":
+                return GetInput(settings.confirmKey);
+            case "cancel":
+                return GetInput(settings.cancelKey);
+            default:
+                Debug.LogError("InputManager was requested unknown input: " + input);
+                return false;
+        }
+    }
+    public bool GetInput(KeyCode[] input)
+    {
+        foreach( KeyCode key in input ) {
+            if( Input.GetKey(key) ) { return true; }
+        }
+
+        return false;
+    }
+
+    void CheckKey(KeyCode[] keys, InputAction action)
+    {
+        foreach( KeyCode key in keys ) {
+            if( Input.GetKeyDown(key) && action != null ) { action(true); break; }
+            if( Input.GetKeyUp(key) && action != null ) { action(false); break; }
+        }
+    }
     public void DoUpdate(GameManager.UpdateData data)
     {
         if( Input.anyKeyDown && AnyInput != null ) { AnyInput(true); }
 
-        foreach( KeyCode key in settings.upKey ) {
-            if( Input.GetKeyDown(key) && UpInput != null ) { UpInput(true); }
-            if( Input.GetKeyUp(key) && UpInput != null ) { UpInput(false); }
-        }
-
-        foreach( KeyCode key in settings.rightKey ) {
-            if( Input.GetKeyDown(key) && RightInput != null ) { RightInput(true); }
-            if( Input.GetKeyUp(key) && RightInput != null ) { RightInput(false); }
-        }
-
-        foreach( KeyCode key in settings.downKey ) {
-            if( Input.GetKeyDown(key) && DownInput != null ) { DownInput(true); }
-            if( Input.GetKeyUp(key) && DownInput != null ) { DownInput(false); }
-        }
-
-        foreach( KeyCode key in settings.leftKey ) {
-            if( Input.GetKeyDown(key) && LeftInput != null ) { LeftInput(true); }
-            if( Input.GetKeyUp(key) && LeftInput != null ) { LeftInput(false); }
-        }
-
-        foreach( KeyCode key in settings.confirmKey ) {
-            if( Input.GetKeyDown(key) && ConfirmInput != null ) { ConfirmInput(true); }
-            if( Input.GetKeyUp(key) && ConfirmInput != null ) { ConfirmInput(false); }
-        }
-
-        foreach( KeyCode key in settings.cancelKey ) {
-            if( Input.GetKeyDown(key) && CancelInput != null ) { CancelInput(true); }
-            if( Input.GetKeyUp(key) && CancelInput != null ) { CancelInput(false); }
-        }
+        CheckKey(settings.upKey, UpInput);
+        CheckKey(settings.rightKey, RightInput);
+        CheckKey(settings.downKey, DownInput);
+        CheckKey(settings.leftKey, LeftInput);
+        CheckKey(settings.confirmKey, ConfirmInput);
+        CheckKey(settings.cancelKey, CancelInput);
     }
 }

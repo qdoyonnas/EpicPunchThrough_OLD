@@ -41,7 +41,9 @@ public class MenuManager
     {
         this.settings = settings;
 
+        GameManager.Instance.stateChanged -= GameStateChanged;
         GameManager.Instance.stateChanged += GameStateChanged;
+        GameManager.Instance.fixedUpdated -= DoUpdate;
         GameManager.Instance.fixedUpdated += DoUpdate;
 
         isInitialized = true;
