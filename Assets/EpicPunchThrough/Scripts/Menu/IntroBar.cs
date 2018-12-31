@@ -15,38 +15,68 @@ public class IntroBar : Menu
         }
     }
 
+    Tweener activeTween;
+
     void Awake()
     {
         MenuManager.Instance.RegisterMenu(this);
-        this.gameObject.SetActive(false);
 
         startPosition = transform.position;
+        transform.position = outPosition;
+
+        this.gameObject.SetActive(false);
     }
     
-    public override void TransitionIn()
+    public override void TransitionIn(TweenCallback completeAction = null)
     {
         this.gameObject.SetActive(true);
-
-        transform.position = outPosition;
-        transform.DOMove(startPosition, transitionTime).OnComplete( () => {
+        
+        if( activeTween != null ) { activeTween.Kill(); }
+        activeTween = transform.DOMove(startPosition, transitionTime).OnComplete( () => {
             inFocus = true;
-            InputManager.Instance.AnyInput += OnAnyKey;
+            HandleSubscriptions(true);
+
+            completeAction();
         } );
     }
-    public override void TransitionOut()
+    public override void TransitionOut(TweenCallback completeAction = null)
     {
-        InputManager.Instance.AnyInput -= OnAnyKey;
+        HandleSubscriptions(false);
         
-        transform.DOMove(outPosition, transitionTime).OnComplete( () => { this.gameObject.SetActive(false); } );
+        if( activeTween != null ) { activeTween.Kill(); }
+        activeTween = transform.DOMove(outPosition, transitionTime).OnComplete( () => {
+            this.gameObject.SetActive(false);
+
+            completeAction();
+        } );
 
         inFocus = false;
     }
 
+    void HandleSubscriptions(bool state)
+    {
+        if( state ) {
+            InputManager.Instance.AnyInput += OnAnyKey;
+            InputManager.Instance.CancelInput += Exit;
+        } else {
+            InputManager.Instance.AnyInput -= OnAnyKey;
+            InputManager.Instance.CancelInput -= Exit;
+        }
+    }
+
+    void Exit(bool isDown)
+    {
+        // XXX: Currently not working due to OnAnyKey firing first
+
+        if( !isDown ) { return; }
+
+        Application.Quit();
+        Debug.Log("QUIT");
+    }
     void OnAnyKey( bool isDown )
     {
-        if( !inFocus ) { return; }
-
         TransitionOut();
+
         Menu mainMenu = MenuManager.Instance.GetMenu("MainMenu");
         if( mainMenu != null ) {
             mainMenu.TransitionIn();

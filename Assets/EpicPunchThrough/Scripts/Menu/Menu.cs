@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 /// <summary>
 /// Interface for Menu objects
@@ -13,6 +14,6 @@ public class Menu: MonoBehaviour
     public float transitionTime = 0.4f;
 
     public virtual void DoUpdate(GameManager.UpdateData data) {}
-    public virtual void TransitionIn() {}
-    public virtual void TransitionOut() {}
+    public virtual void TransitionIn(TweenCallback completeAction = null) {}
+    public virtual void TransitionOut(TweenCallback completeAction = null) {}
 }
