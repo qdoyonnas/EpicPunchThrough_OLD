@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 
 public class MainMenu : Menu
@@ -23,6 +24,7 @@ public class MainMenu : Menu
     [SerializeField] Button[] buttons;
 
     Tweener activeTween;
+    Tweener selectorActiveTween;
 
     void Awake()
     {
@@ -92,13 +94,28 @@ public class MainMenu : Menu
 
     public override void DoUpdate( GameManager.UpdateData data )
     {
+        HandlePointerInteraction();
+    }
+    void HandlePointerInteraction()
+    {
         GraphicRaycaster raycaster = GetComponentInParent<GraphicRaycaster>();
         if( raycaster == null ) { return; }
 
-        PointerEventData
-
-        for( int i = 0; i < buttons.Length; i++ ) {
-            raycaster.Raycast(
+        PointerEventData pointerData = new PointerEventData(MenuManager.Instance.eventSystem);
+        pointerData.position = Input.mousePosition;
+        List<RaycastResult> resultList = new List<RaycastResult>();
+        raycaster.Raycast(pointerData, resultList);
+        
+        foreach( RaycastResult result in resultList ) {
+            Debug.Log(result.gameObject.name);
+            Button hitButton = result.gameObject.GetComponent<Button>();
+            if( hitButton != null ) {
+                for( int i = 0; i < buttons.Length; i++ ) {
+                    if( hitButton == buttons[i] ) {
+                        selector.transform.DOMove(buttons[i].transform.position, selectorTweenDuration).SetEase(Ease.InOutCirc);
+                    }
+                }
+            }
         }
     }
 

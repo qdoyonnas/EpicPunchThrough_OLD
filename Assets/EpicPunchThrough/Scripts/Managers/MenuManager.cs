@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class MenuManager
 {
@@ -34,12 +35,30 @@ public class MenuManager
     #endregion
 
     public MenuSettings settings;
+
     private List<Menu> menues = new List<Menu>();
+    [SerializeField]
+    private EventSystem _eventSystem;
+    public EventSystem eventSystem {
+        get {
+            return _eventSystem;
+        }
+    }
 
     private bool isInitialized = false;
     public bool Initialize(MenuSettings settings)
     {
         this.settings = settings;
+
+        if( _eventSystem == null ) {
+            GameObject eventObject = GameObject.Find("EventSystem");
+            if( eventObject != null ) {
+                _eventSystem = eventObject.GetComponent<EventSystem>();
+            }
+            if( _eventSystem == null ) {
+                Debug.LogError("MenuManager could not find EventSystem");
+            }
+        }
 
         GameManager.Instance.stateChanged -= GameStateChanged;
         GameManager.Instance.stateChanged += GameStateChanged;
