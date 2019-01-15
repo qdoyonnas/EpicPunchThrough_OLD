@@ -16,6 +16,7 @@ public class InputManager
         public KeyCode[] leftKey;
         public KeyCode[] confirmKey;
         public KeyCode[] cancelKey;
+        public bool mouseEnabled;
     }
 
     #endregion
@@ -38,8 +39,13 @@ public class InputManager
 
     #region Input Events
 
-    public delegate void InputAction(bool isDown);
+    public delegate bool InputAction(bool isDown);
+    public delegate bool MouseAction(Vector2 pos, Vector2 delta);
 
+    /// <summary>
+    /// Triggers on the frame that Unity's Input.anyKeyDown is true.
+    /// WARNING: If registered to AnyInput event as well as other Input events, make sure to check the state the other keys inside the registered method."
+    /// </summary>
     public event InputAction AnyInput;
 
     public event InputAction UpInput;
@@ -49,9 +55,13 @@ public class InputManager
     public event InputAction ConfirmInput;
     public event InputAction CancelInput;
 
+    public event MouseAction MouseMovement;
+
     #endregion
 
     public InputSettings settings;
+
+    Vector3 oldMousePosition = new Vector2();
 
     private bool isInitialized = false;
     public bool Initialize(InputSettings settings)
@@ -113,5 +123,11 @@ public class InputManager
         CheckKey(settings.leftKey, LeftInput);
         CheckKey(settings.confirmKey, ConfirmInput);
         CheckKey(settings.cancelKey, CancelInput);
+
+        if( Input.mousePosition != oldMousePosition ) {
+            Vector2 delta = oldMousePosition - Input.mousePosition;
+            if( MouseMovement != null ) {  MouseMovement(Input.mousePosition, delta); }
+            oldMousePosition = Input.mousePosition;
+        }
     }
 }

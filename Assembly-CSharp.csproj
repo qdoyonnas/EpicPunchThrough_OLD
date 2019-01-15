@@ -93,9 +93,13 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\IntroBar.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MainMenu.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menu.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ButtonControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\IntroBar.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\MainMenu.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Selector.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Transitional.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\SceneEntrance.cs" />
     <None Include="Assets\Anima2D\Version.txt" />
     <None Include="Assets\Demigiant\DOTween\readme.txt" />

@@ -267,8 +267,9 @@ MonoBehaviour:
       rightKey: 6400000013010000
       downKey: 7300000012010000
       leftKey: 6100000014010000
-      confirmKey: 0d00000020000000
-      cancelKey: 1b00000008000000
+      confirmKey: 0d0000002000000043010000
+      cancelKey: 1b0000000800000044010000
+      mouseEnabled: 1
   activeCamera: {fileID: 0}
 --- !u!1 &519420028
 GameObject:

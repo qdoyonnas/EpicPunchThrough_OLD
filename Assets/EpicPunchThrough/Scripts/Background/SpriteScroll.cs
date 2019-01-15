@@ -102,6 +102,11 @@ public class SpriteScroll : MonoBehaviour
 
             // If tile does not exist, create new tile objects for instantiation
 		    tiles[i] = new GameObject(sprites[i].name + "Tile");
+
+            // Guarantee tiles are kept in the scene of the SpriteScroll
+            tiles[i].transform.SetParent(transform);
+            tiles[i].transform.SetParent(null);
+
 		    tiles[i].SetActive(false);
 		    SpriteRenderer renderer = tiles[i].AddComponent<SpriteRenderer>();
 		    renderer.sprite = sprites[i];

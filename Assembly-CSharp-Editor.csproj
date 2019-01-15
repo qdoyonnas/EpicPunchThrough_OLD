@@ -199,6 +199,7 @@
     <Compile Include="Assets\Anima2D\Scripts\Editor\VertexManipulator\VertexManipulator.cs" />
     <Compile Include="Assets\Anima2D\Scripts\Editor\WeightEditor.cs" />
     <Compile Include="Assets\Anima2D\Scripts\Editor\WindowEditorTool.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Editor\TransitionalEditor.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
