@@ -14,6 +14,7 @@ public class MenuManager
     {
         public bool useController;
         public float fadeInDuration;
+        public string[] openingMenuNames;
     }
 
     #endregion
@@ -80,7 +81,7 @@ public class MenuManager
     public Menu GetMenu(string name)
     {
         foreach( Menu menu in menues ) {
-            if( menu.gameObject.name == name ) {
+            if( menu.gameObject.name.ToLower() == name.ToLower() ) {
                 return menu;
             }
         }
@@ -97,12 +98,15 @@ public class MenuManager
 
                     GameManager.Instance.activeCamera.Fade(1, 0);
                     GameManager.Instance.activeCamera.Fade(0, settings.fadeInDuration);
+
                     GameManager.Instance.activeCamera.EndedFade += (x) => {
-                        Menu introBar = GetMenu("IntroBar");
-                        if( introBar != null ) {
-                            introBar.TransitionIn();
-                        } else {
-                            Debug.LogError("MenuManager could not find IntroBar");
+                        foreach( string menuName in settings.openingMenuNames ) {
+                            Menu loadMenu = GetMenu(menuName);
+                            if( loadMenu != null ) {
+                                loadMenu.TransitionIn();
+                            } else {
+                                Debug.LogError("MenuManager could not find '" + menuName + "' menu");
+                            }
                         }
                     };
                 }

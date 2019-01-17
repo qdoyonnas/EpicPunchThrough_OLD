@@ -262,6 +262,8 @@ MonoBehaviour:
     menuSettings:
       useController: 0
       fadeInDuration: 1
+      openingMenuNames:
+      - IntroBar
     inputSettings:
       upKey: 7700000011010000
       rightKey: 6400000013010000

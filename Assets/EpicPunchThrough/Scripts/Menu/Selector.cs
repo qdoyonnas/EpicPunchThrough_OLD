@@ -17,6 +17,11 @@ public class Selector : MonoBehaviour
     Tweener activeSizeTween;
     Tweener activeColorTween;
 
+    private void Awake()
+    {
+        image = GetComponent<Image>();
+    }
+
     public void MoveTo(Vector2 pos, float duration)
     {
         if( activePosTween != null ) { activePosTween.Kill(); }
