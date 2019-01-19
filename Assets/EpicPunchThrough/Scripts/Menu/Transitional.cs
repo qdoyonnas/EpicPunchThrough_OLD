@@ -5,8 +5,12 @@ using DG.Tweening;
 
 public class Transitional : MonoBehaviour
 {
+    [Tooltip("Position when visible and active")]
     public Vector3 inPosition;
+    [Tooltip("Position of entering from")]
     public Vector3 outPosition;
+    [Tooltip("Position to exit to")]
+    public Vector3 exitPosition;
     public Ease ease = Ease.OutCirc;
 
     protected RectTransform rectTransform;
@@ -31,6 +35,7 @@ public class Transitional : MonoBehaviour
     {
         if( activeTween != null ) { activeTween.Kill(); }
 
+        rectTransform.anchoredPosition = outPosition;
         activeTween = rectTransform.DOAnchorPos(inPosition, duration).SetEase(ease);
 
         return activeTween;
@@ -39,7 +44,8 @@ public class Transitional : MonoBehaviour
     {
         if( activeTween != null ) { activeTween.Kill(); }
 
-        activeTween = rectTransform.DOAnchorPos(outPosition, duration).SetEase(ease);
+        rectTransform.anchoredPosition = inPosition;
+        activeTween = rectTransform.DOAnchorPos(exitPosition, duration).SetEase(ease);
 
         return activeTween;
     }

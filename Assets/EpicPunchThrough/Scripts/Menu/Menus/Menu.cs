@@ -20,23 +20,32 @@ public class Menu: MonoBehaviour
 
     [Header("Menu Items")]
     [SerializeField] protected MenuItemsRow[] menuItems;
-    protected int[] selectedItemCord = { 0, 0 };
+    protected int[] _selectedItemCord = { 0, 0 };
+    public int[] selectedItemCord { // XXX: I feel array range checks should happen here. However, this must not lose input direction functionality as found in the Input Methods below
+        get {
+            return _selectedItemCord;
+        }
+        set {
+            if( selectedItem != null ) { selectedItem.UnFocused(this); }
+
+            _selectedItemCord = value;
+
+            if( selectedItem != null ) { selectedItem.Focused(this); }
+        }
+    }
     public MenuControl selectedItem {
         get {
-            if( selectedItemCord[1] >= menuItems.Length
-                || selectedItemCord[0] >= menuItems[selectedItemCord[1]].row.Length )
+            if( _selectedItemCord[1] >= menuItems.Length
+                || _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length )
             {
                 return null;
             }
             
-            return menuItems[selectedItemCord[1]].row[selectedItemCord[0]];
+            return menuItems[_selectedItemCord[1]].row[_selectedItemCord[0]];
         }
     }
 
-    [Header("Selector")]
     [SerializeField] protected Selector selector;
-    public Color defaultSelectorColor = Color.gray;
-    public Color defaultSelectorSelectColor = Color.green;
 
     [Header("Navigation Options")]
     public float transitionTime = 0.4f;
@@ -63,11 +72,12 @@ public class Menu: MonoBehaviour
             transional.Init();
             transional.TransitionOut(0);
         }
-        foreach( MenuItemsRow row in menuItems ) {
-            foreach( MenuControl control in row.row ) {
-                control.Init();
+        for( int y = 0; y < menuItems.Length; y++ ) {
+            for( int x = 0; x < menuItems[y].row.Length; x++ ) {
+                menuItems[y].row[x].Init(new int[]{x, y});
             }
         }
+        DisplaySelector(false);
 
         gameObject.SetActive(false);
 
@@ -89,7 +99,7 @@ public class Menu: MonoBehaviour
                 inFocus = true;
                 HandleSubscriptions(true);
 
-                selectedItemCord[0] = 0; selectedItemCord[1] = 0;
+                _selectedItemCord[0] = 0; _selectedItemCord[1] = 0;
                 if( selectedItem != null ) {  selectedItem.Focused(this); }
 
                 completeAction();
@@ -100,7 +110,7 @@ public class Menu: MonoBehaviour
     {
         HandleSubscriptions(false);
         if( selectedItem != null ) {  selectedItem.UnFocused(this); }
-        DisplaySelector(false);
+        DisplaySelector(false, true);
 
         Tweener tween = null;
         foreach( Transitional transional in transitionals ) {
@@ -144,17 +154,16 @@ public class Menu: MonoBehaviour
 
     #region Selector Methods
 
-    public virtual void DisplaySelector(bool state)
+    public virtual void DisplaySelector(bool state, bool resetPos = false)
     {
         if( selector == null ) { return; }
 
+        if( resetPos ) { selector.ResetPos(); }
         selector.gameObject.SetActive(state);
     }
     public virtual void MoveSelector(Vector2 pos, float duration)
     {
-        if( selector == null ) { return; }
-
-        MoveSelector(pos, selector.size, duration);
+        MoveSelector(pos, Vector2.zero, duration);
     }
     public virtual void MoveSelector(Vector2 pos, Vector2 size, float duration)
     {
@@ -164,7 +173,7 @@ public class Menu: MonoBehaviour
         }
 
         selector.MoveTo(pos, duration);
-        selector.SizeTo(size, duration);
+        if( size != Vector2.zero ) {  selector.SizeTo(size, duration); }
     }
     public virtual void SelectorColor(Color color, float duration)
     {
@@ -193,9 +202,14 @@ public class Menu: MonoBehaviour
         if( isDown ) {
             if( selectedItem != null ) { selectedItem.UnFocused(this); }
 
-            selectedItemCord[1]--;
-            if( selectedItemCord[1] < 0 ) {
-                selectedItemCord[1] = menuItems.Length - 1;
+            selectedItemCord[0] = 2;
+
+            _selectedItemCord[1]--;
+            if( _selectedItemCord[1] < 0 ) {
+                _selectedItemCord[1] = menuItems.Length - 1;
+            }
+            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
+                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
             }
 
             if( selectedItem != null ) { selectedItem.Focused(this); }
@@ -213,9 +227,12 @@ public class Menu: MonoBehaviour
         if( isDown ) {
             if( selectedItem != null ) { selectedItem.UnFocused(this); }
 
-            selectedItemCord[0]++;
-            if( selectedItemCord[0] >= menuItems[selectedItemCord[1]].row.Length ) {
-                selectedItemCord[0] = 0;
+            _selectedItemCord[0]++;
+            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
+                _selectedItemCord[0] = 0;
+            }
+            if( _selectedItemCord[1] >= menuItems.Length ) {
+                _selectedItemCord[1] = menuItems.Length - 1;
             }
 
             if( selectedItem != null ) { selectedItem.Focused(this); }
@@ -232,9 +249,12 @@ public class Menu: MonoBehaviour
         if( isDown ) {
             if( selectedItem != null ) { selectedItem.UnFocused(this); }
 
-            selectedItemCord[1]++;
-            if( selectedItemCord[1] >= menuItems.Length ) {
-                selectedItemCord[1] = 0;
+            _selectedItemCord[1]++;
+            if( _selectedItemCord[1] >= menuItems.Length ) {
+                _selectedItemCord[1] = 0;
+            }
+            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
+                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
             }
 
             if( selectedItem != null ) { selectedItem.Focused(this); }
@@ -251,9 +271,12 @@ public class Menu: MonoBehaviour
         if( isDown ) {
             if( selectedItem != null ) { selectedItem.UnFocused(this); }
 
-            selectedItemCord[0]--;
-            if( selectedItemCord[0] < 0 ) {
-                selectedItemCord[0] = menuItems[selectedItemCord[1]].row.Length - 1;
+            _selectedItemCord[0]--;
+            if( _selectedItemCord[0] < 0 ) {
+                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
+            }
+            if( _selectedItemCord[1] >= menuItems.Length ) {
+                _selectedItemCord[1] = menuItems.Length - 1;
             }
 
             if( selectedItem != null ) { selectedItem.Focused(this); }
@@ -319,27 +342,7 @@ public class Menu: MonoBehaviour
 
                     // Check if focus needs to be updated
                     if( item != selectedItem ) {
-                        if( selectedItem != null ) { selectedItem.UnFocused(this); }
-
-                        // Retrieve cords of hit MenuControl
-                        int[] hitItemCords = { -1, -1 };
-                        for( int y = 0; y < menuItems.Length; y++ ) {
-                            for( int x = 0; x < menuItems[y].row.Length; x++ ) {
-                                if( item == menuItems[y].row[x] ) {
-                                    hitItemCords[0] = x;
-                                    hitItemCords[1] = y;
-                                    break;
-                                }
-                            }
-
-                            if( hitItemCords[0] != -1 ) {
-                                break;
-                            }
-                        }
-                        selectedItemCord[0] = hitItemCords[0];
-                        selectedItemCord[1] = hitItemCords[1];
-
-                        item.Focused(this);
+                        selectedItemCord = item.menuItemCord;
                     }
                     return true;
                 }

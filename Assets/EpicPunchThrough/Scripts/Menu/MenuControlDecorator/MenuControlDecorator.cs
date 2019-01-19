@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MenuControlDecorator : MenuControl
 {
-    public override void Init()
+    public override void Init(int[] cord)
     {
         // Do not init decorators (MenuControl handles chaining)
     }

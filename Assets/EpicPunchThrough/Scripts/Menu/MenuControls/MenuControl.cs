@@ -4,15 +4,23 @@ using UnityEngine;
 
 public class MenuControl : MonoBehaviour
 {
+    protected int[] _menuItemCord;
+    public int[] menuItemCord {
+        get {
+            return _menuItemCord;
+        }
+    }
+
     protected bool didInit = false;
     protected MenuControlDecorator decorator;
 
     private void Awake()
     {
-        Init();
+        Init(new int[] {0, 0});
     }
-    public virtual void Init()
+    public virtual void Init(int[] cord)
     {
+        _menuItemCord = cord;
         if( didInit ) { return; }
 
         MenuControlDecorator[] decorators = GetComponents<MenuControlDecorator>();

@@ -93,12 +93,16 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControlDecorator\ColorControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControlDecorator\MenuControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControlDecorator\SelectorControlDecorator.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControlDecorator\SoundControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControlDecorator\TooltipControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuChangeControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\TabControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\IntroBar.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\Menu.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Selector.cs" />

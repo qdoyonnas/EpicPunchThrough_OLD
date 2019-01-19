@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 	    public WorldBounds worldBounds;
         public MenuManager.MenuSettings menuSettings;
         public InputManager.InputSettings inputSettings;
+        public SoundManager.SoundManagerSettings soundSettings;
     }
 
     [Serializable]
@@ -102,6 +103,7 @@ public class GameManager : MonoBehaviour
     {
         InputManager.Instance.Initialize(settings.inputSettings);
         MenuManager.Instance.Initialize(settings.menuSettings);
+        SoundManager.Instance.Initialize(settings.soundSettings);
     }
 
     #region UpdateEvents

@@ -12,6 +12,9 @@ public class Selector : MonoBehaviour
         }
     }
 
+    Vector2 initPos;
+    Vector2 initSize;
+
     Image image;
     Tweener activePosTween;
     Tweener activeSizeTween;
@@ -20,8 +23,16 @@ public class Selector : MonoBehaviour
     private void Awake()
     {
         image = GetComponent<Image>();
+
+        initPos = image.rectTransform.anchoredPosition;
+        initSize = image.rectTransform.sizeDelta;
     }
 
+    public void ResetPos()
+    {
+        image.rectTransform.anchoredPosition = initPos;
+        image.rectTransform.sizeDelta = initSize;
+    }
     public void MoveTo(Vector2 pos, float duration)
     {
         if( activePosTween != null ) { activePosTween.Kill(); }

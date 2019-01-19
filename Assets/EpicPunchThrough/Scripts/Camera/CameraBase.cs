@@ -56,7 +56,7 @@ public class CameraBase : MonoBehaviour
         if( relative ) {
             transform.Translate(vector);
         } else {
-            transform.position = new Vector3(vector.x, vector.y, cameraZDistance);
+            transform.position = new Vector3(vector.x, vector.y, 0);
         }
         CheckWorldBounds();
 
@@ -166,12 +166,12 @@ public class CameraBase : MonoBehaviour
 		if( shakeDuration > 0 ) {
 			float xVal = Random.Range(-shakeRadius, shakeRadius);
 			float yVal = Random.Range(-shakeRadius, shakeRadius);
-			_camera.transform.localPosition = new Vector3(xVal, yVal, 0);
+			_camera.transform.localPosition = new Vector3(xVal, yVal, cameraZDistance);
 
 			shakeRadius -= shakeRadius * (Time.deltaTime/shakeDuration);
 			shakeDuration -= Time.deltaTime;
 		} else {
-			_camera.transform.localPosition = Vector3.zero;
+			_camera.transform.localPosition = new Vector3(0, 0, cameraZDistance);
 		}
     }
 

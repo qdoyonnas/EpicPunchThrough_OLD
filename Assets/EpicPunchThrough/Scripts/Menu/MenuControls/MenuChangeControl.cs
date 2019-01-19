@@ -10,7 +10,7 @@ public class MenuChangeControl: MenuControl
     {
         base.HandleConfirmInput(isDown, menu);
 
-        if( isDown ) {
+        if( menuNames.Length > 0 && isDown ) {
 
             bool didFail = false;
             Menu[] menus = new Menu[menuNames.Length];
