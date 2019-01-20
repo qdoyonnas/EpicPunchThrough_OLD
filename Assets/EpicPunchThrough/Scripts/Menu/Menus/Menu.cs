@@ -11,7 +11,21 @@ using DG.Tweening;
 /// </summary>
 public class Menu: MonoBehaviour
 {
-    public bool inFocus = false;
+    bool _inFocus = false;
+    public bool inFocus {
+        get {
+            return _inFocus;
+        }
+        set {
+            if( value ) {
+                if( selectedItem != null ) {  selectedItem.Focused(this); }
+            } else {
+                if( selectedItem != null ) {  selectedItem.UnFocused(this); }
+            }
+            HandleSubscriptions(value);
+            _inFocus = value;
+        }
+    }
 
     [Serializable]
     protected struct MenuItemsRow {
@@ -20,15 +34,59 @@ public class Menu: MonoBehaviour
 
     [Header("Menu Items")]
     [SerializeField] protected MenuItemsRow[] menuItems;
-    protected int[] _selectedItemCord = { 0, 0 };
-    public int[] selectedItemCord { // XXX: I feel array range checks should happen here. However, this must not lose input direction functionality as found in the Input Methods below
+    protected Vector2Int _selectedItemCord = new Vector2Int();
+    public Vector2Int selectedItemCord { // XXX: I feel array range checks should happen here. However, this must not lose input direction functionality as found in the Input Methods below
         get {
             return _selectedItemCord;
         }
         set {
             if( selectedItem != null ) { selectedItem.UnFocused(this); }
 
+            int xDirection = 0;
+            int yDirection = 0;
+
+            // Determine direction of change
+            if( value[0] > _selectedItemCord[0] ) {
+                xDirection = 1;
+            } else if( value[0] < _selectedItemCord[1] ) {
+                xDirection = -1;
+            }
+            if( value[1] > _selectedItemCord[1] ) {
+                yDirection = 1;
+            } else if( value[1] < _selectedItemCord[1] ) {
+                yDirection = -1;
+            }
+
             _selectedItemCord = value;
+
+            // Determine if warp or cap behavior - only wrap if direction = difference
+            if( _selectedItemCord[1] < 0 ) {
+                if( yDirection == -1 ) {
+                    _selectedItemCord[1] = menuItems.Length-1; // wrap
+                } else {
+                    _selectedItemCord[1] = 0;
+                }
+            } else if( _selectedItemCord[1] >= menuItems.Length ) {
+                if( yDirection == 1 ) {
+                    _selectedItemCord[1] = 0; // wrap
+                } else {
+                    _selectedItemCord[1] = menuItems.Length-1;
+                }
+            }
+
+            if( _selectedItemCord[0] < 0 ) {
+                if( xDirection == -1 ) {
+                    _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length-1; // wrap
+                } else {
+                    _selectedItemCord[0] = 0;
+                }
+            } else if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
+                if( xDirection == 1 ) {
+                    _selectedItemCord[0] = 0; // wrap
+                } else {
+                    _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length-1;
+                }
+            }
 
             if( selectedItem != null ) { selectedItem.Focused(this); }
         }
@@ -45,16 +103,17 @@ public class Menu: MonoBehaviour
         }
     }
 
-    [SerializeField] protected Selector selector;
+    protected Selector selector;
 
     [Header("Navigation Options")]
     public float transitionTime = 0.4f;
-    public string[] cancelMenuNames;
     Transitional[] transitionals;
+    bool inFrame = false;
 
-    bool didInit = false;
+    protected MenuDecorator decorator;
     GraphicRaycaster raycaster;
 
+    bool didInit = false;
     private void Awake()
     {
         Init();
@@ -67,49 +126,87 @@ public class Menu: MonoBehaviour
 
         raycaster = GetComponentInParent<GraphicRaycaster>();
 
-        transitionals = GetComponentsInChildren<Transitional>();
-        foreach( Transitional transional in transitionals ) {
-            transional.Init();
-            transional.TransitionOut(0);
-        }
-        for( int y = 0; y < menuItems.Length; y++ ) {
-            for( int x = 0; x < menuItems[y].row.Length; x++ ) {
-                menuItems[y].row[x].Init(new int[]{x, y});
-            }
-        }
-        DisplaySelector(false);
+        InitDecorators();
+        InitTransitionals();
+        InitMenuItems();
+        InitSelector();
 
         gameObject.SetActive(false);
 
         didInit = true;
     }
+    void InitDecorators()
+    {
+        MenuDecorator[] decorators = GetComponents<MenuDecorator>();
+        MenuDecorator last = null;
+        foreach( MenuDecorator decor in decorators ) {
+            if( last == null ) {
+                this.decorator = decor;
+            } else {
+                last.Init(this, decor);
+            }
+            last = decor;
+        }
+        if( last != null ) { last.Init(this, null); }
+    }
+    void InitTransitionals()
+    {
+        transitionals = GetComponentsInChildren<Transitional>();
+        foreach( Transitional transional in transitionals ) {
+            transional.Init();
+            transional.TransitionOut(0);
+        }
+    }
+    void InitMenuItems()
+    {
+        for( int y = 0; y < menuItems.Length; y++ ) {
+            for( int x = 0; x < menuItems[y].row.Length; x++ ) {
+                menuItems[y].row[x].Init(new Vector2Int(x, y));
+            }
+        }
+    }
+    void InitSelector()
+    {
+        selector = GetComponentInChildren<Selector>();
+        DisplaySelector(false);
+    }
 
-    public virtual void DoUpdate(GameManager.UpdateData data) {}
+    public virtual void DoUpdate(GameManager.UpdateData data)
+    {
+        if( decorator != null ) { decorator.DoUpdate(data); }
+    }
 
     public virtual void TransitionIn(TweenCallback completeAction = null)
     {
+        if( decorator != null ) { decorator.TransitionIn(completeAction); }
+
         this.gameObject.SetActive(true);
 
-        Tweener tween = null;
-        foreach( Transitional transional in transitionals ) {
-            tween = transional.TransitionIn(transitionTime);
-        }
+        if( inFrame ) {
+            inFocus = true;
+            completeAction();
+        } else {
+            Tweener tween = null;
+            foreach( Transitional transional in transitionals ) {
+                tween = transional.TransitionIn(transitionTime);
+            }
 
-        if( tween != null ) { tween.OnComplete(() => {
-                inFocus = true;
-                HandleSubscriptions(true);
+            if( tween != null ) { tween.OnComplete(() => {
+                    _selectedItemCord[0] = 0; _selectedItemCord[1] = 0;
+                    inFocus = true;
+                    inFrame = true;
 
-                _selectedItemCord[0] = 0; _selectedItemCord[1] = 0;
-                if( selectedItem != null ) {  selectedItem.Focused(this); }
-
-                completeAction();
-            });
+                    completeAction();
+                });
+            }
         }
     }
     public virtual void TransitionOut(TweenCallback completeAction = null)
     {
-        HandleSubscriptions(false);
-        if( selectedItem != null ) {  selectedItem.UnFocused(this); }
+        if( decorator != null ) { decorator.TransitionIn(completeAction); }
+
+        inFocus = false;
+        inFrame = false;
         DisplaySelector(false, true);
 
         Tweener tween = null;
@@ -127,6 +224,8 @@ public class Menu: MonoBehaviour
 
     protected virtual void HandleSubscriptions(bool state)
     {
+        if( decorator != null ) { decorator.HandleSubscriptions(state); }
+
         if( state ) {
             InputManager.Instance.AnyInput += OnAnyKey;
 
@@ -156,9 +255,11 @@ public class Menu: MonoBehaviour
 
     public virtual void DisplaySelector(bool state, bool resetPos = false)
     {
+        if( decorator != null ) { decorator.DisplaySelector(state, resetPos); }
+
         if( selector == null ) { return; }
 
-        if( resetPos ) { selector.ResetPos(); }
+        if( resetPos ) { selector.ResetSettings(); }
         selector.gameObject.SetActive(state);
     }
     public virtual void MoveSelector(Vector2 pos, float duration)
@@ -167,8 +268,10 @@ public class Menu: MonoBehaviour
     }
     public virtual void MoveSelector(Vector2 pos, Vector2 size, float duration)
     {
+        if( decorator != null ) { decorator.MoveSelector(pos, size, duration); }
+
         if( selector == null ) {
-            Debug.LogError("Menu " + gameObject.name + " does not have a Selector assgined and a call to move a selector was made to it.");
+            Debug.LogError("Menu " + gameObject.name + " does not have a Selector assigned and a call to move a selector was made to it.");
             return;
         }
 
@@ -177,7 +280,12 @@ public class Menu: MonoBehaviour
     }
     public virtual void SelectorColor(Color color, float duration)
     {
-        if( selector == null ) { return; }
+        if( decorator != null ) { decorator.SelectorColor(color, duration); }
+
+        if( selector == null ) {
+            Debug.LogError("Menu " + gameObject.name + " does not have a Selector assigned and a call to change color of a selector was made to it.");
+            return;
+        }
 
         selector.ColorTo(color, duration);
     }
@@ -188,142 +296,59 @@ public class Menu: MonoBehaviour
 
     protected virtual bool OnAnyKey(bool isDown)
     {
-        if( menuItems.Length == 0 || selectedItem == null ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleAnyInput(this) ) { return true; }
 
-        return selectedItem.HandleAnyInput(this);
+        if( decorator != null ) { decorator.OnAnyKey(isDown); }
+        return false;
     }
 
     protected virtual bool OnUp(bool isDown)
     {
-        if( menuItems.Length == 0 ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleUpInput(isDown, this) ) { return true; }
 
-        if( selectedItem != null && selectedItem.HandleUpInput(isDown, this) ) { return true; }
-
-        if( isDown ) {
-            if( selectedItem != null ) { selectedItem.UnFocused(this); }
-
-            selectedItemCord[0] = 2;
-
-            _selectedItemCord[1]--;
-            if( _selectedItemCord[1] < 0 ) {
-                _selectedItemCord[1] = menuItems.Length - 1;
-            }
-            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
-                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
-            }
-
-            if( selectedItem != null ) { selectedItem.Focused(this); }
-            return true;
-        }
-
+        if( decorator != null ) { decorator.OnUp(isDown); }
         return false;
     }
     protected virtual bool OnRight(bool isDown)
     {
-        if( menuItems.Length == 0 ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleRightInput(isDown, this) ) { return true; }
 
-        if( selectedItem != null && selectedItem.HandleRightInput(isDown, this) ) { return true; }
-
-        if( isDown ) {
-            if( selectedItem != null ) { selectedItem.UnFocused(this); }
-
-            _selectedItemCord[0]++;
-            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
-                _selectedItemCord[0] = 0;
-            }
-            if( _selectedItemCord[1] >= menuItems.Length ) {
-                _selectedItemCord[1] = menuItems.Length - 1;
-            }
-
-            if( selectedItem != null ) { selectedItem.Focused(this); }
-            return true;
-        }
+        if( decorator != null ) { decorator.OnRight(isDown); }
         return false;
     }
     protected virtual bool OnDown(bool isDown)
     {
-        if( menuItems.Length == 0 ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleDownInput(isDown, this) ) { return true; }
 
-        if( selectedItem != null && selectedItem.HandleDownInput(isDown, this) ) { return true; }
-
-        if( isDown ) {
-            if( selectedItem != null ) { selectedItem.UnFocused(this); }
-
-            _selectedItemCord[1]++;
-            if( _selectedItemCord[1] >= menuItems.Length ) {
-                _selectedItemCord[1] = 0;
-            }
-            if( _selectedItemCord[0] >= menuItems[_selectedItemCord[1]].row.Length ) {
-                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
-            }
-
-            if( selectedItem != null ) { selectedItem.Focused(this); }
-            return true;
-        }
+        if( decorator != null ) { decorator.OnDown(isDown); }
         return false;
     }
     protected virtual bool OnLeft(bool isDown)
     {
-        if( menuItems.Length == 0 ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleLeftInput(isDown, this) ) { return true; }
 
-        if( selectedItem != null && selectedItem.HandleLeftInput(isDown, this) ) { return true; }
-
-        if( isDown ) {
-            if( selectedItem != null ) { selectedItem.UnFocused(this); }
-
-            _selectedItemCord[0]--;
-            if( _selectedItemCord[0] < 0 ) {
-                _selectedItemCord[0] = menuItems[_selectedItemCord[1]].row.Length - 1;
-            }
-            if( _selectedItemCord[1] >= menuItems.Length ) {
-                _selectedItemCord[1] = menuItems.Length - 1;
-            }
-
-            if( selectedItem != null ) { selectedItem.Focused(this); }
-            return true;
-        }
+        if( decorator != null ) { decorator.OnLeft(isDown); }
         return false;
     }
     protected virtual bool OnConfirm(bool isDown)
     {
-        if( menuItems.Length == 0 || selectedItem == null ) { return false; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleConfirmInput(isDown, this) ) { return true; }
 
-        return selectedItem.HandleConfirmInput(isDown, this);
+        if( decorator != null ) { decorator.OnConfirm(isDown); }
+        return false;
     }
     protected virtual bool OnCancel(bool isDown)
     {
-        if( selectedItem != null && selectedItem.HandleCancelInput(isDown, this) ) { return true; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleCancelInput(isDown, this) ) { return true; }
 
-        if( cancelMenuNames.Length > 0 && isDown ) {
-            bool didFail = false;
-            Menu[] menus = new Menu[cancelMenuNames.Length];
-
-            for( int i = 0; i < cancelMenuNames.Length; i++ ) {
-                Menu loadMenu = MenuManager.Instance.GetMenu(cancelMenuNames[i]);
-                if( loadMenu != null ) {
-                    menus[i] = loadMenu;
-                } else {
-                    Debug.LogError("Menu: " + gameObject.name + "could not find menu by name of: " + cancelMenuNames[i]);
-                    didFail = true;
-                }
-            }
-
-            if( !didFail ) {
-                TransitionOut( () => {
-                    foreach( Menu loadMenu in menus ) {
-                        loadMenu.TransitionIn();
-                    }
-                });
-            }
-
-            return true;
-        }
-
+        if( decorator != null ) { decorator.OnCancel(isDown); }
         return false;
     }
 
     protected virtual bool HandlePointerInteraction(Vector2 pos, Vector2 delta)
     {
+        if( decorator != null ) { decorator.HandlePointerInteraction(pos, delta); }
+
         // Setup Raycast
         if( raycaster == null ) { return false; }
 

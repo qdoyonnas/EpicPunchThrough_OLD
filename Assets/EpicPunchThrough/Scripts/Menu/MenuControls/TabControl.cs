@@ -6,6 +6,7 @@ public class TabControl : MenuControl
 {
     public TabControl nextTab;
     public TabControl previousTab;
+    public bool isVertical = false;
     public bool autoSwitchOnInput = true;
 
     public override bool HandleConfirmInput( bool isDown, Menu menu )
@@ -25,7 +26,7 @@ public class TabControl : MenuControl
     {
         base.HandleRightInput(isDown, menu);
 
-        if( isDown ) {
+        if( !isVertical && nextTab != null && isDown ) {
             menu.selectedItemCord = nextTab.menuItemCord;
             if( autoSwitchOnInput ) {  nextTab.HandleConfirmInput(true, menu); }
 
@@ -38,9 +39,36 @@ public class TabControl : MenuControl
     {
         base.HandleLeftInput(isDown, menu);
 
-        if( isDown ) {
+        if( !isVertical && previousTab != null && isDown ) {
             menu.selectedItemCord = previousTab.menuItemCord;
             if( autoSwitchOnInput ) { previousTab.HandleConfirmInput(true, menu); }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public override bool HandleUpInput( bool isDown, Menu menu )
+    {
+        base.HandleUpInput(isDown, menu);
+
+        if( isVertical && previousTab != null && isDown ) {
+            menu.selectedItemCord = previousTab.menuItemCord;
+            if( autoSwitchOnInput ) {  previousTab.HandleConfirmInput(true, menu); }
+
+            return true;
+        }
+
+        return false; 
+    }
+    public override bool HandleDownInput( bool isDown, Menu menu )
+    {
+        base.HandleDownInput(isDown, menu);
+
+        if( isVertical && nextTab != null && isDown ) {
+            menu.selectedItemCord = nextTab.menuItemCord;
+            if( autoSwitchOnInput ) { nextTab.HandleConfirmInput(true, menu); }
 
             return true;
         }

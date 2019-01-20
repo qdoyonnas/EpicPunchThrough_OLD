@@ -14,6 +14,7 @@ public class Selector : MonoBehaviour
 
     Vector2 initPos;
     Vector2 initSize;
+    Color initColor;
 
     Image image;
     Tweener activePosTween;
@@ -26,12 +27,18 @@ public class Selector : MonoBehaviour
 
         initPos = image.rectTransform.anchoredPosition;
         initSize = image.rectTransform.sizeDelta;
+        initColor = image.color;
     }
 
-    public void ResetPos()
+    public void ResetSettings()
     {
         image.rectTransform.anchoredPosition = initPos;
         image.rectTransform.sizeDelta = initSize;
+        image.color = initColor;
+
+        if( activePosTween != null ) { activePosTween.Kill(); }
+        if( activeSizeTween != null ) { activeSizeTween.Kill(); }
+        if( activeColorTween != null ) { activeColorTween.Kill(); }
     }
     public void MoveTo(Vector2 pos, float duration)
     {
@@ -47,7 +54,7 @@ public class Selector : MonoBehaviour
     }
     public void ColorTo( Color color, float duration )
     {
-        if( activeColorTween != null ) { return; }
+        if( activeColorTween != null ) { activeColorTween.Kill(); }
 
         activeColorTween = image.DOColor(color, duration).SetEase(Ease.InOutCirc);
     }

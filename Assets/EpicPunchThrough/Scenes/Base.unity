@@ -272,6 +272,7 @@ MonoBehaviour:
       confirmKey: 0d0000002000000043010000
       cancelKey: 1b0000000800000044010000
       mouseEnabled: 1
+      activateMouseThreshold: 10
     soundSettings:
       musicOn: 1
       soundOn: 1

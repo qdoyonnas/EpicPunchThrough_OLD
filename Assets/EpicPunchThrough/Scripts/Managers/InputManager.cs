@@ -17,6 +17,7 @@ public class InputManager
         public KeyCode[] confirmKey;
         public KeyCode[] cancelKey;
         public bool mouseEnabled;
+        public float activateMouseThreshold;
     }
 
     #endregion
@@ -63,6 +64,24 @@ public class InputManager
 
     Vector3 oldMousePosition = new Vector2();
 
+    public delegate void ActiveControlAction(ActiveControlType previouseState, ActiveControlType newState);
+    public event ActiveControlAction ActiveControlChanged;
+    public enum ActiveControlType {
+        Mouse,
+        Keyboard,
+        Controller
+    }
+    ActiveControlType _activeControlType = ActiveControlType.Keyboard;
+    public ActiveControlType activeControlType {
+        get {
+            return _activeControlType;
+        }
+        set {
+            if( ActiveControlChanged != null ) { ActiveControlChanged(_activeControlType, value); }
+            _activeControlType = value;
+        }
+    }
+
     private bool isInitialized = false;
     public bool Initialize(InputSettings settings)
     {
@@ -70,6 +89,9 @@ public class InputManager
         
         GameManager.Instance.updated -= DoUpdate;
         GameManager.Instance.updated += DoUpdate;
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
 
         isInitialized = true;
         return isInitialized;
@@ -106,14 +128,41 @@ public class InputManager
         return false;
     }
 
+    public ActiveControlType GetInputType(KeyCode input)
+    {
+        // XXX: This might be really unreliable with any Unity updates.
+        //      Consider either making settings to easily change values or
+        //      finding better solution.
+        if( (int)input >= 330 && (int)input <= 509 ) {
+            return ActiveControlType.Controller;
+        } else if( (int)input >= 323 && (int)input <= 329 ) {
+            return ActiveControlType.Mouse;
+        } else {
+            return ActiveControlType.Keyboard;
+        }
+    }
+
     void CheckKey(KeyCode[] keys, InputAction action)
     {
         foreach( KeyCode key in keys ) {
-            if( Input.GetKeyDown(key) && action != null ) { action(true); break; }
-            if( Input.GetKeyUp(key) && action != null ) { action(false); break; }
+            if( Input.GetKeyDown(key) && action != null ) {
+                activeControlType = GetInputType(key); // XXX: Need way to distinguish between keyboard and controller keys
+                action(true);
+                break;
+            }
+            if( Input.GetKeyUp(key) && action != null ) {
+                activeControlType = GetInputType(key);
+                action(false);
+                break;
+            }
         }
     }
     public void DoUpdate(GameManager.UpdateData data)
+    {
+        ManageKeys();
+        ManageMouse();
+    }
+    void ManageKeys()
     {
         if( Input.anyKeyDown && AnyInput != null ) { AnyInput(true); }
 
@@ -123,11 +172,21 @@ public class InputManager
         CheckKey(settings.leftKey, LeftInput);
         CheckKey(settings.confirmKey, ConfirmInput);
         CheckKey(settings.cancelKey, CancelInput);
-
-        if( Input.mousePosition != oldMousePosition ) {
+    }
+    void ManageMouse()
+    {
+        if( activeControlType != ActiveControlType.Mouse 
+            && Vector2.Distance(Input.mousePosition, oldMousePosition) >= settings.activateMouseThreshold )
+        {
+            activeControlType = ActiveControlType.Mouse;
+        }
+        if( activeControlType == ActiveControlType.Mouse
+            && Input.mousePosition != oldMousePosition )
+        {
             Vector2 delta = oldMousePosition - Input.mousePosition;
             if( MouseMovement != null ) {  MouseMovement(Input.mousePosition, delta); }
-            oldMousePosition = Input.mousePosition;
         }
+
+        oldMousePosition = Input.mousePosition;
     }
 }

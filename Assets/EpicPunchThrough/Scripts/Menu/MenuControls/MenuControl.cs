@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MenuControl : MonoBehaviour
 {
-    protected int[] _menuItemCord;
-    public int[] menuItemCord {
+    protected Vector2Int _menuItemCord = new Vector2Int();
+    public Vector2Int menuItemCord {
         get {
             return _menuItemCord;
         }
@@ -16,11 +16,11 @@ public class MenuControl : MonoBehaviour
 
     private void Awake()
     {
-        Init(new int[] {0, 0});
+        Init(new Vector2Int(-1, -1));
     }
-    public virtual void Init(int[] cord)
+    public virtual void Init(Vector2Int cord)
     {
-        _menuItemCord = cord;
+        if( cord.x != -1 ) { _menuItemCord = cord; }
         if( didInit ) { return; }
 
         MenuControlDecorator[] decorators = GetComponents<MenuControlDecorator>();
