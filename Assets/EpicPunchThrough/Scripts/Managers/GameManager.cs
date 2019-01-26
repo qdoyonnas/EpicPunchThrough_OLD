@@ -90,10 +90,14 @@ public class GameManager : MonoBehaviour
 			//XXX: hack unity singleton
 			Debug.LogError("Two instances of GameManager. Destroying.");
             Destroy(gameObject);
+            return;
 		}
         
         if( activeCamera == null ) {
             activeCamera = GameObject.Find( "CameraBase" ).GetComponent<CameraBase>();
+            if( activeCamera == null ) {
+                Debug.LogError("GameManager did not find CameraBase. ActiveCamera not set");
+            }
         }
         
         InitializeManagers();
