@@ -90,11 +90,13 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\FollowCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\MotionCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\SpectatorCamera.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\ActorManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStartControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuChangeControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\ColorControlDecorator.cs" />
@@ -110,8 +112,9 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\MenuDecorators\MenuDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Selector.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Transitional.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\SceneEntrance.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Actors\Actor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\SceneEntrance.cs" />
     <None Include="Assets\Anima2D\Version.txt" />
     <None Include="Assets\Demigiant\DOTween\readme.txt" />
     <None Include="Assets\Anima2D\Licenses.txt" />

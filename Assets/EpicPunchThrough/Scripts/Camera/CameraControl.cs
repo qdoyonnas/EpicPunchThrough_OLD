@@ -35,12 +35,12 @@ public class CameraControl : MonoBehaviour
 
     void FindCamera()
     {
-        if( cameraBase != null ) { return; }
+        if( _cameraBase != null ) { return; }
 
-        cameraBase = GetComponent<CameraBase>();
-        if( cameraBase == null ) {
-            cameraBase = GameManager.Instance.activeCamera;
-            if( cameraBase == null ) {
+        _cameraBase = GetComponent<CameraBase>();
+        if( _cameraBase == null ) {
+            _cameraBase = GameManager.Instance.activeCamera;
+            if( _cameraBase == null ) {
                 Debug.LogError("Spectator Camera could not find CameraBase");
                 gameObject.SetActive(false);
             }

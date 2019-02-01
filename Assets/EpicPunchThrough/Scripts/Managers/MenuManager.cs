@@ -46,6 +46,8 @@ public class MenuManager
         }
     }
 
+    private string menuSceneName = "Menu";
+
     private bool isInitialized = false;
     public bool Initialize(MenuSettings settings)
     {
@@ -94,7 +96,7 @@ public class MenuManager
         switch( newState ) {
             case GameManager.GameState.menu:
                 if( previousState == GameManager.GameState.init ) {
-                    if( !SceneManager.GetSceneByName("Menu").isLoaded ) { SceneManager.LoadScene("Menu", LoadSceneMode.Additive); }
+                    if( !SceneManager.GetSceneByName(menuSceneName).isLoaded ) { SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive); }
 
                     GameManager.Instance.activeCamera.Fade(1, 0);
                     GameManager.Instance.activeCamera.Fade(0, settings.fadeInDuration);
@@ -113,6 +115,9 @@ public class MenuManager
                 break;
             case GameManager.GameState.pause:
                 // show pause menu
+                break;
+            default:
+                SceneManager.UnloadSceneAsync(menuSceneName);
                 break;
         }
     }

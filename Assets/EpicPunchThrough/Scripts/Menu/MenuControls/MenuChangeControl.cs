@@ -6,7 +6,7 @@ public class MenuChangeControl: MenuControl
 {
     public string[] menuNames; // XXX: Should consider whether or not this *should* be an array or just a single value. Similar issue with initial menus and cancel-into menus.
     public bool additive = false;
-    public bool setCancelBack = true;
+    public bool setCancelBack = false;
 
     public override bool HandleConfirmInput( bool isDown, Menu menu )
     {

@@ -110,6 +110,11 @@ public class GameManager : MonoBehaviour
         SoundManager.Instance.Initialize(settings.soundSettings);
     }
 
+    public string GetManagerSceneName()
+    {
+        return gameObject.scene.name;
+    }
+
     #region UpdateEvents
 
     public struct UpdateData
