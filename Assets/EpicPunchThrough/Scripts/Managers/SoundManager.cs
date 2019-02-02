@@ -72,12 +72,21 @@ public class SoundManager
         sources.Add(source);
         source.Play();
     }
+    public void UnregisterSound(AudioSource source)
+    {
+        if( sources.Contains(source) ) {
+            source.Stop();
+            sources.Remove(source);
+        }
+    }
 
     void DoUpdate(GameManager.UpdateData data)
     {
         for( int i = sources.Count-1; i >= 0; i-- ) {
-            if( !sources[i].isPlaying ) {
-                sources.Remove(sources[i]);
+            if( sources[i] == null
+                || !sources[i].isPlaying ) 
+            {
+                sources.RemoveAt(i);
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,12 +12,15 @@ public class GameManager : MonoBehaviour
     [Serializable]
     public struct GameOptions
     {
+        public float sceneTransitionFadeDuration;
 	    public float gravity;
 	    public float maximumSpeed;
 	    public WorldBounds worldBounds;
         public MenuManager.MenuSettings menuSettings;
         public InputManager.InputSettings inputSettings;
         public SoundManager.SoundManagerSettings soundSettings;
+        public PlayManager.PlayManagerSettings playSettings;
+        public ActorManager.ActorSettings actorSettings;
     }
 
     [Serializable]
@@ -56,6 +60,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    static string baseSceneName = "Base";
+    public static bool BaseSceneIsLoaded()
+    {
+        return SceneManager.GetSceneByName(baseSceneName).isLoaded;
+    }
+
     #endregion
 
     public GameOptions settings;
@@ -67,14 +77,21 @@ public class GameManager : MonoBehaviour
         play,
         pause,
         exit
-    } GameState state;
+    } GameState _state;
+    public GameState State {
+        get {
+            return _state;
+        }
+    }
+
+    [SerializeField] GameState initialState = GameState.menu;
 
     public delegate void StateChangeAction(GameState previouseState, GameState newState);
     public event StateChangeAction stateChanged;
     public void SetState(GameState state)
     {
-        GameState oldState = this.state;
-        this.state = state;
+        GameState oldState = _state;
+        _state = state;
 
         StateChangeAction handler = stateChanged;
         if( handler != null ) {
@@ -108,6 +125,8 @@ public class GameManager : MonoBehaviour
         InputManager.Instance.Initialize(settings.inputSettings);
         MenuManager.Instance.Initialize(settings.menuSettings);
         SoundManager.Instance.Initialize(settings.soundSettings);
+        ActorManager.Instance.Initialize(settings.actorSettings);
+        PlayManager.Instance.Initialize(settings.playSettings);
     }
 
     public string GetManagerSceneName()
@@ -120,12 +139,12 @@ public class GameManager : MonoBehaviour
     public struct UpdateData
     {
         public float timeScale;
-        public GameState state;
+        public float deltaTime;
 
-        public UpdateData(float timeScale, GameState state)
+        public UpdateData(float timeScale, float deltaTime)
         {
             this.timeScale = timeScale;
-            this.state = state;
+            this.deltaTime = deltaTime;
         }
     }
     public delegate void UpdateAction(UpdateData data);
@@ -135,11 +154,12 @@ public class GameManager : MonoBehaviour
     {
         UpdateAction handler = updated;
         if( handler != null ) {
-            handler(new UpdateData(1, state));
+            handler(new UpdateData(1, Time.deltaTime));
         }
 
-        if( state == GameState.init ) {
-            SetState(GameState.menu);
+        if( _state == GameState.init ) {
+            activeCamera.Fade(1, 0);
+            SetState(initialState);
         }
     }
 
@@ -148,7 +168,7 @@ public class GameManager : MonoBehaviour
 	{
         UpdateAction handler = fixedUpdated;
         if( handler != null ) {
-            handler(new UpdateData(1, state));
+            handler(new UpdateData(1, Time.fixedDeltaTime));
         }
 	}
 

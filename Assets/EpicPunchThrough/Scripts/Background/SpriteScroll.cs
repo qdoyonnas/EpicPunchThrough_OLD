@@ -58,8 +58,7 @@ public class SpriteScroll : MonoBehaviour
         if( sprites == null || sprites.Length <= 0 ) { Debug.LogError("SpriteScroll not provided a sprite"); return; }
 
 		// Track camera movement by event
-		GameManager.Instance.activeCamera.Moved += CameraMoved;
-		GameManager.Instance.activeCamera.Zoomed += CameraZoomed;
+        HandleSubscriptions(true);
 
 		ConfigureSpriteScaling(sprites[0]);
         CreateTileObjects();
@@ -68,6 +67,20 @@ public class SpriteScroll : MonoBehaviour
         CalcFieldSize();
 		TileField();
 	}
+    private void OnDestroy()
+    {
+        HandleSubscriptions(false);
+    }
+    void HandleSubscriptions(bool state)
+    {
+        if( state ) {
+            GameManager.Instance.activeCamera.Moved += CameraMoved;
+		    GameManager.Instance.activeCamera.Zoomed += CameraZoomed;
+        } else {
+            GameManager.Instance.activeCamera.Moved -= CameraMoved;
+            GameManager.Instance.activeCamera.Zoomed -= CameraZoomed;
+        }
+    }
 
     void ConfigureSpriteScaling(Sprite sprite)
     {

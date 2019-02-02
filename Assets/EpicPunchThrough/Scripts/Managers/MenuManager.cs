@@ -13,8 +13,8 @@ public class MenuManager
     public struct MenuSettings
     {
         public bool useController;
-        public float fadeInDuration;
         public string[] openingMenuNames;
+        public string pauseMenuName;
     }
 
     #endregion
@@ -38,15 +38,14 @@ public class MenuManager
     public MenuSettings settings;
 
     private List<Menu> menues = new List<Menu>();
-    [SerializeField]
-    private EventSystem _eventSystem;
+    [SerializeField] private EventSystem _eventSystem;
     public EventSystem eventSystem {
         get {
             return _eventSystem;
         }
     }
 
-    private string menuSceneName = "Menu";
+    [SerializeField] private string menuSceneName = "Menu";
 
     private bool isInitialized = false;
     public bool Initialize(MenuSettings settings)
@@ -93,38 +92,53 @@ public class MenuManager
 
     void GameStateChanged(GameManager.GameState previousState, GameManager.GameState newState)
     {
+        Menu pauseMenu;
+
+
         switch( newState ) {
             case GameManager.GameState.menu:
-                if( previousState == GameManager.GameState.init ) {
-                    if( !SceneManager.GetSceneByName(menuSceneName).isLoaded ) { SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive); }
+                if( !SceneManager.GetSceneByName(menuSceneName).isLoaded ) { SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive); }
 
-                    GameManager.Instance.activeCamera.Fade(1, 0);
-                    GameManager.Instance.activeCamera.Fade(0, settings.fadeInDuration);
-
-                    GameManager.Instance.activeCamera.EndedFade += (x) => {
-                        foreach( string menuName in settings.openingMenuNames ) {
-                            Menu loadMenu = GetMenu(menuName);
-                            if( loadMenu != null ) {
-                                loadMenu.TransitionIn();
-                            } else {
-                                Debug.LogError("MenuManager could not find '" + menuName + "' menu");
-                            }
+                GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true, () => {
+                    foreach( string menuName in settings.openingMenuNames ) {
+                        Menu loadMenu = GetMenu(menuName);
+                        if( loadMenu != null ) {
+                            loadMenu.TransitionIn();
+                        } else {
+                            Debug.LogError("MenuManager could not find '" + menuName + "' menu");
                         }
-                    };
-                }
+                    }
+                });
+                
                 break;
             case GameManager.GameState.pause:
-                // show pause menu
+                pauseMenu = GetMenu(settings.pauseMenuName);
+                if( pauseMenu != null ) {
+                    pauseMenu.TransitionIn();
+                } else {
+                    Debug.LogError("MenuManager could not find '" + settings.pauseMenuName + "' menu");
+                }
+
                 break;
             default:
-                SceneManager.UnloadSceneAsync(menuSceneName);
+                if( previousState == GameManager.GameState.menu
+                    && SceneManager.GetSceneByName(menuSceneName).isLoaded )
+                { 
+                    GameManager.Instance.activeCamera.Fade(1, 0);
+                    SceneManager.UnloadSceneAsync(menuSceneName);
+                } else if( previousState == GameManager.GameState.pause ) {
+                    pauseMenu = GetMenu(settings.pauseMenuName);
+                    if( pauseMenu != null && pauseMenu.inFocus ) {
+                        pauseMenu.TransitionOut();
+                    }
+                }
                 break;
         }
     }
     
     void DoUpdate(GameManager.UpdateData data)
     {
-        if( data.state != GameManager.GameState.menu && data.state != GameManager.GameState.pause ) { return; }
+        if( GameManager.Instance.State != GameManager.GameState.menu && GameManager.Instance.State != GameManager.GameState.pause ) { return; }
 
         foreach( Menu menu in menues ) {
             menu.DoUpdate(data);

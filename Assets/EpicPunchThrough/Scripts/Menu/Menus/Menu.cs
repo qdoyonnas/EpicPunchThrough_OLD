@@ -171,6 +171,12 @@ public class Menu: MonoBehaviour
         DisplaySelector(false);
     }
 
+    private void OnDestroy()
+    {
+        MenuManager.Instance.UnregisterMenu(this);
+        HandleSubscriptions(false);
+    }
+
     public virtual void DoUpdate(GameManager.UpdateData data)
     {
         if( decorator != null ) { decorator.DoUpdate(data); }

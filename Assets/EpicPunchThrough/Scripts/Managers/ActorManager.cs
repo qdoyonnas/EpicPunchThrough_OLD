@@ -11,8 +11,6 @@ public class ActorManager
     public struct ActorSettings
     {
         public bool useController;
-        public float fadeInDuration;
-        public string[] openingMenuNames;
     }
 
     #endregion
@@ -35,6 +33,7 @@ public class ActorManager
     public ActorSettings settings;
 
     private List<Actor> actors = new List<Actor>();
+    public Actor playerActor;
 
     private bool isInitialized = false;
     public bool Initialize(ActorSettings settings)
@@ -59,9 +58,23 @@ public class ActorManager
         }
     }
 
+    #region Actor Methods
+
+    public void RegisterActor(Actor actor)
+    {
+        actors.Add(actor);
+    }
+
+    public void UnregisterActor(Actor actor)
+    {
+        actors.Remove(actor);
+    }
+
+    #endregion
+
     private void DoUpdate( GameManager.UpdateData data )
     {
-        for( int i = actors.Count; i >= 0; i-- ) {
+        for( int i = actors.Count-1; i >= 0; i-- ) {
             actors[i].DoUpdate(data);
         }
     }

@@ -94,9 +94,11 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\PlayManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStartControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStateControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuChangeControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\ColorControlDecorator.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Selector.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Transitional.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Actors\Actor.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Actors\PlayerActor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\SceneEntrance.cs" />
     <None Include="Assets\Anima2D\Version.txt" />

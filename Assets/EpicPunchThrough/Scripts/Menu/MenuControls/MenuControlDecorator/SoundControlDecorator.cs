@@ -21,6 +21,10 @@ public class SoundControlDecorator : MenuControlDecorator
     {
         source = GetComponent<AudioSource>();
     }
+    private void OnDestroy()
+    {
+        SoundManager.Instance.UnregisterSound(source);
+    }
 
     public override void Focused( Menu menu )
     {

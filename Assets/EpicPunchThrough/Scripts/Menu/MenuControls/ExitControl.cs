@@ -10,6 +10,7 @@ public class ExitControl : MenuControl
 
         if( isDown ) {
             Debug.Log("QUIT");
+            GameManager.Instance.SetState(GameManager.GameState.exit);
             Application.Quit();
 
             return true;

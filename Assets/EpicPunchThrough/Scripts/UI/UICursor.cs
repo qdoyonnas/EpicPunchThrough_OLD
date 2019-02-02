@@ -6,14 +6,33 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public class UICursor : MonoBehaviour
 {
+    public bool hideOnStart = false;
     public bool hideOnMouseControlNotActive = true;
     protected Image image;
 
     private void Awake()
     {
         image = GetComponent<Image>();
-        InputManager.Instance.MouseMovement += UpdatePointer;
-        InputManager.Instance.ActiveControlChanged += OnActiveControlChange;
+        HandleSubscriptions(true);
+
+        if( hideOnStart ) {
+            SetVisibility(0);
+        }
+    }
+    private void OnDestroy()
+    {
+        HandleSubscriptions(false);
+    }
+
+    void HandleSubscriptions(bool state)
+    {
+        if( state ) {
+            InputManager.Instance.MouseMovement += UpdatePointer;
+            InputManager.Instance.ActiveControlChanged += OnActiveControlChange;
+        } else {
+            InputManager.Instance.MouseMovement -= UpdatePointer;
+            InputManager.Instance.ActiveControlChanged -= OnActiveControlChange;
+        }
     }
 
     protected virtual bool UpdatePointer(Vector2 pos, Vector2 delta)
@@ -25,17 +44,20 @@ public class UICursor : MonoBehaviour
     protected virtual void OnActiveControlChange(InputManager.ActiveControlType previouseState, InputManager.ActiveControlType newState)
     {
         if( hideOnMouseControlNotActive ) {
-            Color col = image.color;
-
             if( newState != InputManager.ActiveControlType.Mouse ) {
-                col.a = 0;
+                SetVisibility(0);
             } else {
-                col.a = 1;
+                SetVisibility(1);
             }
-
-            image.color = col;
         }
 
 
+    }
+
+    protected virtual void SetVisibility(float value)
+    {
+        Color col = image.color;
+        col.a = value;
+        image.color = col;
     }
 }

@@ -3,7 +3,8 @@ guid: 0adc37639ffc3564d8800cf4aa85459a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - idleController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

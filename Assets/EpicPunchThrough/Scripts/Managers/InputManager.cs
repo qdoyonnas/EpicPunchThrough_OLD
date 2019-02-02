@@ -10,12 +10,17 @@ public class InputManager
     [Serializable]
     public struct InputSettings
     {
+        [Header("Menu Inputs")]
         public KeyCode[] upKey;
         public KeyCode[] rightKey;
         public KeyCode[] downKey;
         public KeyCode[] leftKey;
         public KeyCode[] confirmKey;
         public KeyCode[] cancelKey;
+        [Header("Player Inputs")]
+        public KeyCode[] attackKey;
+        public KeyCode[] blockKey;
+        public KeyCode[] jumpKey;
         public bool mouseEnabled;
         public float activateMouseThreshold;
     }
@@ -53,8 +58,15 @@ public class InputManager
     public event InputAction RightInput;
     public event InputAction DownInput;
     public event InputAction LeftInput;
+
+    // Menu Inputs
     public event InputAction ConfirmInput;
     public event InputAction CancelInput;
+
+    // Player Inputs
+    public event InputAction AttackInput;
+    public event InputAction BlockInput;
+    public event InputAction JumpInput;
 
     public event MouseAction MouseMovement;
 
@@ -172,6 +184,9 @@ public class InputManager
         CheckKey(settings.leftKey, LeftInput);
         CheckKey(settings.confirmKey, ConfirmInput);
         CheckKey(settings.cancelKey, CancelInput);
+        CheckKey(settings.attackKey, AttackInput);
+        CheckKey(settings.blockKey, BlockInput);
+        CheckKey(settings.jumpKey, JumpInput);
     }
     void ManageMouse()
     {

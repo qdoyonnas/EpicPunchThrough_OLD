@@ -248,6 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings:
+    sceneTransitionFadeDuration: 1
     gravity: 0
     maximumSpeed: 0
     worldBounds:
@@ -261,9 +262,9 @@ MonoBehaviour:
       maxY: 0
     menuSettings:
       useController: 0
-      fadeInDuration: 1
       openingMenuNames:
       - IntroBar
+      pauseMenuName: PauseMenu
     inputSettings:
       upKey: 7700000011010000
       rightKey: 6400000013010000
@@ -271,12 +272,18 @@ MonoBehaviour:
       leftKey: 6100000014010000
       confirmKey: 0d0000002000000043010000
       cancelKey: 1b0000000800000044010000
+      attackKey: 43010000
+      blockKey: 44010000
+      jumpKey: 20000000
       mouseEnabled: 1
       activateMouseThreshold: 10
     soundSettings:
       musicOn: 1
       soundOn: 1
+    actorSettings:
+      useController: 0
   activeCamera: {fileID: 0}
+  initialState: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

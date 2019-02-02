@@ -135,7 +135,8 @@ public class CameraBase : MonoBehaviour
     public event FadeAction StartedFade;
     public event FadeAction UpdatedFade;
     public event FadeAction EndedFade;
-    public void Fade(float value, float duration) // value: 0-1. 0 fade in, 1 fade to black
+    private Tweener fadeTween;
+    public void Fade( float value, float duration, bool doQueue = false, TweenCallback completeCallback = null ) // value: 0-1. 0 fade in, 1 fade to black
     {
         if( screenFade == null ) { return; }
 
@@ -143,12 +144,82 @@ public class CameraBase : MonoBehaviour
             Color c = screenFade.color;
             c.a = value;
             screenFade.color = c;
+
+            if( completeCallback != null ) { completeCallback(); }
         } else {
-            screenFade.DOFade(value, duration).SetEase(Ease.InCubic)
-                .OnStart(() => { StartedFade(screenFade.color.a); })
-                .OnUpdate(() => { UpdatedFade(screenFade.color.a); })
-                .OnComplete(() => { EndedFade(screenFade.color.a); });
+            if( fadeTween != null ) { fadeTween.Kill(true); }
+
+            fadeTween = screenFade.DOFade(value, duration).SetEase(Ease.InCubic)
+                .OnStart(() =>
+                {
+                    FadeAction handler = StartedFade;
+                    if( handler != null ) {
+                        handler(screenFade.color.a);
+                    }
+                })
+                .OnUpdate(() =>
+                {
+                    FadeAction handler = UpdatedFade;
+                    if( handler != null ) {
+                        handler(screenFade.color.a);
+                    }
+                })
+                .OnComplete(() =>
+                {
+                    if( completeCallback != null ) { completeCallback(); }
+                    FadeAction handler = EndedFade;
+                    if( handler != null ) {
+                        handler(screenFade.color.a);
+                    }
+                });
         }
+
+        // XXX: Code was for queuing fade actions. Issue with not being able to
+        //      resolve race conditions
+        #region Oldcode
+        /*
+        if( screenFade == null ) { return; }
+
+        if( doQueue && fadeTween != null ) {
+            TweenCallback callback = fadeTween.onComplete;
+            fadeTween.OnComplete(() => {
+                if( callback != null ) { callback(); }
+                Fade(value, duration, false, completeCallback);
+            });
+        } else {
+            if( fadeTween != null ) { fadeTween.Kill(true); }
+
+            if( duration <= 0 ) {
+                Color c = screenFade.color;
+                c.a = value;
+                screenFade.color = c;
+
+                if( completeCallback != null ) { completeCallback(); }
+            } else {
+                fadeTween = screenFade.DOFade(value, duration).SetEase(Ease.InCubic)
+                    .OnStart(() => {
+                        FadeAction handler = StartedFade;
+                        if( handler != null ) {
+                            handler(screenFade.color.a);
+                        }
+                    })
+                    .OnUpdate(() => {
+                        FadeAction handler = UpdatedFade;
+                        if( handler != null ) {
+                            handler(screenFade.color.a);
+                        }
+                    })
+                    .OnComplete(() => {
+                        if( completeCallback != null ) { completeCallback(); }
+                        FadeAction handler = EndedFade;
+                        if( handler != null ) {
+                            handler(screenFade.color.a);
+                        }
+                    });
+            }
+        }
+        */
+        #endregion
     }
 
 	void Awake()
