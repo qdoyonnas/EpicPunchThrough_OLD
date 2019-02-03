@@ -249,7 +249,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings:
     sceneTransitionFadeDuration: 1
-    gravity: 0
     maximumSpeed: 0
     worldBounds:
       leftBound: 0
@@ -262,8 +261,6 @@ MonoBehaviour:
       maxY: 0
     menuSettings:
       useController: 0
-      openingMenuNames:
-      - IntroBar
       pauseMenuName: PauseMenu
     inputSettings:
       upKey: 7700000011010000
@@ -280,10 +277,16 @@ MonoBehaviour:
     soundSettings:
       musicOn: 1
       soundOn: 1
+    playSettings:
+      groundHeight: 5
     actorSettings:
       useController: 0
+      baseCharacterPrefab: {fileID: 1178119509965772, guid: fe5aad4221830944bb2740a26db35969,
+        type: 2}
+      baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
+        type: 2}
   activeCamera: {fileID: 0}
-  initialState: 1
+  initialState: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,8 +474,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 101d308f8088abe4088394dd3522484d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minimumZoom: 2
-  maximumZoom: 15
+  minimumZoom: 5
+  maximumZoom: 30
   screenFade: {fileID: 864349540}
 --- !u!1 &1299124095
 GameObject:

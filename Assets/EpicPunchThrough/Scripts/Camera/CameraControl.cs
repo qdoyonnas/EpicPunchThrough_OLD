@@ -26,6 +26,10 @@ public class CameraControl : MonoBehaviour
     {
         GameManager.Instance.fixedUpdated -= DoFixedUpdate;
     }
+    private void OnDestroy()
+    {
+        GameManager.Instance.fixedUpdated -= DoFixedUpdate;
+    }
     private void OnEnable()
     {
         FindCamera();

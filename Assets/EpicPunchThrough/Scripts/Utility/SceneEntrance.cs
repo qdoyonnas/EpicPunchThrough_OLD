@@ -9,8 +9,10 @@ public class SceneEntrance : MonoBehaviour
     private void Start()
     {
         if( GameManager.Instance.activeCamera != null ) {
-            GameManager.Instance.activeCamera.Move(transform.position);
             GameManager.Instance.activeCamera.Zoom(cameraSize);
+
+            GameManager.Instance.activeCamera.transform.position = Vector3.zero;
+            GameManager.Instance.activeCamera.Move(transform.position);
         }
     }
 }

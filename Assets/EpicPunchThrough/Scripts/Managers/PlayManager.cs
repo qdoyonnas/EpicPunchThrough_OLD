@@ -11,6 +11,7 @@ public class PlayManager
     [Serializable]
     public struct PlayManagerSettings
     {
+        public float groundHeight;
     }
 
     #endregion
@@ -45,11 +46,13 @@ public class PlayManager
         GameManager.Instance.fixedUpdated -= DoUpdate;
         GameManager.Instance.fixedUpdated += DoUpdate;
 
-        InputManager.Instance.CancelInput -= Pause;
-        InputManager.Instance.CancelInput += Pause;
-
         isInitialized = true;
         return isInitialized;
+    }
+
+    public Scene GetGameScene()
+    {
+        return SceneManager.GetSceneByName(gameSceneName);
     }
 
     bool Pause(bool isDown)
@@ -67,8 +70,19 @@ public class PlayManager
     {
         switch( newState ) {
             case GameManager.GameState.play:
+                InputManager.Instance.CancelInput += Pause;
+
                 if( !SceneManager.GetSceneByName(gameSceneName).isLoaded ) {
                     SceneManager.LoadScene(gameSceneName, LoadSceneMode.Additive);
+
+                    SceneManager.sceneLoaded += SpawnPlayer;
+                } else if( ActorManager.Instance.playerActor == null ) {
+                    SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
+                }
+
+                if( previousState != GameManager.GameState.play 
+                    || previousState != GameManager.GameState.pause )
+                {
                     GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true);
                 }
 
@@ -76,19 +90,36 @@ public class PlayManager
             case GameManager.GameState.pause:
                 // coexist with pause menu
                 // pause all actions
+                InputManager.Instance.CancelInput -= Pause;
+
                 break;
             default:
+                InputManager.Instance.CancelInput -= Pause;
+
                 if( ( previousState == GameManager.GameState.play
                     || previousState == GameManager.GameState.pause )
                     && SceneManager.GetSceneByName(gameSceneName).isLoaded ) 
                 {
                     GameManager.Instance.activeCamera.Fade(1, 0);
                     SceneManager.UnloadSceneAsync(gameSceneName);
+
                 }
                 break;
         }
     }
     
+    void SpawnPlayer(Scene scene, LoadSceneMode mode)
+    {
+        ActorManager.SpawnData spawnData = new ActorManager.SpawnData();
+        spawnData.name = "Player";
+        spawnData.position = new Vector3(0, settings.groundHeight, 0);
+        spawnData.team = 0;
+        spawnData.type = ActorManager.ActorType.player;
+        ActorManager.Instance.SpawnActor(spawnData);
+
+        SceneManager.sceneLoaded -= SpawnPlayer;
+    }
+
     void DoUpdate(GameManager.UpdateData data)
     {
     }

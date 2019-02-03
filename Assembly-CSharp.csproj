@@ -98,7 +98,6 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStartControl.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStateControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuChangeControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\ColorControlDecorator.cs" />
@@ -106,6 +105,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\SelectorControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\SoundControlDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\TooltipControlDecorator.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuSceneLoadControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\TabControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\IntroBar.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\Menu.cs" />

@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
     public struct GameOptions
     {
         public float sceneTransitionFadeDuration;
-	    public float gravity;
 	    public float maximumSpeed;
 	    public WorldBounds worldBounds;
         public MenuManager.MenuSettings menuSettings;

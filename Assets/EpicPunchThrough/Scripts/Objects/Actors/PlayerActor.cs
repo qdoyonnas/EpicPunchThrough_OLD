@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class PlayerActor : Actor
 {
+    public override void Init()
+    {
+        base.Init();
 
+        ActorManager.Instance.playerActor = this;
+    }
 
     // AnimatorController Switching Test
     /* 

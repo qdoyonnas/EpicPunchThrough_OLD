@@ -13,7 +13,6 @@ public class MenuManager
     public struct MenuSettings
     {
         public bool useController;
-        public string[] openingMenuNames;
         public string pauseMenuName;
     }
 
@@ -36,16 +35,18 @@ public class MenuManager
     #endregion
 
     public MenuSettings settings;
+    public string displayMenuNameOnLoad = string.Empty;
+    string defaultDisplayMenu = "IntroBar";
 
-    private List<Menu> menues = new List<Menu>();
-    [SerializeField] private EventSystem _eventSystem;
+    private string menuSceneName = "Menu";
+    private EventSystem _eventSystem;
     public EventSystem eventSystem {
         get {
             return _eventSystem;
         }
     }
 
-    [SerializeField] private string menuSceneName = "Menu";
+    private List<Menu> menues = new List<Menu>();
 
     private bool isInitialized = false;
     public bool Initialize(MenuSettings settings)
@@ -71,6 +72,8 @@ public class MenuManager
         return isInitialized;
     }
 
+    #region Menu Methods
+
     public void RegisterMenu(Menu menu)
     {
         menues.Add(menu);
@@ -90,23 +93,23 @@ public class MenuManager
         return null;
     }
 
+    #endregion
+
     void GameStateChanged(GameManager.GameState previousState, GameManager.GameState newState)
     {
         Menu pauseMenu;
-
 
         switch( newState ) {
             case GameManager.GameState.menu:
                 if( !SceneManager.GetSceneByName(menuSceneName).isLoaded ) { SceneManager.LoadScene(menuSceneName, LoadSceneMode.Additive); }
 
                 GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true, () => {
-                    foreach( string menuName in settings.openingMenuNames ) {
-                        Menu loadMenu = GetMenu(menuName);
-                        if( loadMenu != null ) {
-                            loadMenu.TransitionIn();
-                        } else {
-                            Debug.LogError("MenuManager could not find '" + menuName + "' menu");
-                        }
+                    displayMenuNameOnLoad = displayMenuNameOnLoad.Length > 0 ? displayMenuNameOnLoad : defaultDisplayMenu;
+                    Menu loadMenu = GetMenu(displayMenuNameOnLoad);
+                    if( loadMenu != null ) {
+                        loadMenu.TransitionIn();
+                    } else {
+                        Debug.LogError("MenuManager could not find '" + displayMenuNameOnLoad + "' menu");
                     }
                 });
                 

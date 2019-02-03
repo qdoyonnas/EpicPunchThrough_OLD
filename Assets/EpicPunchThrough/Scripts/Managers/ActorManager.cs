@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ActorManager
 {
@@ -11,6 +12,8 @@ public class ActorManager
     public struct ActorSettings
     {
         public bool useController;
+        public GameObject baseCharacterPrefab;
+        public RuntimeAnimatorController baseCharacterController;
     }
 
     #endregion
@@ -34,6 +37,8 @@ public class ActorManager
 
     private List<Actor> actors = new List<Actor>();
     public Actor playerActor;
+
+    private Transform actorsObject;
 
     private bool isInitialized = false;
     public bool Initialize(ActorSettings settings)
@@ -64,10 +69,59 @@ public class ActorManager
     {
         actors.Add(actor);
     }
-
     public void UnregisterActor(Actor actor)
     {
         actors.Remove(actor);
+    }
+
+    public enum ActorType {
+        player,
+        fighter,
+        boss
+    }
+    public struct SpawnData
+    {
+        public Vector3 position;
+        public string name;
+        public ActorType type;
+        public int team;
+    }
+    public void SpawnActor(SpawnData data)
+    {
+        GetActorsObject();
+
+        GameObject actor = GameObject.Instantiate(settings.baseCharacterPrefab, data.position, Quaternion.identity);
+        actor.transform.parent = actorsObject;
+
+        Actor actorScript;
+        switch( data.type ) {
+            case ActorType.player:
+                actorScript = actor.AddComponent<PlayerActor>();
+                break;
+            default:
+                actorScript = actor.AddComponent<Actor>();
+                break;
+        }
+        actorScript.Init(settings.baseCharacterController, data.team);
+        
+    }
+    public Transform GetActorsObject()
+    {
+        if( actorsObject != null && actorsObject.gameObject.activeInHierarchy ) { return actorsObject; }
+
+        Scene gameScene = PlayManager.Instance.GetGameScene();
+        if( !gameScene.IsValid() || !gameScene.isLoaded ) { Debug.LogError("ActorManager received Spawn request when Game Scene is not loaded"); return null; }
+
+        GameObject[] roots = gameScene.GetRootGameObjects();
+        foreach( GameObject root in roots ) {
+            if( root.name == "Actors" ) {
+                actorsObject = root.transform;
+                return actorsObject;
+            }
+        }
+
+        actorsObject = new GameObject("Actors").transform;
+        return actorsObject;
     }
 
     #endregion
