@@ -14,6 +14,7 @@ public class ActorManager
         public bool useController;
         public GameObject baseCharacterPrefab;
         public RuntimeAnimatorController baseCharacterController;
+        public int actionSequenceLength;
     }
 
     #endregion
@@ -90,20 +91,20 @@ public class ActorManager
     {
         GetActorsObject();
 
-        GameObject actor = GameObject.Instantiate(settings.baseCharacterPrefab, data.position, Quaternion.identity);
-        actor.transform.parent = actorsObject;
+        GameObject actorObject = GameObject.Instantiate(settings.baseCharacterPrefab, data.position, Quaternion.identity);
+        actorObject.transform.parent = actorsObject;
 
-        Actor actorScript;
+        Actor actor;
         switch( data.type ) {
             case ActorType.player:
-                actorScript = actor.AddComponent<PlayerActor>();
+                actor = actorObject.AddComponent<PlayerActor>();
                 break;
             default:
-                actorScript = actor.AddComponent<Actor>();
+                actor = actorObject.AddComponent<Actor>();
                 break;
         }
-        actorScript.Init(settings.baseCharacterController, data.team);
-        
+        actor.Init(settings.baseCharacterController, data.team);
+        TechniqueGenerator.Instance.AddBaseMovementTechniques(actor);
     }
     public Transform GetActorsObject()
     {

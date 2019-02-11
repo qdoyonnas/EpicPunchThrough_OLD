@@ -139,6 +139,18 @@ public class InputManager
 
         return false;
     }
+    public bool IsNoInput()
+    {
+        return  !( GetInput(settings.upKey)
+        || GetInput(settings.rightKey)
+        || GetInput(settings.downKey)
+        || GetInput(settings.leftKey)
+        || GetInput(settings.confirmKey)
+        || GetInput(settings.cancelKey)
+        || GetInput(settings.attackKey)
+        || GetInput(settings.blockKey)
+        || GetInput(settings.jumpKey) );
+    }
 
     public ActiveControlType GetInputType(KeyCode input)
     {

@@ -285,6 +285,7 @@ MonoBehaviour:
         type: 2}
       baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
         type: 2}
+      actionSequenceLength: 0
   activeCamera: {fileID: 0}
   initialState: 2
 --- !u!1 &519420028
