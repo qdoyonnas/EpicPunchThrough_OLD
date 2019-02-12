@@ -249,7 +249,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings:
     sceneTransitionFadeDuration: 1
-    maximumSpeed: 0
     worldBounds:
       leftBound: 0
       rightBound: 0
@@ -286,6 +285,10 @@ MonoBehaviour:
       baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
         type: 2}
       actionSequenceLength: 0
+      autoStopSpeed: 0.01
+      gravity: 0
+      airFriction: 0.0001
+      groundFriction: 0.001
   activeCamera: {fileID: 0}
   initialState: 2
 --- !u!1 &519420028

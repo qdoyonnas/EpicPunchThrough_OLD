@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent( typeof(Animator), typeof(Rigidbody) )]
 public class Actor : MonoBehaviour
 {
+    #region Animation Fields
+
     [SerializeField] protected RuntimeAnimatorController baseController;
 
     protected Animator animator;
@@ -16,14 +18,30 @@ public class Actor : MonoBehaviour
             animator.runtimeAnimatorController = value;
         }
     }
-    protected bool stopAnimationControllerTransition = false;
+    protected bool stopAnimatorControllerTransition = false;
 
-    protected Rigidbody _rigidbody;
-    new public Rigidbody rigidbody {
+    protected string transitionStateName = "ControllerTransition";
+    protected string transitionBool = "transitionController";
+
+    #endregion
+
+    #region Technique Fields
+
+    protected List<Technique> techniques = new List<Technique>();
+
+    protected Technique _activeTechnique;
+    public Technique activeTechnique {
         get {
-            return _rigidbody;
+            return _activeTechnique;
+        }
+        set {
+            _activeTechnique = value;
         }
     }
+
+    #endregion
+
+    #region Actor State Fields
 
     protected int _team = 0;
     public int Team {
@@ -32,17 +50,6 @@ public class Actor : MonoBehaviour
         }
         set {
             _team = value;
-        }
-    }
-
-    protected List<Technique> techniques = new List<Technique>();
-    protected Technique _activeTechnique;
-    public Technique activeTechnique {
-        get {
-            return _activeTechnique;
-        }
-        set {
-            _activeTechnique = value;
         }
     }
 
@@ -65,10 +72,21 @@ public class Actor : MonoBehaviour
         Stunned,
         Launched
     }
-    protected State _state = State.Grounded;
+    protected State _state;
     public State state {
         get {
             return _state;
+        }
+        set {
+            _state = value;
+            switch( value ) {
+                case State.Grounded:
+                    friction = ActorManager.Instance.settings.groundFriction;
+                    break;
+                case State.InAir:
+                    friction = ActorManager.Instance.settings.airFriction;
+                    break;
+            }
         }
     }
 
@@ -85,6 +103,21 @@ public class Actor : MonoBehaviour
         Clash
     }
     protected List<Action> actions = new List<Action>();
+
+    #endregion
+
+    #region Physics Fields
+
+    public float friction = 0f;
+
+    protected Rigidbody _rigidbody;
+    new public Rigidbody rigidbody {
+        get {
+            return _rigidbody;
+        }
+    }
+
+    #endregion
 
     protected bool didInit = false;
     private void Start()
@@ -107,6 +140,7 @@ public class Actor : MonoBehaviour
         AnimatorController = baseController;
 
         _rigidbody = GetComponent<Rigidbody>();
+        state = State.Grounded;
 
         ActorManager.Instance.RegisterActor(this);
 
@@ -115,20 +149,51 @@ public class Actor : MonoBehaviour
 
     public virtual void DoUpdate(GameManager.UpdateData data)
     {
+        if( animator.GetBool(transitionBool) ) {
+            TransitionTechnique(activeTechnique);
+        }
+
         if( activeTechnique != null ) {
             activeTechnique.Update(data);
+        } else {
+            HandlePhysics();
+        }
+    }
+
+    public virtual void HandlePhysics()
+    {
+        if( friction > 0 ) {
+            rigidbody.velocity = rigidbody.velocity * friction;
+            if( rigidbody.velocity.magnitude < ActorManager.Instance.settings.autoStopSpeed ) {
+                rigidbody.velocity = Vector3.zero;
+            }
         }
     }
 
     #region Technique Methods
 
-    public virtual void AddTechnique(Technique technique)
+    public virtual void AddTechnique( Technique technique )
     {
         techniques.Add(technique);
     }
-    public virtual void RemoveTechnique(Technique technique)
+    public virtual void RemoveTechnique( Technique technique )
     {
         techniques.Remove(technique);
+    }
+
+    public virtual void  TransitionTechnique( Technique technique = null, bool blend = true )
+    {
+        activeTechnique = technique;
+        if( blend && !animator.GetCurrentAnimatorStateInfo(0).IsName(transitionStateName) ) {
+            animator.SetBool(transitionBool, true);
+            return;
+        }
+
+        if( technique == null ) {
+            AnimatorController = baseController;
+        } else {
+            AnimatorController = technique.animatorController;
+        }
     }
 
     #endregion

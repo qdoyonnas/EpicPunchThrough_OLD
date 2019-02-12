@@ -5,7 +5,12 @@ using UnityEngine;
 public class Technique
 {
     protected Actor owner;
-    protected RuntimeAnimatorController animController;
+    protected RuntimeAnimatorController _animatorController;
+    public RuntimeAnimatorController animatorController {
+        get {
+            return _animatorController;
+        }
+    }
 
     public struct TechTrigger {
         public Actor.State state;
@@ -33,6 +38,7 @@ public class Technique
 
         this.owner = owner;
         techTrigger = techTrgr;
+        _animatorController = animCtrl;
 
         this.triggerStrategy = triggerStrategy;
         this.validateStrategy = validateStrategy;
@@ -60,14 +66,15 @@ public class Technique
     }
     public virtual void OnTrigger()
     {
-        if( !( owner.state == techTrigger.state 
+        if( !( owner.activeTechnique != null
+            || owner.state == techTrigger.state 
             || techTrigger.state == Actor.State.Any ) ) 
         { return; }
 
         // Check action sequence
 
         if( !triggerStrategy.Trigger(owner) ) { return; }
-        owner.activeTechnique = this;
+        owner.TransitionTechnique(this, false);
     }
 
     #endregion

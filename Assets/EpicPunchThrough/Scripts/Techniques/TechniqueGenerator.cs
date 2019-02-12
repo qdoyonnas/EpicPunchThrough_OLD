@@ -19,11 +19,11 @@ public class TechniqueGenerator
 
     #endregion
 
-    public string animationControllerFolderPath = "AnimationControllers/";
-    public string baseAnimationControllerPath = "Base/BaseCharacter";
+    public string animatorControllerFolderPath = "AnimatorControllers/";
+    public string baseAnimatorControllerPath = "Base/BaseCharacter";
 
     public struct TechniqueOptions {
-        public string animationControllerPath;
+        public string animatorControllerPath;
 
         public Actor.State state;
         public List<Actor.Action> actions;
@@ -34,7 +34,7 @@ public class TechniqueGenerator
     }
     public void GenerateTechnique( Actor actor, TechniqueOptions options )
     {
-        RuntimeAnimatorController animController = RetrieveAnimatorController(options.animationControllerPath);
+        RuntimeAnimatorController animController = RetrieveAnimatorController(options.animatorControllerPath);
         if( animController == null ) {
             return;
         }
@@ -55,9 +55,9 @@ public class TechniqueGenerator
     {
         string controllerPath;
         if( path == null || path == string.Empty ) {
-            controllerPath = animationControllerFolderPath + baseAnimationControllerPath;
+            controllerPath = animatorControllerFolderPath + baseAnimatorControllerPath;
         } else {
-            controllerPath = animationControllerFolderPath + path;
+            controllerPath = animatorControllerFolderPath + path;
         }
         RuntimeAnimatorController controller = Resources.Load<RuntimeAnimatorController>(controllerPath);
         if( controller == null ) {
@@ -86,16 +86,18 @@ public class TechniqueGenerator
     public void AddBaseMovementTechniques(Actor actor)
     {
         TechniqueOptions options = new TechniqueOptions();
+        options.animatorControllerPath = "Base/BasicMove";
         options.state = Actor.State.Grounded;
         options.actions = new List<Actor.Action>();
         options.actions.Add(Actor.Action.MoveForward);
-        options.updateStrategy = new RunForwardUpdate(3f);
+        options.updateStrategy = new RunForwardUpdate(10f, 6f);
+        options.validateStrategy = new EndTechValidate(new EndTechValidate.ActionState(Actor.Action.MoveForward, false));
 
         GenerateTechnique( actor, options );
 
         options.actions.Clear();
         options.actions.Add(Actor.Action.MoveBack);
-        options.updateStrategy = null;
+        options.triggerStrategy = new FlipDirectionTrigger();
 
         GenerateTechnique( actor, options );
     }

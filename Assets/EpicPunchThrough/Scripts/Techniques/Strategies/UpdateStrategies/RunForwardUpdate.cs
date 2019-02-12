@@ -4,21 +4,26 @@ using UnityEngine;
 
 public class RunForwardUpdate : UpdateStrategy
 {
-    float speed;
+    float maxSpeed;
+    float acceleration;
 
-    public RunForwardUpdate(float speed)
+    public RunForwardUpdate(float maxSpeed, float acceleration)
     {
-        this.speed = speed;
+        this.maxSpeed = maxSpeed;
+        this.acceleration = acceleration;
     }
 
     public void Update( Actor actor, GameManager.UpdateData data )
     {
-        Debug.Log("IN RunForwardUpdate.Update");
+        if( actor.rigidbody.velocity.magnitude > maxSpeed ) {
+             return;
+        }
 
+        Vector3 velDelta = Vector3.right * (acceleration * Time.fixedDeltaTime);
         if( actor.isFacingRight ) {
-            actor.rigidbody.velocity = new Vector3(speed, 0, 0);
+            actor.rigidbody.velocity += velDelta;
         } else {
-            actor.rigidbody.velocity = new Vector3(-speed, 0, 0);
+            actor.rigidbody.velocity -= velDelta;
         }
     }
 }

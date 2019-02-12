@@ -398,7 +398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuItems:
   - row:
-    - {fileID: 1686780757}
+    - {fileID: 1686780756}
   - row:
     - {fileID: 1128694490}
   - row:
@@ -1110,7 +1110,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1242291407
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1142,6 +1142,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hideOnStart: 1
   hideOnMouseControlNotActive: 1
+  onlyActiveOnState: 1
+  activeOnState: 3
 --- !u!114 &1242291409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1419,8 +1421,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1686780753}
   - component: {fileID: 1686780760}
+  - component: {fileID: 1686780756}
   - component: {fileID: 1686780759}
-  - component: {fileID: 1686780757}
   - component: {fileID: 1686780758}
   - component: {fileID: 1686780755}
   - component: {fileID: 1686780754}
@@ -1566,7 +1568,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1686780757
+--- !u!114 &1686780756
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1574,10 +1576,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1686780752}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2db837d8bdc91b04da29b0618b6e8d70, type: 3}
+  m_Script: {fileID: 11500000, guid: d53bf30fb39dbfe4d9d172d43daf9023, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayMenuNameOnLoad: Fight
+  state: 2
 --- !u!114 &1686780758
 MonoBehaviour:
   m_ObjectHideFlags: 0

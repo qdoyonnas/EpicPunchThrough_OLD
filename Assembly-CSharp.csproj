@@ -98,6 +98,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStartControl.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStateControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuChangeControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\MenuControlDecorator\ColorControlDecorator.cs" />
@@ -117,7 +118,9 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Actors\Actor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Actors\PlayerActor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\Strategies.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\TriggerStrategies\FlipDirectionTrigger.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\RunForwardUpdate.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ValidateStrategies\EndTechValidate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Technique.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\TechniqueGenerator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />

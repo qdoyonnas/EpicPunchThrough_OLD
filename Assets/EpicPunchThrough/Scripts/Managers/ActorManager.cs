@@ -11,10 +11,18 @@ public class ActorManager
     [Serializable]
     public struct ActorSettings
     {
+
+        [Header("Animator Controllers")]
         public bool useController;
         public GameObject baseCharacterPrefab;
         public RuntimeAnimatorController baseCharacterController;
         public int actionSequenceLength;
+
+        [Header("Physic Settings")]
+        public float autoStopSpeed;
+        public float gravity;
+        public float airFriction;
+        public float groundFriction;
     }
 
     #endregion
