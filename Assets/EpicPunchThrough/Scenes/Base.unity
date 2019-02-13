@@ -278,17 +278,17 @@ MonoBehaviour:
       soundOn: 1
     playSettings:
       groundHeight: 5
-    actorSettings:
+    agentSettings:
       useController: 0
       baseCharacterPrefab: {fileID: 1178119509965772, guid: fe5aad4221830944bb2740a26db35969,
         type: 2}
       baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
         type: 2}
-      actionSequenceLength: 0
+      actionSequenceLength: 10
       autoStopSpeed: 0.01
       gravity: 0
-      airFriction: 0.0001
-      groundFriction: 0.001
+      airFriction: 0.001
+      groundFriction: 0.07
   activeCamera: {fileID: 0}
   initialState: 2
 --- !u!1 &519420028

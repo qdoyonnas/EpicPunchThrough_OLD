@@ -75,9 +75,9 @@ public class PlayManager
                 if( !SceneManager.GetSceneByName(gameSceneName).isLoaded ) {
                     SceneManager.LoadScene(gameSceneName, LoadSceneMode.Additive);
 
-                    SceneManager.sceneLoaded += SpawnPlayer;
-                } else if( ActorManager.Instance.playerActor == null ) {
-                    SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
+                    SceneManager.sceneLoaded += SetupPlay;
+                } else if( AgentManager.Instance.playerAgent == null ) {
+                    SetupPlay(GetGameScene(), LoadSceneMode.Additive);
                 }
 
                 if( previousState != GameManager.GameState.play 
@@ -107,15 +107,18 @@ public class PlayManager
                 break;
         }
     }
-    
+    void SetupPlay(Scene scene, LoadSceneMode mode)
+    {
+        SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
+    }
     void SpawnPlayer(Scene scene, LoadSceneMode mode)
     {
-        ActorManager.SpawnData spawnData = new ActorManager.SpawnData();
+        AgentManager.SpawnData spawnData = new AgentManager.SpawnData();
         spawnData.name = "Player";
         spawnData.position = new Vector3(0, settings.groundHeight, 0);
         spawnData.team = 0;
-        spawnData.type = ActorManager.ActorType.player;
-        ActorManager.Instance.SpawnActor(spawnData);
+        spawnData.type = AgentManager.AgentType.player;
+        AgentManager.Instance.SpawnAgent(spawnData);
 
         SceneManager.sceneLoaded -= SpawnPlayer;
     }

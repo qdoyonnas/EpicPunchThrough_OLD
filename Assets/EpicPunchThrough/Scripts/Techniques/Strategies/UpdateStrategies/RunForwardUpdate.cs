@@ -13,17 +13,17 @@ public class RunForwardUpdate : UpdateStrategy
         this.acceleration = acceleration;
     }
 
-    public void Update( Actor actor, GameManager.UpdateData data )
+    public void Update( Agent agent, GameManager.UpdateData data )
     {
-        if( actor.rigidbody.velocity.magnitude > maxSpeed ) {
+        if( agent.rigidbody.velocity.magnitude > maxSpeed ) {
              return;
         }
 
         Vector3 velDelta = Vector3.right * (acceleration * Time.fixedDeltaTime);
-        if( actor.isFacingRight ) {
-            actor.rigidbody.velocity += velDelta;
+        if( agent.isFacingRight ) {
+            agent.rigidbody.velocity += velDelta;
         } else {
-            actor.rigidbody.velocity -= velDelta;
+            agent.rigidbody.velocity -= velDelta;
         }
     }
 }

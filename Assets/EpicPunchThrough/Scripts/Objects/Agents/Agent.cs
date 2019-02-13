@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent( typeof(Animator), typeof(Rigidbody) )]
-public class Actor : MonoBehaviour
+public class Agent : MonoBehaviour
 {
     #region Animation Fields
 
@@ -41,7 +41,7 @@ public class Actor : MonoBehaviour
 
     #endregion
 
-    #region Actor State Fields
+    #region Agent State Fields
 
     protected int _team = 0;
     public int Team {
@@ -65,7 +65,7 @@ public class Actor : MonoBehaviour
     }
 
     public enum State {
-        Any, // For technique triggers only - Actors should never be in this state
+        Any, // For technique triggers only - Agents should never be in this state
         Grounded,
         InAir,
         Flinched,
@@ -81,10 +81,10 @@ public class Actor : MonoBehaviour
             _state = value;
             switch( value ) {
                 case State.Grounded:
-                    friction = ActorManager.Instance.settings.groundFriction;
+                    friction = AgentManager.Instance.settings.groundFriction;
                     break;
                 case State.InAir:
-                    friction = ActorManager.Instance.settings.airFriction;
+                    friction = AgentManager.Instance.settings.airFriction;
                     break;
             }
         }
@@ -142,7 +142,7 @@ public class Actor : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         state = State.Grounded;
 
-        ActorManager.Instance.RegisterActor(this);
+        AgentManager.Instance.RegisterAgent(this);
 
         didInit = true;
     }
@@ -163,8 +163,8 @@ public class Actor : MonoBehaviour
     public virtual void HandlePhysics()
     {
         if( friction > 0 ) {
-            rigidbody.velocity = rigidbody.velocity * friction;
-            if( rigidbody.velocity.magnitude < ActorManager.Instance.settings.autoStopSpeed ) {
+            rigidbody.velocity = rigidbody.velocity * (1 - friction);
+            if( rigidbody.velocity.magnitude < AgentManager.Instance.settings.autoStopSpeed ) {
                 rigidbody.velocity = Vector3.zero;
             }
         }
@@ -268,7 +268,7 @@ public class Actor : MonoBehaviour
 
         if( state ) {
             actions.Add(action);
-            if( actions.Count > ActorManager.Instance.settings.actionSequenceLength ) {
+            if( actions.Count > AgentManager.Instance.settings.actionSequenceLength ) {
                 actions.RemoveAt(0);
             }
         }

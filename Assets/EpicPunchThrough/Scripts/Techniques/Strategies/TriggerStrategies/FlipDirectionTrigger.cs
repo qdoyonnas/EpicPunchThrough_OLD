@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class FlipDirectionTrigger : TriggerStrategy
 {
-    public bool Trigger( Actor actor )
+    public bool Trigger( Agent agent )
     {
-        actor.isFacingRight = !actor.isFacingRight;
+        agent.isFacingRight = !agent.isFacingRight;
 
         return true;
     }

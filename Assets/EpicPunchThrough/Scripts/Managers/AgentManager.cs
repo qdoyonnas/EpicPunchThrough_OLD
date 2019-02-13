@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ActorManager
+public class AgentManager
 {
     #region Settings
 
     [Serializable]
-    public struct ActorSettings
+    public struct AgentSettings
     {
 
         [Header("Animator Controllers")]
@@ -29,28 +29,28 @@ public class ActorManager
 
     #region Static
 
-    private static ActorManager instance;
-    public static ActorManager Instance
+    private static AgentManager instance;
+    public static AgentManager Instance
     {
         get {
             if( instance == null ) {
-                instance = new ActorManager();
-                instance.Initialize(new ActorSettings());
+                instance = new AgentManager();
+                instance.Initialize(new AgentSettings());
             }
             return instance;
         }
     }
 
     #endregion
-    public ActorSettings settings;
+    public AgentSettings settings;
 
-    private List<Actor> actors = new List<Actor>();
-    public Actor playerActor;
+    private List<Agent> agents = new List<Agent>();
+    public Agent playerAgent;
 
-    private Transform actorsObject;
+    private Transform agentsObject;
 
     private bool isInitialized = false;
-    public bool Initialize(ActorSettings settings)
+    public bool Initialize(AgentSettings settings)
     {
         this.settings = settings;
 
@@ -72,18 +72,18 @@ public class ActorManager
         }
     }
 
-    #region Actor Methods
+    #region Agent Methods
 
-    public void RegisterActor(Actor actor)
+    public void RegisterAgent(Agent agent)
     {
-        actors.Add(actor);
+        agents.Add(agent);
     }
-    public void UnregisterActor(Actor actor)
+    public void UnregisterAgent(Agent agent)
     {
-        actors.Remove(actor);
+        agents.Remove(agent);
     }
 
-    public enum ActorType {
+    public enum AgentType {
         player,
         fighter,
         boss
@@ -92,53 +92,53 @@ public class ActorManager
     {
         public Vector3 position;
         public string name;
-        public ActorType type;
+        public AgentType type;
         public int team;
     }
-    public void SpawnActor(SpawnData data)
+    public void SpawnAgent(SpawnData data)
     {
-        GetActorsObject();
+        GetAgentsObject();
 
-        GameObject actorObject = GameObject.Instantiate(settings.baseCharacterPrefab, data.position, Quaternion.identity);
-        actorObject.transform.parent = actorsObject;
+        GameObject agentObject = GameObject.Instantiate(settings.baseCharacterPrefab, data.position, Quaternion.identity);
+        agentObject.transform.parent = agentsObject;
 
-        Actor actor;
+        Agent agent;
         switch( data.type ) {
-            case ActorType.player:
-                actor = actorObject.AddComponent<PlayerActor>();
+            case AgentType.player:
+                agent = agentObject.AddComponent<PlayerAgent>();
                 break;
             default:
-                actor = actorObject.AddComponent<Actor>();
+                agent = agentObject.AddComponent<Agent>();
                 break;
         }
-        actor.Init(settings.baseCharacterController, data.team);
-        TechniqueGenerator.Instance.AddBaseMovementTechniques(actor);
+        agent.Init(settings.baseCharacterController, data.team);
+        TechniqueGenerator.Instance.AddBaseMovementTechniques(agent);
     }
-    public Transform GetActorsObject()
+    public Transform GetAgentsObject()
     {
-        if( actorsObject != null && actorsObject.gameObject.activeInHierarchy ) { return actorsObject; }
+        if( agentsObject != null && agentsObject.gameObject.activeInHierarchy ) { return agentsObject; }
 
         Scene gameScene = PlayManager.Instance.GetGameScene();
-        if( !gameScene.IsValid() || !gameScene.isLoaded ) { Debug.LogError("ActorManager received Spawn request when Game Scene is not loaded"); return null; }
+        if( !gameScene.IsValid() || !gameScene.isLoaded ) { Debug.LogError("AgentManager received Spawn request when Game Scene is not loaded"); return null; }
 
         GameObject[] roots = gameScene.GetRootGameObjects();
         foreach( GameObject root in roots ) {
-            if( root.name == "Actors" ) {
-                actorsObject = root.transform;
-                return actorsObject;
+            if( root.name == "Agents" ) {
+                agentsObject = root.transform;
+                return agentsObject;
             }
         }
 
-        actorsObject = new GameObject("Actors").transform;
-        return actorsObject;
+        agentsObject = new GameObject("Agents").transform;
+        return agentsObject;
     }
 
     #endregion
 
     private void DoUpdate( GameManager.UpdateData data )
     {
-        for( int i = actors.Count-1; i >= 0; i-- ) {
-            actors[i].DoUpdate(data);
+        for( int i = agents.Count-1; i >= 0; i-- ) {
+            agents[i].DoUpdate(data);
         }
     }
 }

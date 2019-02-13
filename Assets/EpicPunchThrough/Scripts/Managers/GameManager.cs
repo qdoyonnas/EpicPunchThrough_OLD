@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
         public InputManager.InputSettings inputSettings;
         public SoundManager.SoundManagerSettings soundSettings;
         public PlayManager.PlayManagerSettings playSettings;
-        public ActorManager.ActorSettings actorSettings;
+        public AgentManager.AgentSettings agentSettings;
     }
 
     [Serializable]
@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
         InputManager.Instance.Initialize(settings.inputSettings);
         MenuManager.Instance.Initialize(settings.menuSettings);
         SoundManager.Instance.Initialize(settings.soundSettings);
-        ActorManager.Instance.Initialize(settings.actorSettings);
+        AgentManager.Instance.Initialize(settings.agentSettings);
         PlayManager.Instance.Initialize(settings.playSettings);
     }
 

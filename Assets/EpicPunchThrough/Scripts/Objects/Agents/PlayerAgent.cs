@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerActor : Actor
+public class PlayerAgent : Agent
 {
     public override void Init()
     {
         base.Init();
 
-        ActorManager.Instance.playerActor = this;
+        AgentManager.Instance.playerAgent = this;
 
         HandleSubscriptions(true);
     }
@@ -69,7 +69,7 @@ public class PlayerActor : Actor
         InputManager.Instance.BlockInput += BattleStance;
         InputManager.Instance.AttackInput += BasicAttack;
 
-        ActorManager.Instance.playerActor = this;
+        AgentManager.Instance.playerAgent = this;
     }
 
     public override void DoUpdate( GameManager.UpdateData data )

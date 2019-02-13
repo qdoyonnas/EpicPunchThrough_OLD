@@ -25,14 +25,14 @@ public class TechniqueGenerator
     public struct TechniqueOptions {
         public string animatorControllerPath;
 
-        public Actor.State state;
-        public List<Actor.Action> actions;
+        public Agent.State state;
+        public List<Agent.Action> actions;
 
         public TriggerStrategy triggerStrategy;
         public ValidateStrategy validateStrategy;
         public UpdateStrategy updateStrategy;
     }
-    public void GenerateTechnique( Actor actor, TechniqueOptions options )
+    public void GenerateTechnique( Agent agent, TechniqueOptions options )
     {
         RuntimeAnimatorController animController = RetrieveAnimatorController(options.animatorControllerPath);
         if( animController == null ) {
@@ -44,9 +44,9 @@ public class TechniqueGenerator
         ValidateStrategy validateStrategy = options.validateStrategy == null ? new NoValidate() : options.validateStrategy;
         UpdateStrategy updateStrategy = options.updateStrategy == null ? new NoUpdate() : options.updateStrategy;
 
-        Technique tech = new Technique(actor, animController, techTrigger, 
+        Technique tech = new Technique(agent, animController, techTrigger, 
                                 triggerStrategy, validateStrategy, updateStrategy);
-        actor.AddTechnique(tech);
+        agent.AddTechnique(tech);
     }
 
     #region Generator Helper Functions
@@ -72,9 +72,9 @@ public class TechniqueGenerator
         Technique.TechTrigger techTrigger = new Technique.TechTrigger(options.state);
         if( options.actions == null || options.actions.Count == 0 ) {
             Debug.LogError("Technique generated with no trigger actions. Probably undersired behaviour.");
-            techTrigger.sequence.Add(Actor.Action.AttackForward);
+            techTrigger.sequence.Add(Agent.Action.AttackForward);
         } else {
-            techTrigger.sequence = new List<Actor.Action>(options.actions);
+            techTrigger.sequence = new List<Agent.Action>(options.actions);
         }
 
 
@@ -83,22 +83,22 @@ public class TechniqueGenerator
 
     #endregion
 
-    public void AddBaseMovementTechniques(Actor actor)
+    public void AddBaseMovementTechniques(Agent agent)
     {
         TechniqueOptions options = new TechniqueOptions();
         options.animatorControllerPath = "Base/BasicMove";
-        options.state = Actor.State.Grounded;
-        options.actions = new List<Actor.Action>();
-        options.actions.Add(Actor.Action.MoveForward);
+        options.state = Agent.State.Grounded;
+        options.actions = new List<Agent.Action>();
+        options.actions.Add(Agent.Action.MoveForward);
         options.updateStrategy = new RunForwardUpdate(10f, 6f);
-        options.validateStrategy = new EndTechValidate(new EndTechValidate.ActionState(Actor.Action.MoveForward, false));
+        options.validateStrategy = new EndTechValidate(new EndTechValidate.ActionState(Agent.Action.MoveForward, false));
 
-        GenerateTechnique( actor, options );
+        GenerateTechnique( agent, options );
 
         options.actions.Clear();
-        options.actions.Add(Actor.Action.MoveBack);
+        options.actions.Add(Agent.Action.MoveBack);
         options.triggerStrategy = new FlipDirectionTrigger();
 
-        GenerateTechnique( actor, options );
+        GenerateTechnique( agent, options );
     }
 }

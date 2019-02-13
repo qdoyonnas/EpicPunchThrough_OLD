@@ -5,10 +5,10 @@ using UnityEngine;
 public class EndTechValidate : ValidateStrategy
 {
     public struct ActionState {
-        public Actor.Action action;
+        public Agent.Action action;
         public bool state;
 
-        public ActionState(Actor.Action action, bool state)
+        public ActionState(Agent.Action action, bool state)
         {
             this.action = action;
             this.state = state;
@@ -22,11 +22,11 @@ public class EndTechValidate : ValidateStrategy
         this.actionStates = actionStates;
     }
 
-    public bool Validate( Actor actor, Actor.Action action, bool state )
+    public bool Validate( Agent agent, Agent.Action action, bool state )
     {
         foreach( ActionState actionState in actionStates ) {
             if( actionState.action == action && actionState.state == state  ) {
-                actor.TransitionTechnique(null, true);
+                agent.TransitionTechnique(null, true);
                 return true;
             }
         }

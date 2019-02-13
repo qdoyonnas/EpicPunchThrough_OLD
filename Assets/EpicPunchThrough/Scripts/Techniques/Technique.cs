@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Technique
 {
-    protected Actor owner;
+    protected Agent owner;
     protected RuntimeAnimatorController _animatorController;
     public RuntimeAnimatorController animatorController {
         get {
@@ -13,13 +13,13 @@ public class Technique
     }
 
     public struct TechTrigger {
-        public Actor.State state;
-        public List<Actor.Action> sequence;
+        public Agent.State state;
+        public List<Agent.Action> sequence;
 
-        public TechTrigger(Actor.State state)
+        public TechTrigger(Agent.State state)
         {
             this.state = state;
-            sequence = new List<Actor.Action>();
+            sequence = new List<Agent.Action>();
         }
     }
     protected TechTrigger techTrigger;
@@ -28,7 +28,7 @@ public class Technique
     protected ValidateStrategy validateStrategy;
     protected UpdateStrategy updateStrategy;
 
-    public Technique( Actor owner, RuntimeAnimatorController animCtrl, TechTrigger techTrgr, 
+    public Technique( Agent owner, RuntimeAnimatorController animCtrl, TechTrigger techTrgr, 
         TriggerStrategy triggerStrategy, ValidateStrategy validateStrategy, UpdateStrategy updateStrategy )
     {
         if( owner == null || animCtrl == null ) { 
@@ -55,7 +55,7 @@ public class Technique
     /// </summary>
     /// <param name="action">The action in question</param>
     /// <returns>Boolean indicating whether the action is allowed during the technique</returns>
-    public virtual bool ValidateAction(Actor.Action action, bool state)
+    public virtual bool ValidateAction(Agent.Action action, bool state)
     {
         return validateStrategy.Validate(owner, action, state);
     }
@@ -68,7 +68,7 @@ public class Technique
     {
         if( !( owner.activeTechnique != null
             || owner.state == techTrigger.state 
-            || techTrigger.state == Actor.State.Any ) ) 
+            || techTrigger.state == Agent.State.Any ) ) 
         { return; }
 
         // Check action sequence
