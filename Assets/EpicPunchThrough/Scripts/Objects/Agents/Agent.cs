@@ -102,7 +102,7 @@ public class Agent : MonoBehaviour
         Dash,
         Clash
     }
-    protected List<Action> actions = new List<Action>();
+    [SerializeField] protected List<Action> actions = new List<Action>();
 
     #endregion
 
@@ -150,7 +150,7 @@ public class Agent : MonoBehaviour
     public virtual void DoUpdate(GameManager.UpdateData data)
     {
         if( animator.GetBool(transitionBool) ) {
-            TransitionTechnique(activeTechnique);
+            TransitionTechnique(activeTechnique, false);
         }
 
         if( activeTechnique != null ) {
@@ -191,8 +191,10 @@ public class Agent : MonoBehaviour
 
         if( technique == null ) {
             AnimatorController = baseController;
+            animator.SetBool(transitionBool, false);
         } else {
             AnimatorController = technique.animatorController;
+            animator.SetBool(transitionBool, false);
         }
     }
 

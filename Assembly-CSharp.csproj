@@ -84,13 +84,15 @@
     <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUI.cs" />
     <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
     <Compile Include="Assets\Demigiant\DOTween\Modules\DOTweenModuleUtils.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Background\SpriteScroll.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\CameraBase.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\CameraControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\FollowCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\MotionCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\SpectatorCamera.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Environment\Environment.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Environment\SpriteScroll.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\AgentManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\EnvironmentManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />

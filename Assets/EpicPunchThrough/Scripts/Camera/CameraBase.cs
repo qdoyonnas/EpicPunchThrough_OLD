@@ -65,32 +65,32 @@ public class CameraBase : MonoBehaviour
     }
     protected void CheckWorldBounds()
 	{
-		if( GameManager.Instance.settings.worldBounds.leftBound ) {
-			if( cameraLeft < GameManager.Instance.settings.worldBounds.minX ) {
-				transform.position = new Vector3(GameManager.Instance.settings.worldBounds.minX + cameraSize.x,
+		if( GameManager.Instance.settings.cameraBounds.leftBound ) {
+			if( cameraLeft < GameManager.Instance.settings.cameraBounds.minX ) {
+				transform.position = new Vector3(GameManager.Instance.settings.cameraBounds.minX + cameraSize.x,
 												transform.position.y,
 												transform.position.z);
 			}
 		}
-		if( GameManager.Instance.settings.worldBounds.rightBound ) {
-			if( cameraRight > GameManager.Instance.settings.worldBounds.maxX ) {
-				transform.position = new Vector3(GameManager.Instance.settings.worldBounds.maxX - cameraSize.x,
+		if( GameManager.Instance.settings.cameraBounds.rightBound ) {
+			if( cameraRight > GameManager.Instance.settings.cameraBounds.maxX ) {
+				transform.position = new Vector3(GameManager.Instance.settings.cameraBounds.maxX - cameraSize.x,
 												transform.position.y,
 												transform.position.z);
 			}
 		}
 
-		if( GameManager.Instance.settings.worldBounds.topBound ) {
-			if( cameraTop > GameManager.Instance.settings.worldBounds.maxY ) {
+		if( GameManager.Instance.settings.cameraBounds.topBound ) {
+			if( cameraTop > GameManager.Instance.settings.cameraBounds.maxY ) {
 				transform.position = new Vector3(transform.position.x,
-												GameManager.Instance.settings.worldBounds.maxY - cameraSize.y,
+												GameManager.Instance.settings.cameraBounds.maxY - cameraSize.y,
 												transform.position.z);
 			}
 		}
-		if( GameManager.Instance.settings.worldBounds.bottombound ) {
-			if( cameraBottom < GameManager.Instance.settings.worldBounds.minY ) {
+		if( GameManager.Instance.settings.cameraBounds.bottombound ) {
+			if( cameraBottom < GameManager.Instance.settings.cameraBounds.minY ) {
 				transform.position = new Vector3(transform.position.x,
-												GameManager.Instance.settings.worldBounds.minY + cameraSize.y,
+												GameManager.Instance.settings.cameraBounds.minY + cameraSize.y,
 												transform.position.z);
 			}
 		}

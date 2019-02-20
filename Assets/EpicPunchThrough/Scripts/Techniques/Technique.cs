@@ -66,9 +66,9 @@ public class Technique
     }
     public virtual void OnTrigger()
     {
-        if( !( owner.activeTechnique != null
-            || owner.state == techTrigger.state 
-            || techTrigger.state == Agent.State.Any ) ) 
+        if( owner.activeTechnique != null
+            || ( techTrigger.state != Agent.State.Any 
+                && owner.state != techTrigger.state ) ) 
         { return; }
 
         // Check action sequence

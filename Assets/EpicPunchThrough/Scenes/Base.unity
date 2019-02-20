@@ -249,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings:
     sceneTransitionFadeDuration: 1
-    worldBounds:
+    cameraBounds:
       leftBound: 0
       rightBound: 0
       topBound: 0
@@ -276,8 +276,6 @@ MonoBehaviour:
     soundSettings:
       musicOn: 1
       soundOn: 1
-    playSettings:
-      groundHeight: 5
     agentSettings:
       useController: 0
       baseCharacterPrefab: {fileID: 1178119509965772, guid: fe5aad4221830944bb2740a26db35969,
@@ -289,6 +287,23 @@ MonoBehaviour:
       gravity: 0
       airFriction: 0.001
       groundFriction: 0.07
+    environmentSettings:
+      environments:
+      - name: City
+        sceneName: 
+        backgrounds:
+        - depth: 0
+          sprites: []
+        obstacles: []
+        agentBounds:
+          leftBound: 0
+          rightBound: 0
+          topBound: 0
+          bottombound: 0
+          minX: 0
+          maxX: 0
+          minY: 0
+          maxY: 0
   activeCamera: {fileID: 0}
   initialState: 2
 --- !u!1 &519420028

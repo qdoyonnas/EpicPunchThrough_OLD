@@ -13,33 +13,13 @@ public class GameManager : MonoBehaviour
     public struct GameOptions
     {
         public float sceneTransitionFadeDuration;
-	    public WorldBounds worldBounds;
+	    public WorldBounds cameraBounds;
         public MenuManager.MenuSettings menuSettings;
         public InputManager.InputSettings inputSettings;
         public SoundManager.SoundManagerSettings soundSettings;
         public PlayManager.PlayManagerSettings playSettings;
         public AgentManager.AgentSettings agentSettings;
-    }
-
-    [Serializable]
-    public struct WorldBounds
-    {
-	    public bool leftBound;
-	    public bool rightBound;
-	    public bool topBound;
-	    public bool bottombound;
-	    public float minX;
-	    public float maxX;
-	    public float width
-	    {
-		    get { return maxX - minX; }
-	    }
-	    public float minY;
-	    public float maxY;
-	    public float height
-	    {
-		    get { return maxY - minY; }
-	    }
+        public EnvironmentManager.EnvironmentSettings environmentSettings;
     }
 
     #endregion
@@ -125,6 +105,7 @@ public class GameManager : MonoBehaviour
         SoundManager.Instance.Initialize(settings.soundSettings);
         AgentManager.Instance.Initialize(settings.agentSettings);
         PlayManager.Instance.Initialize(settings.playSettings);
+        EnvironmentManager.Instance.Initialize(settings.environmentSettings);
     }
 
     public string GetManagerSceneName()

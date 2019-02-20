@@ -91,7 +91,8 @@ public class TechniqueGenerator
         options.actions = new List<Agent.Action>();
         options.actions.Add(Agent.Action.MoveForward);
         options.updateStrategy = new RunForwardUpdate(10f, 6f);
-        options.validateStrategy = new EndTechValidate(new EndTechValidate.ActionState(Agent.Action.MoveForward, false));
+        options.validateStrategy = new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
+                                                        new EndTechValidate.ActionState(Agent.Action.MoveBack, true) );
 
         GenerateTechnique( agent, options );
 

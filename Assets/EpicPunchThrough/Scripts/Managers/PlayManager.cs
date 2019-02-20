@@ -11,7 +11,6 @@ public class PlayManager
     [Serializable]
     public struct PlayManagerSettings
     {
-        public float groundHeight;
     }
 
     #endregion
@@ -70,20 +69,16 @@ public class PlayManager
     {
         switch( newState ) {
             case GameManager.GameState.play:
+                if( previousState == GameManager.GameState.play ) { return; }
+
                 InputManager.Instance.CancelInput += Pause;
 
                 if( !SceneManager.GetSceneByName(gameSceneName).isLoaded ) {
                     SceneManager.LoadScene(gameSceneName, LoadSceneMode.Additive);
 
                     SceneManager.sceneLoaded += SetupPlay;
-                } else if( AgentManager.Instance.playerAgent == null ) {
+                } else {
                     SetupPlay(GetGameScene(), LoadSceneMode.Additive);
-                }
-
-                if( previousState != GameManager.GameState.play 
-                    || previousState != GameManager.GameState.pause )
-                {
-                    GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true);
                 }
 
                 break;
@@ -109,13 +104,20 @@ public class PlayManager
     }
     void SetupPlay(Scene scene, LoadSceneMode mode)
     {
-        SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
+        EnvironmentManager.Instance.ChangeEnvironment(scene, "City");
+
+        if( AgentManager.Instance.playerAgent == null ) {
+            SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
+        }
+
+        GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true);
     }
+
     void SpawnPlayer(Scene scene, LoadSceneMode mode)
     {
         AgentManager.SpawnData spawnData = new AgentManager.SpawnData();
         spawnData.name = "Player";
-        spawnData.position = new Vector3(0, settings.groundHeight, 0);
+        spawnData.position = new Vector3(0, 5, 0);
         spawnData.team = 0;
         spawnData.type = AgentManager.AgentType.player;
         AgentManager.Instance.SpawnAgent(spawnData);
