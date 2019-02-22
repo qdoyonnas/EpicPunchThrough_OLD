@@ -9,7 +9,7 @@ public class PlayManager
     #region Settings
 
     [Serializable]
-    public struct PlayManagerSettings
+    public class PlayManagerSettings
     {
     }
 
@@ -104,7 +104,7 @@ public class PlayManager
     }
     void SetupPlay(Scene scene, LoadSceneMode mode)
     {
-        EnvironmentManager.Instance.ChangeEnvironment(scene, "City");
+        EnvironmentManager.Instance.LoadEnvironment(scene, "City");
 
         if( AgentManager.Instance.playerAgent == null ) {
             SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);

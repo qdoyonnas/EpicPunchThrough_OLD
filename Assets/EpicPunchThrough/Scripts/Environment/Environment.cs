@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct WorldBounds
+public class WorldBounds
 {
 	public bool leftBound;
 	public bool rightBound;
@@ -27,16 +27,8 @@ public struct WorldBounds
 [Serializable]
 public class Environment
 {
-    [Serializable]
-    public struct BackgroundField
-    {
-        public int depth;
-        public Sprite[] sprites;
-    }
-
     public string name;
     public string sceneName;
-    public BackgroundField[] backgrounds;
-    public GameObject[] obstacles;
+    public Vector3 gravity;
     public WorldBounds agentBounds;
 }

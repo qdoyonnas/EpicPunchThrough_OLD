@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     #region Settings
 
     [Serializable]
-    public struct GameOptions
+    public class GameOptions
     {
         public float sceneTransitionFadeDuration;
 	    public WorldBounds cameraBounds;

@@ -9,7 +9,7 @@ public class EnvironmentManager
     #region Settings
 
     [Serializable]
-    public struct EnvironmentSettings
+    public class EnvironmentSettings
     {
         public Environment[] environments;
     }
@@ -33,8 +33,10 @@ public class EnvironmentManager
 
     #endregion
 
-    // Key == order // 0 back -> front
-    Dictionary<int, SpriteScroll[]> spriteScrolls;
+    public delegate void EnvironmentChangeDelegate(Environment previousEnvironment, Environment nextEnvironment);
+    public event EnvironmentChangeDelegate environmentChanged;
+
+    Environment currentEnvironment;
 
     bool isInitialized = false;
     public bool Initialize( EnvironmentSettings settings )
@@ -42,18 +44,38 @@ public class EnvironmentManager
         this.settings = settings;
         if( isInitialized ) { return false; }
 
-        spriteScrolls = new Dictionary<int, SpriteScroll[]>();
-
         return isInitialized = true;
     }
 
-    public void ChangeEnvironment( Scene scene, string environmentName )
+    public void LoadEnvironment( Scene scene, string environmentName )
     {
-        spriteScrolls.Clear();
+        if( currentEnvironment != null && currentEnvironment.name == environmentName ) { return; }
 
+        Environment environment = GetEnvironment(environmentName);
+        if( environment == null || environment.sceneName == string.Empty ) { return; }
+
+        if( currentEnvironment != null ) {
+            SceneManager.UnloadSceneAsync( currentEnvironment.sceneName );
+        }
+        if( Utilities.DoesSceneExist(environment.sceneName) ) {
+            if( !SceneManager.GetSceneByName( environment.sceneName ).isLoaded ) {
+                SceneManager.LoadScene( environment.sceneName, LoadSceneMode.Additive );
+            }
+        }
         
+        Physics.gravity = environment.gravity;
+
+        EnvironmentChangeDelegate handler = environmentChanged;
+        if( handler != null ) {
+            handler(currentEnvironment, environment);
+        }
+        currentEnvironment = environment;
     }
 
+    public Environment GetEnvironment()
+    {
+        return currentEnvironment;
+    }
     public Environment GetEnvironment( string environmentName )
     {
         foreach( Environment env in settings.environments ) {

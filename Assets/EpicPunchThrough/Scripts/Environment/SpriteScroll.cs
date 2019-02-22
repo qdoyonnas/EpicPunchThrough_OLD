@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SpriteScroll : MonoBehaviour
 {
-    #region Parameters
+    #region Fields
 
     // External
     [Header("Sprite")]
@@ -38,10 +38,6 @@ public class SpriteScroll : MonoBehaviour
 
     private bool didInit = false;
 
-    #endregion
-
-    #region Fields
-
     public float inverseRatio
     {
         get {
@@ -51,26 +47,33 @@ public class SpriteScroll : MonoBehaviour
 
     #endregion
 
-
     void Awake ()
 	{
-        // Guard
-        if( sprites == null || sprites.Length <= 0 ) { Debug.LogError("SpriteScroll not provided a sprite"); return; }
-
-		// Track camera movement by event
-        HandleSubscriptions(true);
+        Init();
+	}
+    public void Init()
+    {
+        if( sprites == null || sprites.Length <= 0 ) { return; }
 
 		ConfigureSpriteScaling(sprites[0]);
         CreateTileObjects();
+
         didInit = true;
+
+        HandleSubscriptions(true);
 
         CalcFieldSize();
 		TileField();
-	}
+    }
+
     private void OnDestroy()
     {
+        for( int i = tiles.Length-1; i >= 0; i-- ) {
+            Destroy(tiles[i]);
+        }
         HandleSubscriptions(false);
     }
+
     void HandleSubscriptions(bool state)
     {
         if( state ) {
@@ -98,7 +101,6 @@ public class SpriteScroll : MonoBehaviour
     }
     void CreateTileObjects()
     {
-
         tiles = new GameObject[sprites.Length];
 
         for( int i = 0; i < sprites.Length; i++ ) {

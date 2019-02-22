@@ -9,9 +9,8 @@ public class AgentManager
     #region Settings
 
     [Serializable]
-    public struct AgentSettings
+    public class AgentSettings
     {
-
         [Header("Animator Controllers")]
         public bool useController;
         public GameObject baseCharacterPrefab;
@@ -20,7 +19,6 @@ public class AgentManager
 
         [Header("Physic Settings")]
         public float autoStopSpeed;
-        public float gravity;
         public float airFriction;
         public float groundFriction;
     }
@@ -112,6 +110,7 @@ public class AgentManager
                 break;
         }
         agent.Init(settings.baseCharacterController, data.team);
+        agent.SetName(data.name);
         TechniqueGenerator.Instance.AddBaseMovementTechniques(agent);
     }
     public Transform GetAgentsObject()
@@ -130,6 +129,7 @@ public class AgentManager
         }
 
         agentsObject = new GameObject("Agents").transform;
+        SceneManager.MoveGameObjectToScene(agentsObject.gameObject, gameScene);
         return agentsObject;
     }
 

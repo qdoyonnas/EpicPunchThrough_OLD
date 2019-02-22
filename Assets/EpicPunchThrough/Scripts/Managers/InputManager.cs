@@ -8,7 +8,7 @@ public class InputManager
     #region Settings
 
     [Serializable]
-    public struct InputSettings
+    public class InputSettings
     {
         [Header("Menu Inputs")]
         public KeyCode[] upKey;

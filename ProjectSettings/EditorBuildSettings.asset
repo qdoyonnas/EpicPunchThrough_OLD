@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/EpicPunchThrough/Scenes/Game.unity
     guid: ae244e913e20d52449ec6c6e4262912d
+  - enabled: 1
+    path: Assets/EpicPunchThrough/Scenes/Environments/CityEnvironment.unity
+    guid: 8ef41e111d19b2b45ac608ea904ee2cf
   m_configObjects: {}

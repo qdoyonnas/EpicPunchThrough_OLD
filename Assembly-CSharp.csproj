@@ -88,6 +88,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\CameraControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\FollowCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\MotionCamera.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\SceneEntrance.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Camera\SpectatorCamera.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Environment\Environment.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Environment\SpriteScroll.cs" />
@@ -126,7 +127,8 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Technique.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\TechniqueGenerator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\SceneEntrance.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\Follow.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\Utilities.cs" />
     <None Include="Assets\Anima2D\Version.txt" />
     <None Include="Assets\Demigiant\DOTween\readme.txt" />
     <None Include="Assets\Anima2D\Licenses.txt" />

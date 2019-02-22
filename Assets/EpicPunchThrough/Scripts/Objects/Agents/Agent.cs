@@ -117,6 +117,8 @@ public class Agent : MonoBehaviour
         }
     }
 
+    GameObject[] boundaryColliders;
+
     #endregion
 
     protected bool didInit = false;
@@ -124,6 +126,16 @@ public class Agent : MonoBehaviour
     {
         if( !didInit ) {
             Init();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if( boundaryColliders != null ) {
+            for( int i = boundaryColliders.Length - 1; i >= 0; i-- ) {
+                Destroy(boundaryColliders[i]);
+            }
+            boundaryColliders = null;
         }
     }
 
@@ -140,7 +152,10 @@ public class Agent : MonoBehaviour
         AnimatorController = baseController;
 
         _rigidbody = GetComponent<Rigidbody>();
-        state = State.Grounded;
+        state = State.InAir;
+
+        OnEnvironmentChange( null, EnvironmentManager.Instance.GetEnvironment() );
+        EnvironmentManager.Instance.environmentChanged += OnEnvironmentChange;
 
         AgentManager.Instance.RegisterAgent(this);
 
@@ -157,6 +172,84 @@ public class Agent : MonoBehaviour
             activeTechnique.Update(data);
         } else {
             HandlePhysics();
+        }
+    }
+
+    public virtual void OnEnvironmentChange( Environment previousEnvironment, Environment nextEnvironment )
+    {
+        if( boundaryColliders != null ) {
+            for( int i = boundaryColliders.Length - 1; i >= 0; i-- ) {
+                Destroy(boundaryColliders[i]);
+            }
+        }
+
+        int colliderCount = ( nextEnvironment.agentBounds.topBound ? 1 : 0 )
+                            + ( nextEnvironment.agentBounds.rightBound ? 1 : 0 )
+                            + ( nextEnvironment.agentBounds.bottombound ? 1 : 0 )
+                            + ( nextEnvironment.agentBounds.leftBound ? 1 : 0 );
+        boundaryColliders = new GameObject[colliderCount];
+        if( nextEnvironment.agentBounds.topBound ) {
+            boundaryColliders[0] = new GameObject(gameObject.name + "_TopBoundary");
+            boundaryColliders[0].transform.parent = transform;
+            boundaryColliders[0].transform.parent = null;
+
+            BoxCollider collider = boundaryColliders[0].AddComponent<BoxCollider>();
+            collider.size = new Vector3(1, 5, 1);
+
+            Follow followScript = boundaryColliders[0].AddComponent<Follow>();
+            followScript.followX = true;
+            followScript.onFixedUpdate = true;
+
+            float yPosition = nextEnvironment.agentBounds.maxY + (collider.size.y / 2);
+            boundaryColliders[0].transform.position = new Vector3( transform.position.x, yPosition, transform.position.z);
+        }
+
+        if( nextEnvironment.agentBounds.rightBound ) {
+            boundaryColliders[0] = new GameObject(gameObject.name + "_RightBoundary");
+            boundaryColliders[0].transform.parent = transform;
+            boundaryColliders[0].transform.parent = null;
+
+            BoxCollider collider = boundaryColliders[0].AddComponent<BoxCollider>();
+            collider.size = new Vector3(5, 1, 1);
+
+            Follow followScript = boundaryColliders[0].AddComponent<Follow>();
+            followScript.followY = true;
+            followScript.onFixedUpdate = true;
+
+            float xPosition = nextEnvironment.agentBounds.maxX + (collider.size.x / 2);
+            boundaryColliders[0].transform.position = new Vector3( xPosition, transform.position.y, transform.position.z);
+        }
+
+        if( nextEnvironment.agentBounds.bottombound ) {
+            boundaryColliders[0] = new GameObject(gameObject.name + "_BottomBound");
+            boundaryColliders[0].transform.parent = transform;
+            boundaryColliders[0].transform.parent = null;
+
+            BoxCollider collider = boundaryColliders[0].AddComponent<BoxCollider>();
+            collider.size = new Vector3(1, 5, 1);
+
+            Follow followScript = boundaryColliders[0].AddComponent<Follow>();
+            followScript.followX = true;
+            followScript.onFixedUpdate = true;
+
+            float yPosition = nextEnvironment.agentBounds.minY - (collider.size.y / 2);
+            boundaryColliders[0].transform.position = new Vector3( transform.position.x, yPosition, transform.position.z);
+        }
+
+        if( nextEnvironment.agentBounds.leftBound ) {
+            boundaryColliders[0] = new GameObject(gameObject.name + "_LeftBoundary");
+            boundaryColliders[0].transform.parent = transform;
+            boundaryColliders[0].transform.parent = null;
+
+            BoxCollider collider = boundaryColliders[0].AddComponent<BoxCollider>();
+            collider.size = new Vector3(5, 1, 1);
+
+            Follow followScript = boundaryColliders[0].AddComponent<Follow>();
+            followScript.followY = true;
+            followScript.onFixedUpdate = true;
+
+            float xPosition = nextEnvironment.agentBounds.minX - (collider.size.x / 2);
+            boundaryColliders[0].transform.position = new Vector3( xPosition, transform.position.y, transform.position.z);
         }
     }
 
@@ -277,4 +370,16 @@ public class Agent : MonoBehaviour
     }
 
     #endregion
+
+    public virtual void SetName( string name )
+    {
+        gameObject.name = name;
+        if( boundaryColliders != null ) {
+            for( int i = 0; i < boundaryColliders.Length; i++ ) {
+                string boundaryName = boundaryColliders[i].name;
+                int underScoreIndex = boundaryName.LastIndexOf("_");
+                boundaryColliders[i].name = gameObject.name + boundaryName.Substring( underScoreIndex + 1, boundaryName.Length - underScoreIndex - 1 );
+            }
+        }
+    }
 }

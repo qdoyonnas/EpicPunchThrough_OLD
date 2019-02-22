@@ -10,7 +10,7 @@ public class MenuManager
     #region Settings
 
     [Serializable]
-    public struct MenuSettings
+    public class MenuSettings
     {
         public bool useController;
         public string pauseMenuName;

@@ -8,7 +8,7 @@ public class SoundManager
     #region Settings
 
     [Serializable]
-    public struct SoundManagerSettings
+    public class SoundManagerSettings
     {
         public bool musicOn;
         public bool soundOn;
