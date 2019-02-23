@@ -12,6 +12,8 @@ public class FollowEditor : Editor
     {
         Follow script = (Follow)target;
 
+        script.target = (Transform)EditorGUILayout.ObjectField("Target", script.target, typeof(Transform), true);
+
         script.followX = EditorGUILayout.Toggle("Follow X", script.followX);
         script.followY = EditorGUILayout.Toggle("Follow Y", script.followY);
         script.followZ = EditorGUILayout.Toggle("Follow Z", script.followZ);

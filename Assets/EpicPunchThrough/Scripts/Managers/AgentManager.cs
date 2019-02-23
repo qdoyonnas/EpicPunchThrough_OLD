@@ -11,6 +11,9 @@ public class AgentManager
     [Serializable]
     public class AgentSettings
     {
+        [Header("Agent Settings")]
+        public Agent.State initialAgentState = Agent.State.Grounded;
+
         [Header("Animator Controllers")]
         public bool useController;
         public GameObject baseCharacterPrefab;
@@ -21,6 +24,9 @@ public class AgentManager
         public float autoStopSpeed;
         public float airFriction;
         public float groundFriction;
+        public float wallFriction;
+        public Vector3 verticalBoundarySize;
+        public Vector3 horizontalBoundarySize;
     }
 
     #endregion

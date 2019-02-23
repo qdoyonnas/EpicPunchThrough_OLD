@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
     public GameOptions settings;
     public CameraBase activeCamera;
 
+    public bool DebugOn = false;
+
     public enum GameState {
         init,
         menu,
