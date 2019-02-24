@@ -13,23 +13,29 @@ public class Technique
     }
 
     public struct TechTrigger {
-        public Agent.State state;
-        public List<Agent.Action> sequence;
+        public readonly Agent.State state;
+        public readonly Agent.Action[] sequence;
 
-        public TechTrigger(Agent.State state)
+        public TechTrigger(Agent.State state, params Agent.Action[] actions)
         {
             this.state = state;
-            sequence = new List<Agent.Action>();
+            sequence = actions;
         }
     }
-    protected TechTrigger techTrigger;
+    protected TechTrigger _techTrigger;
+    public TechTrigger techTrigger {
+        get {
+            return _techTrigger;
+        }
+    }
 
     protected TriggerStrategy triggerStrategy;
-    protected ValidateStrategy validateStrategy;
+    protected ActivateStrategy activateStrategy;
+    protected ActionValidateStrategy validateStrategy;
     protected UpdateStrategy updateStrategy;
 
     public Technique( Agent owner, RuntimeAnimatorController animCtrl, TechTrigger techTrgr, 
-        TriggerStrategy triggerStrategy, ValidateStrategy validateStrategy, UpdateStrategy updateStrategy )
+        TriggerStrategy triggerStrategy, ActivateStrategy activateStrategy, ActionValidateStrategy validateStrategy, UpdateStrategy updateStrategy )
     {
         if( owner == null || animCtrl == null ) { 
             Debug.LogError("Technique generated with empty arguments");
@@ -37,14 +43,15 @@ public class Technique
         }
 
         this.owner = owner;
-        techTrigger = techTrgr;
+        _techTrigger = techTrgr;
         _animatorController = animCtrl;
 
         this.triggerStrategy = triggerStrategy;
+        this.activateStrategy = activateStrategy;
         this.validateStrategy = validateStrategy;
         this.updateStrategy = updateStrategy;
 
-        owner.SubscribeToActionEvent(techTrigger.sequence[techTrigger.sequence.Count-1], OnTrigger);
+        owner.SubscribeToActionEvent(techTrigger.sequence[techTrigger.sequence.Length-1], OnTrigger);
     }
 
     #region Behaviour Methods
@@ -60,10 +67,6 @@ public class Technique
         return validateStrategy.Validate(owner, action, state);
     }
 
-    public virtual void Update(GameManager.UpdateData data)
-    {
-        updateStrategy.Update(owner, data);
-    }
     public virtual void OnTrigger()
     {
         if( owner.activeTechnique != null
@@ -71,11 +74,28 @@ public class Technique
                 && owner.state != techTrigger.state ) ) 
         { return; }
 
-        // Check action sequence
+        if( techTrigger.sequence.Length > 1 ) {
+            for( int i = 1; i < techTrigger.sequence.Length; i++ ) {
+                if( techTrigger.sequence[techTrigger.sequence.Length - i] != owner.ActionSequence[owner.ActionSequence.Length - i] ) {
+                    return;
+                }
+            }
+        }
 
         if( !triggerStrategy.Trigger(owner) ) { return; }
-        owner.TransitionTechnique(this, false);
+        owner.AddActivatingTechnique(this);
     }
+
+    public virtual void Activate()
+    {
+        activateStrategy.Activate(owner);
+    }
+
+    public virtual void Update(GameManager.UpdateData data)
+    {
+        updateStrategy.Update(owner, data);
+    }
+
 
     #endregion
 }

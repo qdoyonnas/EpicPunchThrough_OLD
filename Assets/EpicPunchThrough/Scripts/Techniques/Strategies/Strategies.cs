@@ -12,10 +12,21 @@ public class NoTrigger: TriggerStrategy {
     }
 }
 
-public interface ValidateStrategy {
+public interface ActivateStrategy {
+    void Activate(Agent agent);
+}
+public class NoActivate : ActivateStrategy
+{
+    public void Activate( Agent agent )
+    {
+        return;
+    }
+}
+
+public interface ActionValidateStrategy {
     bool Validate(Agent agent, Agent.Action action, bool state);
 }
-public class NoValidate: ValidateStrategy {
+public class NoValidate: ActionValidateStrategy {
     public bool Validate(Agent agent, Agent.Action action, bool state)
     {
         return false;

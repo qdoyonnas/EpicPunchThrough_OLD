@@ -207,11 +207,11 @@
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
       <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
       <HintPath>C:/Users/Ivor Darsil/Desktop/Drive/Unity Projects/EpicPunchThrough/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>

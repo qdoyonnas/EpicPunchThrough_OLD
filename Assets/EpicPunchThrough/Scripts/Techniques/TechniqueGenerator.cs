@@ -22,15 +22,28 @@ public class TechniqueGenerator
     public string animatorControllerFolderPath = "AnimatorControllers/";
     public string baseAnimatorControllerPath = "Base/BaseCharacter";
 
-    public struct TechniqueOptions {
+    public class TechniqueOptions {
         public string animatorControllerPath;
-
+               
         public Agent.State state;
-        public List<Agent.Action> actions;
-
+        public Agent.Action[] actions;
+               
         public TriggerStrategy triggerStrategy;
-        public ValidateStrategy validateStrategy;
+        public ActivateStrategy activateStrategy;
+        public ActionValidateStrategy actionValidateStrategy;
         public UpdateStrategy updateStrategy;
+
+        public TechniqueOptions( string animatorControllerPath, Agent.State state, Agent.Action[] actions, TriggerStrategy triggerStrategy, ActivateStrategy activateStrategy,
+                    ActionValidateStrategy actionValidateStrategy, UpdateStrategy updateStrategy )
+        {
+            this.animatorControllerPath = animatorControllerPath;
+            this.state = state;
+            this.actions = actions;
+            this.triggerStrategy = triggerStrategy;
+            this.activateStrategy = activateStrategy;
+            this.actionValidateStrategy = actionValidateStrategy;
+            this.updateStrategy = updateStrategy;
+        }
     }
     public void GenerateTechnique( Agent agent, TechniqueOptions options )
     {
@@ -41,11 +54,12 @@ public class TechniqueGenerator
         Technique.TechTrigger techTrigger = GenerateTechTrigger(options);
 
         TriggerStrategy triggerStrategy = options.triggerStrategy == null ? new NoTrigger() : options.triggerStrategy;
-        ValidateStrategy validateStrategy = options.validateStrategy == null ? new NoValidate() : options.validateStrategy;
+        ActivateStrategy activateStrategy = options.activateStrategy == null ? new NoActivate() : options.activateStrategy;
+        ActionValidateStrategy actionValidateStrategy = options.actionValidateStrategy == null ? new NoValidate() : options.actionValidateStrategy;
         UpdateStrategy updateStrategy = options.updateStrategy == null ? new NoUpdate() : options.updateStrategy;
 
         Technique tech = new Technique(agent, animController, techTrigger, 
-                                triggerStrategy, validateStrategy, updateStrategy);
+                                triggerStrategy, activateStrategy, actionValidateStrategy, updateStrategy);
         agent.AddTechnique(tech);
     }
 
@@ -69,14 +83,13 @@ public class TechniqueGenerator
 
     Technique.TechTrigger GenerateTechTrigger( TechniqueOptions options )
     {
-        Technique.TechTrigger techTrigger = new Technique.TechTrigger(options.state);
-        if( options.actions == null || options.actions.Count == 0 ) {
+        Technique.TechTrigger techTrigger;
+        if( options.actions == null || options.actions.Length == 0 ) {
             Debug.LogError("Technique generated with no trigger actions. Probably undersired behaviour.");
-            techTrigger.sequence.Add(Agent.Action.AttackForward);
+            techTrigger = new Technique.TechTrigger(options.state);
         } else {
-            techTrigger.sequence = new List<Agent.Action>(options.actions);
+            techTrigger = new Technique.TechTrigger(options.state, options.actions);
         }
-
 
         return techTrigger;
     }
@@ -85,21 +98,39 @@ public class TechniqueGenerator
 
     public void AddBaseMovementTechniques(Agent agent)
     {
-        TechniqueOptions options = new TechniqueOptions();
-        options.animatorControllerPath = "Base/BasicMove";
-        options.state = Agent.State.Grounded;
-        options.actions = new List<Agent.Action>();
-        options.actions.Add(Agent.Action.MoveForward);
-        options.updateStrategy = new RunForwardUpdate(10f, 6f);
-        options.validateStrategy = new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
-                                                        new EndTechValidate.ActionState(Agent.Action.MoveBack, true) );
-
+        TechniqueOptions options = new TechniqueOptions(
+            "Base/BasicMove",
+            Agent.State.Grounded,
+            new Agent.Action[] { Agent.Action.MoveForward },
+            null,
+            null,
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
+                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true) ),
+            new RunForwardUpdate(10f, 6f)
+        );
         GenerateTechnique( agent, options );
 
-        options.actions.Clear();
-        options.actions.Add(Agent.Action.MoveBack);
-        options.triggerStrategy = new FlipDirectionTrigger();
+        options = new TechniqueOptions(
+            "Base/BasicMove",
+            Agent.State.Grounded,
+            new Agent.Action[] { Agent.Action.MoveBack },
+            null,
+            new FlipDirectionActivate(),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
+                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true) ),
+            new RunForwardUpdate(10f, 6f)
+        );
+        GenerateTechnique( agent, options );
 
+        options = new TechniqueOptions(
+            "Base/BasicJump",
+            Agent.State.Grounded,
+            new Agent.Action[] { Agent.Action.Jump },
+            null,
+            null,
+            null,
+            new JumpUpdate()
+        );
         GenerateTechnique( agent, options );
     }
 }

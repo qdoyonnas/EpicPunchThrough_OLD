@@ -29,6 +29,7 @@ public class Agent : MonoBehaviour
     #region Technique Fields
 
     protected List<Technique> techniques = new List<Technique>();
+    protected List<Technique> activatingTechniques = new List<Technique>();
 
     protected Technique _activeTechnique;
     public Technique activeTechnique {
@@ -134,6 +135,11 @@ public class Agent : MonoBehaviour
         Clash
     }
     protected List<Action> actions = new List<Action>();
+    public Action[] ActionSequence {
+         get {
+            return actions.ToArray();
+        }
+    }
 
     #endregion
 
@@ -305,14 +311,41 @@ public class Agent : MonoBehaviour
     {
         CheckState();
 
-        if( animator.GetBool(transitionBool) ) {
-            TransitionTechnique(activeTechnique, false);
-        }
+        HandleTechniques();
 
         if( activeTechnique != null ) {
             activeTechnique.Update(data);
         } else {
             HandlePhysics();
+        }
+    }
+
+    protected virtual void HandleTechniques()
+    {
+        if( animator.GetBool(transitionBool) ) {
+            TransitionTechnique(activeTechnique, false);
+        }
+
+        if( activatingTechniques.Count == 1 ) {
+            TransitionTechnique(activatingTechniques[0], false);
+            activatingTechniques.Clear();
+        } else if( activatingTechniques.Count > 1 ) {
+            Technique chosenTech = null;
+            int longestSequence = 0;
+            foreach( Technique tech in activatingTechniques ) {
+                if( tech.techTrigger.sequence.Length > longestSequence ) {
+                    chosenTech = tech;
+                    longestSequence = tech.techTrigger.sequence.Length;
+                } else if( tech.techTrigger.sequence.Length == longestSequence ) {
+                    if( chosenTech.techTrigger.state == State.Any && tech.techTrigger.state != State.Any ) {
+                        chosenTech = tech;
+                        longestSequence = tech.techTrigger.sequence.Length;
+                    }
+                }
+            }
+
+            TransitionTechnique( chosenTech, false );
+            activatingTechniques.Clear();
         }
     }
 
@@ -354,20 +387,25 @@ public class Agent : MonoBehaviour
 
     public virtual void HandlePhysics()
     {
+        HandleGravity();
         HandleFriction();
+    }
+    public virtual void HandleGravity()
+    {
+
     }
     public virtual void HandleFriction()
     {
         if( xFriction > 0 ) {
             rigidbody.velocity = new Vector3( rigidbody.velocity.x * (1 - xFriction), rigidbody.velocity.y, 0 );
-            if( rigidbody.velocity.x < AgentManager.Instance.settings.autoStopSpeed ) {
+            if( Mathf.Abs(rigidbody.velocity.x) < AgentManager.Instance.settings.autoStopSpeed ) {
                 rigidbody.velocity = new Vector3( 0, rigidbody.velocity.y, 0);
             }
         }
 
         if( yFriction > 0 ) {
             rigidbody.velocity = new Vector3( rigidbody.velocity.y , rigidbody.velocity.y * (1 - yFriction), 0 );
-            if( rigidbody.velocity.y < AgentManager.Instance.settings.autoStopSpeed ) {
+            if( Mathf.Abs(rigidbody.velocity.y) < AgentManager.Instance.settings.autoStopSpeed ) {
                 rigidbody.velocity = new Vector3( rigidbody.velocity.x, 0, 0);
             }
         }
@@ -386,9 +424,20 @@ public class Agent : MonoBehaviour
         techniques.Remove(technique);
     }
 
+    public virtual void AddActivatingTechnique( Technique technique )
+    {
+        activatingTechniques.Add( technique );
+    }
+
     public virtual void  TransitionTechnique( Technique technique = null, bool blend = true )
     {
-        activeTechnique = technique;
+        if( activeTechnique != technique ) {
+            activeTechnique = technique;
+            if( technique != null ) {
+                technique.Activate();
+            }
+        }
+
         if( blend && !animator.GetCurrentAnimatorStateInfo(0).IsName(transitionStateName) ) {
             animator.SetBool(transitionBool, true);
             return;
@@ -469,15 +518,16 @@ public class Agent : MonoBehaviour
                 Debug.LogError("Action not implemented: " + action);
                 return;
         }
-        if( handler != null ) {
-            handler();
-        }
 
         if( state ) {
             actions.Add(action);
             if( actions.Count > AgentManager.Instance.settings.actionSequenceLength ) {
                 actions.RemoveAt(0);
             }
+        }
+
+        if( handler != null ) {
+            handler();
         }
     }
 
