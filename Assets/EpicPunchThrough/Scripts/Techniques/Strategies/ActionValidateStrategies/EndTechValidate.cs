@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EndTechValidate : ActionValidateStrategy
+public class EndTechValidate : ActionValidateTechStrategy
 {
     public struct ActionState {
         public Agent.Action action;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlipDirectionActivate : ActivateStrategy
+public class FlipDirectionActivate : ActivateTechStrategy
 {
     public void Activate( Agent agent )
     {

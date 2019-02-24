@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RunForwardUpdate : UpdateStrategy
+public class RunForwardUpdate : UpdateTechStrategy
 {
     float maxSpeed;
     float acceleration;
@@ -15,7 +15,7 @@ public class RunForwardUpdate : UpdateStrategy
 
     public void Update( Agent agent, GameManager.UpdateData data )
     {
-        Vector3 velDelta = Vector3.right * (acceleration * Time.fixedDeltaTime);
+        Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime);
         float directionalVelocity = agent.rigidbody.velocity.x + Mathf.Abs(agent.rigidbody.velocity.y);
 
         if( agent.isFacingRight ) {

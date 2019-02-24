@@ -123,8 +123,8 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Agents\PlayerAgent.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ActionValidateStrategies\EndTechValidate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ActivateStrategies\FlipDirectionActivate.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ExitStrategies\JumpExit.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\Strategies.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\JumpUpdate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\RunForwardUpdate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Technique.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\TechniqueGenerator.cs" />

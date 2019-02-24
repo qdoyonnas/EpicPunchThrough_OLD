@@ -8,7 +8,7 @@ public class MotionCamera : CameraControl
 
     protected override void DoFixedUpdate( GameManager.UpdateData data )
     {
-        Vector2 fixedMotion = motion * Time.fixedDeltaTime;
+        Vector2 fixedMotion = motion * data.deltaTime;
 
         cameraBase.Move(fixedMotion, true);
     }

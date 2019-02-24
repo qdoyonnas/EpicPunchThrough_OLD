@@ -313,7 +313,7 @@ public class Agent : MonoBehaviour
 
         HandleTechniques();
 
-        if( activeTechnique != null ) {
+        if( ValidActiveTechnique() ) {
             activeTechnique.Update(data);
         } else {
             HandlePhysics();
@@ -429,11 +429,14 @@ public class Agent : MonoBehaviour
         activatingTechniques.Add( technique );
     }
 
-    public virtual void  TransitionTechnique( Technique technique = null, bool blend = true )
+    public virtual void TransitionTechnique( Technique technique = null, bool blend = true )
     {
         if( activeTechnique != technique ) {
+            if( ValidActiveTechnique() ) {
+                activeTechnique.Exit();
+            }
             activeTechnique = technique;
-            if( technique != null ) {
+            if( technique != null && technique.IsValid() ) {
                 technique.Activate();
             }
         }
@@ -450,6 +453,11 @@ public class Agent : MonoBehaviour
             animatorController = technique.animatorController;
             animator.SetBool(transitionBool, false);
         }
+    }
+
+    public virtual bool ValidActiveTechnique()
+    {
+        return ( activeTechnique != null && activeTechnique.IsValid() );
     }
 
     #endregion
@@ -498,7 +506,7 @@ public class Agent : MonoBehaviour
 
     public void PerformAction( Action action, bool state )
     {
-        if( activeTechnique != null
+        if( ValidActiveTechnique()
             && !activeTechnique.ValidateAction(action, state) )
         { return; }
         if( !state ) { return; }

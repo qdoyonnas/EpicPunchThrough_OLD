@@ -239,8 +239,8 @@ public class CameraBase : MonoBehaviour
 			float yVal = Random.Range(-shakeRadius, shakeRadius);
 			_camera.transform.localPosition = new Vector3(xVal, yVal, cameraZDistance);
 
-			shakeRadius -= shakeRadius * (Time.deltaTime/shakeDuration);
-			shakeDuration -= Time.deltaTime;
+			shakeRadius -= shakeRadius * (data.deltaTime/shakeDuration);
+			shakeDuration -= data.deltaTime;
 		} else {
 			_camera.transform.localPosition = new Vector3(0, 0, cameraZDistance);
 		}
