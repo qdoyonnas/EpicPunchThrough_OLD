@@ -128,6 +128,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\RunForwardUpdate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Technique.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\TechniqueGenerator.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\UI\DirectionIndicator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\Follow.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\TriggerCheck.cs" />

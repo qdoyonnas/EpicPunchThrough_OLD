@@ -8,6 +8,8 @@ public class PlayerAgent : Agent
     {
         base.Init();
 
+        directionIndicator.gameObject.SetActive(true);
+
         AgentManager.Instance.playerAgent = this;
 
         HandleSubscriptions(true);
@@ -19,10 +21,12 @@ public class PlayerAgent : Agent
             InputManager.Instance.LeftInput += OnLeftInput;
             InputManager.Instance.RightInput += OnRightInput;
             InputManager.Instance.JumpInput += OnJump;
+            InputManager.Instance.MouseMovement += OnDirectionInput;
         } else {
             InputManager.Instance.LeftInput -= OnLeftInput;
             InputManager.Instance.RightInput -= OnRightInput;
             InputManager.Instance.JumpInput -= OnJump;
+            InputManager.Instance.MouseMovement -= OnDirectionInput;
         }
     }
 
@@ -47,6 +51,16 @@ public class PlayerAgent : Agent
     protected bool OnJump(bool isDown)
     {
         PerformAction(Action.Jump, isDown);
+        return true;
+    }
+    protected bool OnDirectionInput( Vector2 pos, Vector2 delta )
+    {
+        if( delta == Vector2.zero ) { return false; }
+
+        Vector2 normalizedDelta = delta.normalized;
+
+        aimDirection = -normalizedDelta;
+
         return true;
     }
 }

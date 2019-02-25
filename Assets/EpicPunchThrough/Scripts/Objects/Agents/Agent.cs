@@ -24,6 +24,8 @@ public class Agent : MonoBehaviour
     protected string transitionStateName = "ControllerTransition";
     protected string transitionBool = "transitionController";
 
+    protected DirectionIndicator directionIndicator;
+
     #endregion
 
     #region Technique Fields
@@ -141,6 +143,21 @@ public class Agent : MonoBehaviour
         }
     }
 
+    protected Vector2 _aimDirection = Vector2.up;
+    public Vector2 aimDirection {
+        get {
+            return _aimDirection;
+        }
+        set {
+            if( value.magnitude <= 0 ) {
+                _aimDirection = Vector2.up;
+            }
+            _aimDirection = value.normalized;
+
+            directionIndicator.transform.eulerAngles = new Vector3( 0, 0, Vector2.SignedAngle(Vector2.up, _aimDirection) );
+        }
+    }
+
     #endregion
 
     #region Physics Fields
@@ -209,6 +226,9 @@ public class Agent : MonoBehaviour
         _leftWallCheck = FindTriggerCheck( "LeftWallCheck", SetWallFound );
         _rightWallCheck = FindTriggerCheck( "RightWallCheck", SetWallFound );
         _ceilingCheck = FindTriggerCheck( "CeilingCheck", SetCeilingFound );
+
+        directionIndicator = GetComponentInChildren<DirectionIndicator>();
+        directionIndicator.gameObject.SetActive(false);
 
         state = AgentManager.Instance.settings.initialAgentState;
 

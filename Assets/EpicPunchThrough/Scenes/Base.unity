@@ -294,6 +294,7 @@ MonoBehaviour:
       autoStopSpeed: 0.01
       airFriction: 0
       groundFriction: 0.07
+      wallFriction: 0
       verticalBoundarySize: {x: 2, y: 5, z: 1}
       horizontalBoundarySize: {x: 5, y: 2, z: 1}
     environmentSettings:
