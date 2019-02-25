@@ -185,6 +185,7 @@ public class InputManager
     {
         ManageKeys();
         ManageMouse();
+
     }
     void ManageKeys()
     {
