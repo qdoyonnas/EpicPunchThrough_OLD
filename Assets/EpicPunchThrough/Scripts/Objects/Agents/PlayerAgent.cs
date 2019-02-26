@@ -18,49 +18,52 @@ public class PlayerAgent : Agent
     protected void HandleSubscriptions(bool state)
     {
         if( state ) {
-            InputManager.Instance.LeftInput += OnLeftInput;
-            InputManager.Instance.RightInput += OnRightInput;
+            InputManager.Instance.HorizontalInput += OnHorizontal;
+            InputManager.Instance.VerticalInput += OnVertical;
             InputManager.Instance.JumpInput += OnJump;
-            InputManager.Instance.MouseMovement += OnDirectionInput;
         } else {
-            InputManager.Instance.LeftInput -= OnLeftInput;
-            InputManager.Instance.RightInput -= OnRightInput;
+            InputManager.Instance.HorizontalInput -= OnHorizontal;
+            InputManager.Instance.VerticalInput -= OnVertical;
             InputManager.Instance.JumpInput -= OnJump;
-            InputManager.Instance.MouseMovement -= OnDirectionInput;
         }
     }
 
-    protected bool OnLeftInput(bool isDown)
+    protected bool OnHorizontal( float value )
     {
-        if( !isFacingRight ) {
-            PerformAction(Action.MoveForward, isDown);
+        if( value == 0 ) {
+            if( actions[actions.Count - 1] == Action.MoveForward ) {
+                PerformAction(Action.MoveForward, 0);
+            } else if( actions[actions.Count - 1] == Action.MoveBack ) {
+                PerformAction(Action.MoveBack, 0);
+            }
         } else {
-            PerformAction(Action.MoveBack, isDown);
+            if( value > 0 ) {
+                if( isFacingRight ) {
+                    PerformAction(Action.MoveForward, value);
+                } else {
+                    PerformAction(Action.MoveBack, value);
+                }
+            } else {
+                if( isFacingRight ) {
+                    PerformAction(Action.MoveBack, value);
+                } else {
+                    PerformAction(Action.MoveForward, value);
+                }
+            }
         }
-        return true;
-    }
-    protected bool OnRightInput(bool isDown)
-    {
-        if( isFacingRight ) {
-            PerformAction(Action.MoveForward, isDown);
-        } else {
-            PerformAction(Action.MoveBack, isDown);
-        }
-        return true;
-    }
-    protected bool OnJump(bool isDown)
-    {
-        PerformAction(Action.Jump, isDown);
-        return true;
-    }
-    protected bool OnDirectionInput( Vector2 pos, Vector2 delta )
-    {
-        if( delta == Vector2.zero ) { return false; }
-
-        Vector2 normalizedDelta = delta.normalized;
-
-        aimDirection = -normalizedDelta;
 
         return true;
     }
+    protected bool OnVertical( float value )
+    {
+
+        return true;
+    }
+
+    protected bool OnJump( float value )
+    {
+        PerformAction( Action.Jump, value );
+        return true;
+    }
+
 }

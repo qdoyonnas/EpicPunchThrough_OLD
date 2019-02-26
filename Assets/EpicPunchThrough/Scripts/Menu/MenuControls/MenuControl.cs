@@ -48,39 +48,27 @@ public class MenuControl : MonoBehaviour
 
         return false;
     }
-    public virtual bool HandleUpInput(bool isDown, Menu menu)
+    public virtual bool HandleVertical(float value, Menu menu)
     {
-        if( decorator != null ) { decorator.HandleUpInput(isDown, menu); }
+        if( decorator != null ) { decorator.HandleVertical(value, menu); }
 
         return false;
     }
-    public virtual bool HandleRightInput(bool isDown, Menu menu)
+    public virtual bool HandleHorizontal(float value, Menu menu)
     {
-        if( decorator != null ) { decorator.HandleRightInput(isDown, menu); }
+        if( decorator != null ) { decorator.HandleHorizontal(value, menu); }
 
         return false;
     }
-    public virtual bool HandleDownInput(bool isDown, Menu menu)
+    public virtual bool HandleConfirmInput(float value, Menu menu)
     {
-        if( decorator != null ) { decorator.HandleDownInput(isDown, menu); }
+        if( decorator != null ) { decorator.HandleConfirmInput(value, menu); }
 
         return false;
     }
-    public virtual bool HandleLeftInput(bool isDown, Menu menu)
+    public virtual bool HandleCancelInput(float value, Menu menu)
     {
-        if( decorator != null ) { decorator.HandleLeftInput(isDown, menu); }
-
-        return false;
-    }
-    public virtual bool HandleConfirmInput(bool isDown, Menu menu)
-    {
-        if( decorator != null ) { decorator.HandleConfirmInput(isDown, menu); }
-
-        return false;
-    }
-    public virtual bool HandleCancelInput(bool isDown, Menu menu)
-    {
-        if( decorator != null ) { decorator.HandleCancelInput(isDown, menu); }
+        if( decorator != null ) { decorator.HandleCancelInput(value, menu); }
 
         return false;
     }

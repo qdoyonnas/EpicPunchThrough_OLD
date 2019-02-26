@@ -40,13 +40,15 @@ public class UICursor : MonoBehaviour
     void HandleSubscriptions(bool state)
     {
         if( state ) {
-            InputManager.Instance.MouseMovement += UpdatePointer;
+            InputManager.Instance.PointerHorizontal += OnHorizontal;
+            InputManager.Instance.PointerVertical += OnVertical;
             InputManager.Instance.ActiveControlChanged += OnActiveControlChange;
             if( onlyActiveOnState ) {
                 GameManager.Instance.stateChanged += OnStateChanged;
             }
         } else {
-            InputManager.Instance.MouseMovement -= UpdatePointer;
+            InputManager.Instance.PointerHorizontal -= OnHorizontal;
+            InputManager.Instance.PointerVertical -= OnVertical;
             InputManager.Instance.ActiveControlChanged -= OnActiveControlChange;
             GameManager.Instance.stateChanged -= OnStateChanged;
         }
@@ -57,10 +59,17 @@ public class UICursor : MonoBehaviour
         UpdateVisibility();
     }
 
-    protected virtual bool UpdatePointer(Vector2 pos, Vector2 delta)
+    protected virtual bool OnHorizontal(float value)
     {
         UpdateVisibility();
-        image.rectTransform.position = pos;
+        image.rectTransform.position = new Vector3(image.rectTransform.position.x + value, image.rectTransform.position.y, 0);
+
+        return true;
+    }
+    protected virtual bool OnVertical(float value)
+    {
+        UpdateVisibility();
+        image.rectTransform.position = new Vector3(image.rectTransform.position.x, image.rectTransform.position.y + value, 0);
 
         return true;
     }

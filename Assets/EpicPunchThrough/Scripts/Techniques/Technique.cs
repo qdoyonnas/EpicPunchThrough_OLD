@@ -78,11 +78,11 @@ public class Technique
     /// </summary>
     /// <param name="action">The action in question</param>
     /// <returns>Boolean indicating whether the action is allowed during the technique</returns>
-    public virtual bool ValidateAction(Agent.Action action, bool state)
+    public virtual bool ValidateAction(Agent.Action action, float value)
     {
         if( validateStrategy == null ) { return true; }
 
-        return validateStrategy.Validate(owner, action, state);
+        return validateStrategy.Validate(owner, action, value);
     }
 
     public virtual void OnTrigger()

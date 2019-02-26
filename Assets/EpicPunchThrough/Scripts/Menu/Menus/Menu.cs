@@ -235,25 +235,17 @@ public class Menu: MonoBehaviour
         if( state ) {
             InputManager.Instance.AnyInput += OnAnyKey;
 
-            InputManager.Instance.UpInput += OnUp;
-            InputManager.Instance.RightInput += OnRight;
-            InputManager.Instance.DownInput += OnDown;
-            InputManager.Instance.LeftInput += OnLeft;
+            InputManager.Instance.HorizontalInput += OnHorizontal;
+            InputManager.Instance.VerticalInput += OnVertical;
             InputManager.Instance.ConfirmInput += OnConfirm;
             InputManager.Instance.CancelInput += OnCancel;
-
-            InputManager.Instance.MouseMovement += HandlePointerInteraction;
         } else {
             InputManager.Instance.AnyInput -= OnAnyKey;
 
-            InputManager.Instance.UpInput -= OnUp;
-            InputManager.Instance.RightInput -= OnRight;
-            InputManager.Instance.DownInput -= OnDown;
-            InputManager.Instance.LeftInput -= OnLeft;
+            InputManager.Instance.HorizontalInput -= OnHorizontal;
+            InputManager.Instance.VerticalInput -= OnVertical;
             InputManager.Instance.ConfirmInput -= OnConfirm;
             InputManager.Instance.CancelInput -= OnCancel;
-
-            InputManager.Instance.MouseMovement -= HandlePointerInteraction;
         }
     }
 
@@ -300,54 +292,40 @@ public class Menu: MonoBehaviour
 
     #region Input Methods
 
-    protected virtual bool OnAnyKey(bool isDown)
+    protected virtual bool OnAnyKey(float value)
     {
         if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleAnyInput(this) ) { return true; }
 
-        if( decorator != null ) { decorator.OnAnyKey(isDown); }
+        if( decorator != null ) { decorator.OnAnyKey(value); }
         return false;
     }
 
-    protected virtual bool OnUp(bool isDown)
+    protected virtual bool OnHorizontal(float value)
     {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleUpInput(isDown, this) ) { return true; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleHorizontal(value, this) ) { return true; }
 
-        if( decorator != null ) { decorator.OnUp(isDown); }
+        if( decorator != null ) { decorator.OnHorizontal(value); }
         return false;
     }
-    protected virtual bool OnRight(bool isDown)
+    protected virtual bool OnVertical(float value)
     {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleRightInput(isDown, this) ) { return true; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleVertical(value, this) ) { return true; }
 
-        if( decorator != null ) { decorator.OnRight(isDown); }
+        if( decorator != null ) { decorator.OnVertical(value); }
         return false;
     }
-    protected virtual bool OnDown(bool isDown)
+    protected virtual bool OnConfirm(float value)
     {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleDownInput(isDown, this) ) { return true; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleConfirmInput(value, this) ) { return true; }
 
-        if( decorator != null ) { decorator.OnDown(isDown); }
+        if( decorator != null ) { decorator.OnConfirm(value); }
         return false;
     }
-    protected virtual bool OnLeft(bool isDown)
+    protected virtual bool OnCancel(float value)
     {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleLeftInput(isDown, this) ) { return true; }
+        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleCancelInput(value, this) ) { return true; }
 
-        if( decorator != null ) { decorator.OnLeft(isDown); }
-        return false;
-    }
-    protected virtual bool OnConfirm(bool isDown)
-    {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleConfirmInput(isDown, this) ) { return true; }
-
-        if( decorator != null ) { decorator.OnConfirm(isDown); }
-        return false;
-    }
-    protected virtual bool OnCancel(bool isDown)
-    {
-        if( menuItems.Length > 0 && selectedItem != null && selectedItem.HandleCancelInput(isDown, this) ) { return true; }
-
-        if( decorator != null ) { decorator.OnCancel(isDown); }
+        if( decorator != null ) { decorator.OnCancel(value); }
         return false;
     }
 

@@ -24,12 +24,18 @@ public class NoActivate : ActivateTechStrategy
 }
 
 public interface ActionValidateTechStrategy {
-    bool Validate(Agent agent, Agent.Action action, bool state);
+    bool Validate(Agent agent, Agent.Action action, float value);
 }
 public class NoValidate: ActionValidateTechStrategy {
-    public bool Validate(Agent agent, Agent.Action action, bool state)
+    public bool Validate(Agent agent, Agent.Action action, float value)
     {
         return false;
+    }
+}
+public class AllValidate: ActionValidateTechStrategy {
+    public bool Validate(Agent agent, Agent.Action action, float value)
+    {
+        return true;
     }
 }
 

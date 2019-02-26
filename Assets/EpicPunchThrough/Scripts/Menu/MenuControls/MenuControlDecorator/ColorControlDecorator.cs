@@ -32,19 +32,19 @@ public class ColorControlDecorator : MenuControlDecorator
         image.DOColor(unfocusedColor, transitionTime);
     }
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown ) { image.DOColor(selectedColor, transitionTime); }
+        if( Mathf.Abs(value) > 0 ) { image.DOColor(selectedColor, transitionTime); }
 
         return false;
     }
-    public override bool HandleCancelInput( bool isDown, Menu menu )
+    public override bool HandleCancelInput( float value, Menu menu )
     {
-        base.HandleCancelInput(isDown, menu);
+        base.HandleCancelInput(value, menu);
 
-        if( isDown ) { image.DOColor(selectedColor, transitionTime); }
+        if( Mathf.Abs(value) > 0 ) { image.DOColor(selectedColor, transitionTime); }
 
         return false;
     }

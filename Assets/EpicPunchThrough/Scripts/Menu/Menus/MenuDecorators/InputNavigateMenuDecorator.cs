@@ -4,48 +4,38 @@ using UnityEngine;
 
 public class InputNavigateMenuDecorator : MenuDecorator
 {
-    public override bool OnUp( bool isDown )
+    public override bool OnVertical( float value )
     {
-        base.OnUp(isDown);
+        base.OnVertical(value);
 
-        if( isDown ) {
-            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0], menu.selectedItemCord[1]-1);
+        if( Mathf.Abs(value) > 0 ) {
+            int direction = 0;
+            if( value > 0 ) {
+                direction = -1;
+            } else {
+                direction = 1;
+            }
+            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0], menu.selectedItemCord[1] + direction);
 
             return true;
         }
 
         return false;
     }
-    public override bool OnRight( bool isDown )
+    public override bool OnHorizontal( float value )
     {
-        base.OnRight(isDown);
+        base.OnHorizontal(value);
 
-        if( isDown ) {
-            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0]+1, menu.selectedItemCord[1]);
+        if( Mathf.Abs(value) > 0 ) {
+            int direction = 0;
+            if( value > 0 ) {
+                direction = 1;
+            } else {
+                direction = -1;
+            }
+            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0] + direction, menu.selectedItemCord[1]);
 
             return true;
-        }
-
-        return false;
-    }
-    public override bool OnDown( bool isDown )
-    {
-        base.OnDown(isDown);
-
-        if( isDown ) {
-            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0], menu.selectedItemCord[1]+1);
-
-            return true;
-        }
-
-        return false;
-    }
-    public override bool OnLeft( bool isDown )
-    {
-        base.OnLeft(isDown);
-
-        if( isDown ) {
-            menu.selectedItemCord = new Vector2Int(menu.selectedItemCord[0]-1, menu.selectedItemCord[1]);
         }
 
         return false;

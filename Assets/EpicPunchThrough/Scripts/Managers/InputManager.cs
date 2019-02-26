@@ -10,19 +10,26 @@ public class InputManager
     [Serializable]
     public class InputSettings
     {
+        [Header("Input Settings")]
+        public bool mouseEnabled;
+        public float activateMouseThreshold;
+
+        [Header("General Inputs")]
+        public Axis[] horizontal;
+        public Axis[] vertical;
+
         [Header("Menu Inputs")]
-        public KeyCode[] upKey;
-        public KeyCode[] rightKey;
-        public KeyCode[] downKey;
-        public KeyCode[] leftKey;
         public KeyCode[] confirmKey;
         public KeyCode[] cancelKey;
+        public Axis[] pointerHorizontal;
+        public Axis[] pointerVertical;
+
         [Header("Player Inputs")]
         public KeyCode[] attackKey;
         public KeyCode[] blockKey;
         public KeyCode[] jumpKey;
-        public bool mouseEnabled;
-        public float activateMouseThreshold;
+        public Axis[] aimHorizontal;
+        public Axis[] aimVertical;
     }
 
     #endregion
@@ -43,10 +50,28 @@ public class InputManager
 
     #endregion
 
+    #region Input Enums
+
+    public enum ActiveControlType {
+        Mouse,
+        Keyboard,
+        Controller
+    }
+
+    public enum Axis {
+        ArrowKeysHorizontal, ArrowKeysVertical, WASDHorizontal, WASDVertical, IJKLHorizontal, IJKLVertical, NumpadHorizontal, NumpadVertical,
+        MouseX, MouseY, ScrollWheel,
+        Joystick0Axis0, Joystick0Axis1, Joystick0Axis2, Joystick0Axis3, Joystick0Axis4, Joystick0Axis5, Joystick0Axis6,
+        Joystick1Axis0, Joystick1Axis1, Joystick1Axis2, Joystick1Axis3, Joystick1Axis4, Joystick1Axis5, Joystick1Axis6,
+        Joystick2Axis0, Joystick2Axis1, Joystick2Axis2, Joystick2Axis3, Joystick2Axis4, Joystick2Axis5, Joystick2Axis6,
+        Joystick3Axis0, Joystick3Axis1, Joystick3Axis2, Joystick3Axis3, Joystick3Axis4, Joystick3Axis5, Joystick3Axis6
+    }
+
+    #endregion
+
     #region Input Events
 
-    public delegate bool InputAction(bool isDown);
-    public delegate bool MouseAction(Vector2 pos, Vector2 delta);
+    public delegate bool InputAction(float value);
 
     /// <summary>
     /// Triggers on the frame that Unity's Input.anyKeyDown is true.
@@ -54,35 +79,40 @@ public class InputManager
     /// </summary>
     public event InputAction AnyInput;
 
-    public event InputAction UpInput;
-    public event InputAction RightInput;
-    public event InputAction DownInput;
-    public event InputAction LeftInput;
+    public event InputAction HorizontalInput;
+    public event InputAction VerticalInput;
 
     // Menu Inputs
     public event InputAction ConfirmInput;
     public event InputAction CancelInput;
+    public event InputAction PointerHorizontal;
+    public event InputAction PointerVertical;
 
     // Player Inputs
     public event InputAction AttackInput;
     public event InputAction BlockInput;
     public event InputAction JumpInput;
+    public event InputAction AimHorizontal;
+    public event InputAction AimVertical;
 
-    public event MouseAction MouseMovement;
+    #endregion
+
+    #region Axes Saved Values
+
+    float storedHorizontalValue = 0;
+    float storedVerticalValue = 0;
+    float storedPointerHorizontalValue = 0;
+    float storedPointerVerticalValue = 0;
+    float storedAimHorizontalValue = 0;
+    float storedAimVerticalValue = 0;
 
     #endregion
 
     public InputSettings settings;
 
-    Vector3 oldMousePosition = new Vector2();
-
     public delegate void ActiveControlAction(ActiveControlType previouseState, ActiveControlType newState);
     public event ActiveControlAction ActiveControlChanged;
-    public enum ActiveControlType {
-        Mouse,
-        Keyboard,
-        Controller
-    }
+    
     ActiveControlType _activeControlType = ActiveControlType.Keyboard;
     public ActiveControlType activeControlType {
         get {
@@ -109,47 +139,57 @@ public class InputManager
         return isInitialized;
     }
 
-    public bool GetInput(string input)
+    #region Get Methods
+
+    public float GetInput(string input)
     {
         input = input.ToLower();
 
         switch( input ) {
-            case "up":
-                return GetInput(settings.upKey);
-            case "right":
-                return GetInput(settings.rightKey);
-            case "down":
-                return GetInput(settings.downKey);
-            case "left":
-                return GetInput(settings.leftKey);
+            case "horizontal":
+                return GetInput(settings.horizontal);
+            case "vertical":
+                return GetInput(settings.vertical);
             case "confirm":
                 return GetInput(settings.confirmKey);
             case "cancel":
                 return GetInput(settings.cancelKey);
             default:
                 Debug.LogError("InputManager was requested unknown input: " + input);
-                return false;
+                return 0;
         }
     }
-    public bool GetInput(KeyCode[] input)
+    public float GetInput(KeyCode[] input)
     {
         foreach( KeyCode key in input ) {
-            if( Input.GetKey(key) ) { return true; }
+            if( Input.GetKey(key) ) { return 1; }
         }
 
-        return false;
+        return 0;
     }
+    public float GetInput(Axis[] axes)
+    {
+        float value = 0;
+        foreach( Axis axis in axes ) {
+            float axisValue = Input.GetAxisRaw(axis.ToString());
+            if( Mathf.Abs(axisValue) >= 1 ) { return axisValue; }
+            if( Mathf.Abs(axisValue) > Mathf.Abs(value) ) {
+                value = axisValue;
+            }
+        }
+
+        return value;
+    }
+
     public bool IsNoInput()
     {
-        return  !( GetInput(settings.upKey)
-        || GetInput(settings.rightKey)
-        || GetInput(settings.downKey)
-        || GetInput(settings.leftKey)
-        || GetInput(settings.confirmKey)
-        || GetInput(settings.cancelKey)
-        || GetInput(settings.attackKey)
-        || GetInput(settings.blockKey)
-        || GetInput(settings.jumpKey) );
+        return  ( GetInput(settings.horizontal) == 0
+        && GetInput(settings.vertical) == 0
+        && GetInput(settings.confirmKey) == 0
+        && GetInput(settings.cancelKey) == 0
+        && GetInput(settings.attackKey) == 0
+        && GetInput(settings.blockKey) == 0
+        && GetInput(settings.jumpKey) == 0 );
     }
 
     public ActiveControlType GetInputType(KeyCode input)
@@ -166,55 +206,65 @@ public class InputManager
         }
     }
 
-    void CheckKey(KeyCode[] keys, InputAction action)
+    #endregion
+
+    #region Update Methods
+
+    bool CheckInput( KeyCode[] keys, InputAction action )
     {
         foreach( KeyCode key in keys ) {
             if( Input.GetKeyDown(key) && action != null ) {
-                activeControlType = GetInputType(key); // XXX: Need way to distinguish between keyboard and controller keys
-                action(true);
-                break;
+                activeControlType = GetInputType(key);
+                action(1);
+                return true;
             }
             if( Input.GetKeyUp(key) && action != null ) {
                 activeControlType = GetInputType(key);
-                action(false);
-                break;
+                action(0);
+                return true;
             }
         }
+
+        return false;
     }
+    bool CheckInput( Axis[] axes, InputAction action, float storedValue )
+    {
+        float value = GetInput(axes);
+        if( value != storedValue ) {
+            if( action != null ) { action(value); }
+            return true;
+        }
+
+        return false;
+    }
+
     public void DoUpdate(GameManager.UpdateData data)
     {
-        ManageKeys();
-        ManageMouse();
+        bool anyKeyThisFrame = HandleKeys();
+        HandleAxes();
 
-    }
-    void ManageKeys()
-    {
-        if( Input.anyKeyDown && AnyInput != null ) { AnyInput(true); }
-
-        CheckKey(settings.upKey, UpInput);
-        CheckKey(settings.rightKey, RightInput);
-        CheckKey(settings.downKey, DownInput);
-        CheckKey(settings.leftKey, LeftInput);
-        CheckKey(settings.confirmKey, ConfirmInput);
-        CheckKey(settings.cancelKey, CancelInput);
-        CheckKey(settings.attackKey, AttackInput);
-        CheckKey(settings.blockKey, BlockInput);
-        CheckKey(settings.jumpKey, JumpInput);
-    }
-    void ManageMouse()
-    {
-        if( activeControlType != ActiveControlType.Mouse 
-            && Vector2.Distance(Input.mousePosition, oldMousePosition) >= settings.activateMouseThreshold )
-        {
-            activeControlType = ActiveControlType.Mouse;
+        if( anyKeyThisFrame ) {
+            if( AnyInput != null ) { AnyInput(1); }
         }
-        if( activeControlType == ActiveControlType.Mouse
-            && Input.mousePosition != oldMousePosition )
-        {
-            Vector2 delta = oldMousePosition - Input.mousePosition;
-            if( MouseMovement != null ) {  MouseMovement(Input.mousePosition, delta); }
-        }
-
-        oldMousePosition = Input.mousePosition;
     }
+    bool HandleKeys()
+    {
+        return 
+            CheckInput( settings.confirmKey, ConfirmInput )
+            | CheckInput( settings.cancelKey, CancelInput )
+            | CheckInput( settings.attackKey, AttackInput )
+            | CheckInput( settings.blockKey, BlockInput )
+            | CheckInput( settings.jumpKey, JumpInput );
+    }
+    void HandleAxes()
+    {
+        CheckInput( settings.horizontal, HorizontalInput, storedHorizontalValue );
+        CheckInput( settings.vertical, VerticalInput, storedVerticalValue );
+        CheckInput( settings.pointerHorizontal, PointerHorizontal, storedPointerHorizontalValue );
+        CheckInput( settings.pointerVertical, PointerVertical, storedPointerVerticalValue );
+        CheckInput( settings.aimHorizontal, AimHorizontal, storedAimHorizontalValue );
+        CheckInput( settings.aimVertical, AimVertical, storedAimVerticalValue );
+    }
+
+    #endregion
 }

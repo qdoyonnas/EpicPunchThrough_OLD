@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class IntroBar : Menu
 {
-    protected override bool OnAnyKey( bool isDown )
+    protected override bool OnAnyKey( float value )
     {
-        if( base.OnAnyKey(isDown) ) { return true; }
-        if( !isDown || InputManager.Instance.GetInput("cancel") ) { return false; }
+        if( base.OnAnyKey(value) ) { return true; }
+        if( Mathf.Abs(value) <= 0 || Mathf.Abs(InputManager.Instance.GetInput("cancel")) > 0 ) { return false; }
 
         TransitionOut( () => {
             Menu mainMenu = MenuManager.Instance.GetMenu("MainMenu");
@@ -17,10 +17,10 @@ public class IntroBar : Menu
 
         return true;
     }
-    protected override bool OnCancel( bool isDown )
+    protected override bool OnCancel( float value )
     {
-        if( base.OnCancel(isDown) ) { return true; }
-        if( !isDown ) { return false; }
+        if( base.OnCancel(value) ) { return true; }
+        if( Mathf.Abs(value) <= 0 ) { return false; }
 
         Debug.Log("QUIT");
         Application.Quit();

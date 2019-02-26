@@ -6,11 +6,11 @@ public class GameStateControl : MenuControl
 {
     public GameManager.GameState state;
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown ) {
+        if( Mathf.Abs(value) > 0 ) {
             GameManager.Instance.SetState(state);
 
             return true;

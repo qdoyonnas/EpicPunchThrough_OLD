@@ -6,11 +6,11 @@ public class MenuSceneLoadControl : MenuControl
 {
     public string displayMenuNameOnLoad = string.Empty;
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown ) {
+        if( Mathf.Abs(value) > 0 ) {
             MenuManager.Instance.displayMenuNameOnLoad = displayMenuNameOnLoad;
             GameManager.Instance.SetState(GameManager.GameState.menu);
             return true;

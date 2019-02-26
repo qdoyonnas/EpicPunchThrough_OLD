@@ -9,11 +9,11 @@ public class TabControl : MenuControl
     public bool isVertical = false;
     public bool autoSwitchOnInput = true;
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown ) {
+        if( Mathf.Abs(value) > 0 ) {
             Debug.Log("Switch to " + gameObject.name + " tab");
 
             return true;
@@ -22,57 +22,45 @@ public class TabControl : MenuControl
         return false;
     }
 
-    public override bool HandleRightInput( bool isDown, Menu menu )
+    public override bool HandleHorizontal( float value, Menu menu )
     {
-        base.HandleRightInput(isDown, menu);
+        base.HandleHorizontal(value, menu);
 
-        if( !isVertical && nextTab != null && isDown ) {
-            menu.selectedItemCord = nextTab.menuItemCord;
-            if( autoSwitchOnInput ) {  nextTab.HandleConfirmInput(true, menu); }
+        if( !isVertical && Mathf.Abs(value) > 0 ) {
+            TabControl selectedTab = null;
+            if( value > 0 ) {
+                selectedTab = nextTab;
+            } else {
+                selectedTab = previousTab;
+            }
+
+            menu.selectedItemCord = selectedTab.menuItemCord;
+            if( autoSwitchOnInput ) {  selectedTab.HandleConfirmInput(1, menu); }
 
             return true;
         }
 
         return false; 
     }
-    public override bool HandleLeftInput( bool isDown, Menu menu )
+    public override bool HandleVertical( float value, Menu menu )
     {
-        base.HandleLeftInput(isDown, menu);
+        base.HandleVertical(value, menu);
 
-        if( !isVertical && previousTab != null && isDown ) {
-            menu.selectedItemCord = previousTab.menuItemCord;
-            if( autoSwitchOnInput ) { previousTab.HandleConfirmInput(true, menu); }
+        if( isVertical  && Mathf.Abs(value) > 0 ) {
+            TabControl selectedTab = null;
+            if( value > 0 ) {
+                selectedTab = previousTab;
+            } else {
+                selectedTab = nextTab;
+            }
+            if( selectedTab == null ) { return false; }
 
-            return true;
-        }
-
-        return false;
-    }
-
-    public override bool HandleUpInput( bool isDown, Menu menu )
-    {
-        base.HandleUpInput(isDown, menu);
-
-        if( isVertical && previousTab != null && isDown ) {
-            menu.selectedItemCord = previousTab.menuItemCord;
-            if( autoSwitchOnInput ) {  previousTab.HandleConfirmInput(true, menu); }
+            menu.selectedItemCord = selectedTab.menuItemCord;
+            if( autoSwitchOnInput ) {  selectedTab.HandleConfirmInput(1, menu); }
 
             return true;
         }
 
         return false; 
-    }
-    public override bool HandleDownInput( bool isDown, Menu menu )
-    {
-        base.HandleDownInput(isDown, menu);
-
-        if( isVertical && nextTab != null && isDown ) {
-            menu.selectedItemCord = nextTab.menuItemCord;
-            if( autoSwitchOnInput ) { nextTab.HandleConfirmInput(true, menu); }
-
-            return true;
-        }
-
-        return false;
     }
 }

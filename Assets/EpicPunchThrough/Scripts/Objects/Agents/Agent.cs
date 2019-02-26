@@ -143,6 +143,13 @@ public class Agent : MonoBehaviour
         }
     }
 
+    private float _activeActionValue = 0;
+    public float activeActionValue {
+        get {
+            return _activeActionValue;
+        }
+    }
+
     protected Vector2 _aimDirection = Vector2.up;
     public Vector2 aimDirection {
         get {
@@ -524,12 +531,13 @@ public class Agent : MonoBehaviour
         }
     }
 
-    public void PerformAction( Action action, bool state )
+    public void PerformAction( Action action, float value )
     {
         if( ValidActiveTechnique()
-            && !activeTechnique.ValidateAction(action, state) )
+            && !activeTechnique.ValidateAction(action, value) )
         { return; }
-        if( !state ) { return; }
+
+        if( value == 0 ) { _activeActionValue = 0; return; }
 
         ActionEvent handler;
         switch( action ) {
@@ -547,12 +555,14 @@ public class Agent : MonoBehaviour
                 return;
         }
 
-        if( state ) {
+        if( actions[actions.Count - 1] != action ) {
             actions.Add(action);
+
             if( actions.Count > AgentManager.Instance.settings.actionSequenceLength ) {
                 actions.RemoveAt(0);
             }
         }
+        _activeActionValue = value;
 
         if( handler != null ) {
             handler();

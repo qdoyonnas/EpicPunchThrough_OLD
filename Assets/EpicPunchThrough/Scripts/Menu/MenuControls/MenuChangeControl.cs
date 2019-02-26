@@ -8,11 +8,11 @@ public class MenuChangeControl: MenuControl
     public bool additive = false;
     public bool setCancelBack = false;
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( menuNames.Length > 0 && isDown ) {
+        if( menuNames.Length > 0 && Mathf.Abs(value) > 0 ) {
 
             bool didFail = false;
             Menu[] menus = new Menu[menuNames.Length];

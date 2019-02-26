@@ -6,11 +6,11 @@ public class CancelMenuDecorator : MenuDecorator
 {
     public string[] cancelMenuNames; // XXX: Consider making non-array
 
-    public override bool OnCancel( bool isDown )
+    public override bool OnCancel( float value )
     {
-        base.OnCancel(isDown);
+        base.OnCancel(value);
 
-        if( cancelMenuNames.Length > 0 && isDown ) {
+        if( cancelMenuNames.Length > 0 && Mathf.Abs(value) > 0 ) {
             bool didFail = false;
             Menu[] menus = new Menu[cancelMenuNames.Length];
 

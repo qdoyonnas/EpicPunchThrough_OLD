@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class GameStartControl : MenuControl
 {
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        if( isDown ) {
+        if( Mathf.Abs(value) > 0 ) {
             GameManager.Instance.SetState(GameManager.GameState.play);
 
             return true;

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class ExitControl : MenuControl
 {
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown ) {
+        if( Mathf.Abs(value) > 0 ) {
             Debug.Log("QUIT");
             GameManager.Instance.SetState(GameManager.GameState.exit);
             Application.Quit();

@@ -8,10 +8,8 @@ public class SoundControlDecorator : MenuControlDecorator
     public AudioClip soundOnFocus;
     public AudioClip soundOnUnfocus;
     public AudioClip soundOnAny;
-    public AudioClip soundOnUp;
-    public AudioClip soundOnRight;
-    public AudioClip soundOnDown;
-    public AudioClip soundOnLeft;
+    public AudioClip soundOnHorizontal;
+    public AudioClip soundOnVertical;
     public AudioClip soundOnConfirm;
     public AudioClip soundOnCancel;
 
@@ -56,66 +54,45 @@ public class SoundControlDecorator : MenuControlDecorator
 
         return false;
     }
-    public override bool HandleUpInput( bool isDown, Menu menu )
+    public override bool HandleHorizontal( float value, Menu menu )
     {
-        base.HandleUpInput(isDown, menu);
+        base.HandleHorizontal(value, menu);
 
-        if( isDown && soundOnUp != null ) {
-            source.clip = soundOnUp;
+        if( Mathf.Abs(value) > 0 && soundOnHorizontal != null ) {
+            source.clip = soundOnHorizontal;
             SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
         }
 
         return false;
     }
-    public override bool HandleRightInput( bool isDown, Menu menu )
+    public override bool HandleVertical( float value, Menu menu )
     {
-        base.HandleRightInput(isDown, menu);
+        base.HandleVertical(value, menu);
 
-        if( isDown && soundOnRight != null ) {
-            source.clip = soundOnRight;
+        if( Mathf.Abs(value) > 0 && soundOnVertical != null ) {
+            source.clip = soundOnVertical;
             SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
         }
 
         return false;
     }
-    public override bool HandleDownInput( bool isDown, Menu menu )
+    
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleDownInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
-        if( isDown && soundOnDown != null ) {
-            source.clip = soundOnDown;
-            SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
-        }
-
-        return false;
-    }
-    public override bool HandleLeftInput( bool isDown, Menu menu )
-    {
-        base.HandleLeftInput(isDown, menu);
-
-        if( isDown && soundOnLeft != null ) {
-            source.clip = soundOnLeft;
-            SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
-        }
-
-        return false;
-    }
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
-    {
-        base.HandleConfirmInput(isDown, menu);
-
-        if( isDown && soundOnConfirm != null ) {
+        if( Mathf.Abs(value) > 0 && soundOnConfirm != null ) {
             source.clip = soundOnConfirm;
             SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
         }
 
         return false;
     }
-    public override bool HandleCancelInput( bool isDown, Menu menu )
+    public override bool HandleCancelInput( float value, Menu menu )
     {
-        base.HandleCancelInput(isDown, menu);
+        base.HandleCancelInput(value, menu);
 
-        if( isDown && soundOnCancel != null ) {
+        if( Mathf.Abs(value) > 0 && soundOnCancel != null ) {
             source.clip = soundOnCancel;
             SoundManager.Instance.RegisterSound(SoundManager.SoundLayer.menu, 0, source);
         }

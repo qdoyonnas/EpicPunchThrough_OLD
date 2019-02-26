@@ -44,45 +44,34 @@ public class MenuDecorator: MonoBehaviour
         if( decorator != null ) { decorator.SelectorColor(color, duration); }
     }
  
-    public virtual bool OnAnyKey( bool isDown )
+    public virtual bool OnAnyKey( float value )
     {
-        if( decorator != null ) { decorator.OnAnyKey(isDown); }
+        if( decorator != null ) { decorator.OnAnyKey(value); }
 
         return false;
     }
-    public virtual bool OnUp( bool isDown )
+    public virtual bool OnHorizontal( float value )
     {
-        if( decorator != null ) { decorator.OnUp(isDown); }
+        if( decorator != null ) { decorator.OnHorizontal(value); }
 
         return false;
     }
-    public virtual bool OnRight( bool isDown )
+    public virtual bool OnVertical( float value )
     {
-        if( decorator != null ) { decorator.OnRight(isDown); }
+        if( decorator != null ) { decorator.OnVertical(value); }
 
         return false;
     }
-    public virtual bool OnDown( bool isDown )
+    
+    public virtual bool OnConfirm( float value )
     {
-        if( decorator != null ) { decorator.OnDown(isDown); }
+        if( decorator != null ) { decorator.OnConfirm(value); }
 
         return false;
     }
-    public virtual bool OnLeft( bool isDown )
+    public virtual bool OnCancel( float value )
     {
-        if( decorator != null ) { decorator.OnLeft(isDown); }
-
-        return false;
-    }
-    public virtual bool OnConfirm( bool isDown )
-    {
-        if( decorator != null ) { decorator.OnConfirm(isDown); }
-
-        return false;
-    }
-    public virtual bool OnCancel( bool isDown )
-    {
-        if( decorator != null ) { decorator.OnCancel(isDown); }
+        if( decorator != null ) { decorator.OnCancel(value); }
 
         return false;
     }

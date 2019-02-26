@@ -22,10 +22,10 @@ public class EndTechValidate : ActionValidateTechStrategy
         this.actionStates = actionStates;
     }
 
-    public bool Validate( Agent agent, Agent.Action action, bool state )
+    public bool Validate( Agent agent, Agent.Action action, float value )
     {
         foreach( ActionState actionState in actionStates ) {
-            if( actionState.action == action && actionState.state == state  ) {
+            if( actionState.action == action && actionState.state == (Mathf.Abs(value) > 0)  ) {
                 agent.TransitionTechnique(null, true);
                 return true;
             }

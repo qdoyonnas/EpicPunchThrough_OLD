@@ -54,9 +54,9 @@ public class PlayManager
         return SceneManager.GetSceneByName(gameSceneName);
     }
 
-    bool Pause(bool isDown)
+    bool Pause(float value)
     {
-        if( isDown ) {
+        if( value > 0 ) {
             GameManager.Instance.SetState(GameManager.GameState.pause);
 
             return true;

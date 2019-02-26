@@ -41,9 +41,9 @@ public class SelectorControlDecorator : MenuControlDecorator
         menu.DisplaySelector(false);
     }
 
-    public override bool HandleConfirmInput( bool isDown, Menu menu )
+    public override bool HandleConfirmInput( float value, Menu menu )
     {
-        base.HandleConfirmInput(isDown, menu);
+        base.HandleConfirmInput(value, menu);
 
         menu.SelectorColor(selectedColor, transitionTime);
 
