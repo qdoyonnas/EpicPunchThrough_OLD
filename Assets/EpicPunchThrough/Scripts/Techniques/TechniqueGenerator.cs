@@ -126,8 +126,8 @@ public class TechniqueGenerator
             new Agent.Action[] { Agent.Action.MoveBack },
             null,
             new FlipDirectionActivate(),
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, true),
+                                new EndTechValidate.ActionState(Agent.Action.MoveBack, false) ),
             new RunForwardUpdate(10f, 6f),
             null
         );

@@ -315,7 +315,7 @@ MonoBehaviour:
           maxY: 0
   activeCamera: {fileID: 0}
   DebugOn: 1
-  initialState: 1
+  initialState: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

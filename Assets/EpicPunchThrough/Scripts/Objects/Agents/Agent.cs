@@ -555,7 +555,7 @@ public class Agent : MonoBehaviour
                 return;
         }
 
-        if( actions[actions.Count - 1] != action ) {
+        if( actions.Count == 0 || actions[actions.Count - 1] != action ) {
             actions.Add(action);
 
             if( actions.Count > AgentManager.Instance.settings.actionSequenceLength ) {

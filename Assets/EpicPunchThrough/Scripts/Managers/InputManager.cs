@@ -227,11 +227,12 @@ public class InputManager
 
         return false;
     }
-    bool CheckInput( Axis[] axes, InputAction action, float storedValue )
+    bool CheckInput( Axis[] axes, InputAction action, ref float storedValue )
     {
         float value = GetInput(axes);
         if( value != storedValue ) {
             if( action != null ) { action(value); }
+            storedValue = value;
             return true;
         }
 
@@ -258,12 +259,12 @@ public class InputManager
     }
     void HandleAxes()
     {
-        CheckInput( settings.horizontal, HorizontalInput, storedHorizontalValue );
-        CheckInput( settings.vertical, VerticalInput, storedVerticalValue );
-        CheckInput( settings.pointerHorizontal, PointerHorizontal, storedPointerHorizontalValue );
-        CheckInput( settings.pointerVertical, PointerVertical, storedPointerVerticalValue );
-        CheckInput( settings.aimHorizontal, AimHorizontal, storedAimHorizontalValue );
-        CheckInput( settings.aimVertical, AimVertical, storedAimVerticalValue );
+        CheckInput( settings.horizontal, HorizontalInput, ref storedHorizontalValue );
+        CheckInput( settings.vertical, VerticalInput, ref storedVerticalValue );
+        CheckInput( settings.pointerHorizontal, PointerHorizontal, ref storedPointerHorizontalValue );
+        CheckInput( settings.pointerVertical, PointerVertical, ref storedPointerVerticalValue );
+        CheckInput( settings.aimHorizontal, AimHorizontal, ref storedAimHorizontalValue );
+        CheckInput( settings.aimVertical, AimVertical, ref storedAimVerticalValue );
     }
 
     #endregion
