@@ -113,6 +113,8 @@ public class Menu: MonoBehaviour
     protected MenuDecorator decorator;
     GraphicRaycaster raycaster;
 
+    #region Initialization
+
     bool didInit = false;
     private void Awake()
     {
@@ -170,6 +172,8 @@ public class Menu: MonoBehaviour
         selector = GetComponentInChildren<Selector>();
         DisplaySelector(false);
     }
+
+    #endregion
 
     private void OnDestroy()
     {
@@ -239,6 +243,8 @@ public class Menu: MonoBehaviour
             InputManager.Instance.VerticalInput += OnVertical;
             InputManager.Instance.ConfirmInput += OnConfirm;
             InputManager.Instance.CancelInput += OnCancel;
+
+            UICursor.PositionChanged += OnPointerPositionChange;
         } else {
             InputManager.Instance.AnyInput -= OnAnyKey;
 
@@ -246,6 +252,8 @@ public class Menu: MonoBehaviour
             InputManager.Instance.VerticalInput -= OnVertical;
             InputManager.Instance.ConfirmInput -= OnConfirm;
             InputManager.Instance.CancelInput -= OnCancel;
+
+            UICursor.PositionChanged -= OnPointerPositionChange;
         }
     }
 
@@ -329,34 +337,31 @@ public class Menu: MonoBehaviour
         return false;
     }
 
-    protected virtual bool HandlePointerInteraction(Vector2 pos, Vector2 delta)
+    protected virtual bool OnPointerPositionChange( Vector2 pos, Vector2 delta )
     {
-        if( decorator != null ) { decorator.HandlePointerInteraction(pos, delta); }
-
-        // Setup Raycast
-        if( raycaster == null ) { return false; }
+        if( !inFocus ) { return false; }
 
         PointerEventData pointerData = new PointerEventData(MenuManager.Instance.eventSystem);
         pointerData.position = pos;
-        List<RaycastResult> resultList = new List<RaycastResult>();
-        raycaster.Raycast(pointerData, resultList);
-        
-        foreach( RaycastResult result in resultList ) {
-            // Find all MenuControl components (catching Decorators)
-            MenuControl[] items = result.gameObject.GetComponents<MenuControl>();
-            foreach( MenuControl item in items ) {
-                if( item != null ) {
-                    // Skip decorators as they are not recorded by the menu
-                    if( item.GetType().IsSubclassOf(typeof(MenuControlDecorator)) ) { continue; }
 
-                    // Check if focus needs to be updated
-                    if( item != selectedItem ) {
-                        selectedItemCord = item.menuItemCord;
+        List<RaycastResult> results = new List<RaycastResult>();
+        raycaster.Raycast(pointerData, results);
+
+        foreach( RaycastResult result in results ) {
+            MenuControl[] controls = result.gameObject.GetComponents<MenuControl>();
+            foreach( MenuControl control in controls ) {
+                if( !control.GetType().IsSubclassOf(typeof(MenuControlDecorator)) ) {
+                    if( control.OnPointerPositionChange( pos, delta, this ) ) {
+                        return true;
+                    } else if( selectedItem != control ) {
+                        selectedItemCord = control.menuItemCord;
+                        return true;
                     }
-                    return true;
                 }
             }
         }
+
+        if( decorator != null ) { decorator.OnPointerPositionChange( pos, delta ); }
 
         return false;
     }

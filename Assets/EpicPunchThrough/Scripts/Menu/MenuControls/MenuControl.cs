@@ -72,4 +72,11 @@ public class MenuControl : MonoBehaviour
 
         return false;
     }
+
+    public virtual bool OnPointerPositionChange( Vector2 pos, Vector2 delta, Menu menu )
+    {
+        if( decorator!= null ) { decorator.OnPointerPositionChange( pos, delta, menu ); }
+
+        return false;
+    }
 }

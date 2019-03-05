@@ -13,6 +13,7 @@ public class InputManager
         [Header("Input Settings")]
         public bool mouseEnabled;
         public float activateMouseThreshold;
+        public float pointerSensitivity;
 
         [Header("General Inputs")]
         public Axis[] horizontal;
@@ -60,7 +61,9 @@ public class InputManager
 
     public enum Axis {
         ArrowKeysHorizontal, ArrowKeysVertical, WASDHorizontal, WASDVertical, IJKLHorizontal, IJKLVertical, NumpadHorizontal, NumpadVertical,
+        MouseInputs, // DO NOT USE
         MouseX, MouseY, ScrollWheel,
+        JoystickInputs, // DO NOT USE
         Joystick0Axis0, Joystick0Axis1, Joystick0Axis2, Joystick0Axis3, Joystick0Axis4, Joystick0Axis5, Joystick0Axis6,
         Joystick1Axis0, Joystick1Axis1, Joystick1Axis2, Joystick1Axis3, Joystick1Axis4, Joystick1Axis5, Joystick1Axis6,
         Joystick2Axis0, Joystick2Axis1, Joystick2Axis2, Joystick2Axis3, Joystick2Axis4, Joystick2Axis5, Joystick2Axis6,
@@ -175,6 +178,7 @@ public class InputManager
             if( Mathf.Abs(axisValue) >= 1 ) { return axisValue; }
             if( Mathf.Abs(axisValue) > Mathf.Abs(value) ) {
                 value = axisValue;
+                activeControlType = GetInputType(axis);
             }
         }
 
@@ -203,6 +207,16 @@ public class InputManager
             return ActiveControlType.Mouse;
         } else {
             return ActiveControlType.Keyboard;
+        }
+    }
+    public ActiveControlType GetInputType(Axis axis)
+    {
+        if( axis < Axis.MouseInputs ) {
+            return ActiveControlType.Keyboard;
+        } else if( axis < Axis.JoystickInputs ) {
+            return ActiveControlType.Mouse;
+        } else {
+            return ActiveControlType.Controller;
         }
     }
 
@@ -261,8 +275,10 @@ public class InputManager
     {
         CheckInput( settings.horizontal, HorizontalInput, ref storedHorizontalValue );
         CheckInput( settings.vertical, VerticalInput, ref storedVerticalValue );
+
         CheckInput( settings.pointerHorizontal, PointerHorizontal, ref storedPointerHorizontalValue );
         CheckInput( settings.pointerVertical, PointerVertical, ref storedPointerVerticalValue );
+
         CheckInput( settings.aimHorizontal, AimHorizontal, ref storedAimHorizontalValue );
         CheckInput( settings.aimVertical, AimVertical, ref storedAimVerticalValue );
     }

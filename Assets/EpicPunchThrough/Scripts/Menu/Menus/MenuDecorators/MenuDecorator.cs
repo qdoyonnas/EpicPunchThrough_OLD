@@ -76,9 +76,9 @@ public class MenuDecorator: MonoBehaviour
         return false;
     }
 
-    public virtual bool HandlePointerInteraction( Vector2 pos, Vector2 delta )
+    public virtual bool OnPointerPositionChange( Vector2 pos, Vector2 delta )
     {
-        if( decorator != null ) { decorator.HandlePointerInteraction(pos, delta); }
+        if( decorator != null ) { decorator.OnPointerPositionChange(pos, delta); }
 
         return false;
     }

@@ -271,17 +271,18 @@ MonoBehaviour:
     inputSettings:
       mouseEnabled: 1
       activateMouseThreshold: 10
-      horizontal: 00000000020000000b000000
-      vertical: 01000000030000000c000000
+      pointerSensitivity: 2.5
+      horizontal: 00000000020000000d000000
+      vertical: 01000000030000000e000000
       confirmKey: 0d0000002000000043010000
       cancelKey: 1b0000000800000044010000
-      pointerHorizontal: 
-      pointerVertical: 
+      pointerHorizontal: 09000000
+      pointerVertical: 0a000000
       attackKey: 43010000
       blockKey: 44010000
       jumpKey: 20000000
-      aimHorizontal: 
-      aimVertical: 
+      aimHorizontal: 090000000d000000
+      aimVertical: 0a0000000e000000
     soundSettings:
       musicOn: 1
       soundOn: 1
@@ -315,7 +316,7 @@ MonoBehaviour:
           maxY: 0
   activeCamera: {fileID: 0}
   DebugOn: 1
-  initialState: 2
+  initialState: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
