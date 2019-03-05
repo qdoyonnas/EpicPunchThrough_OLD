@@ -21,10 +21,16 @@ public class PlayerAgent : Agent
             InputManager.Instance.HorizontalInput += OnHorizontal;
             InputManager.Instance.VerticalInput += OnVertical;
             InputManager.Instance.JumpInput += OnJump;
+
+            InputManager.Instance.AimHorizontal += OnAimHorizontal;
+            InputManager.Instance.AimVertical += OnAimVertical;
         } else {
             InputManager.Instance.HorizontalInput -= OnHorizontal;
             InputManager.Instance.VerticalInput -= OnVertical;
             InputManager.Instance.JumpInput -= OnJump;
+
+            InputManager.Instance.AimHorizontal -= OnAimHorizontal;
+            InputManager.Instance.AimVertical -= OnAimVertical;
         }
     }
 
@@ -56,6 +62,25 @@ public class PlayerAgent : Agent
     }
     protected bool OnVertical( float value )
     {
+
+        return true;
+    }
+
+    protected bool OnAimHorizontal( float value )
+    {
+        if( Mathf.Abs(value) <= 0.1f ) { return false; }
+        value = (value < 0 ? -1: 1);
+
+        aimDirection = new Vector2( value, InputManager.Instance.GetInput(InputManager.Instance.settings.aimVertical) );
+
+        return true;
+    }
+    protected bool OnAimVertical( float value )
+    {
+        if( Mathf.Abs(value) <= 0.1f ) { return false; }
+        value = (value < 0 ? -1: 1);
+
+        aimDirection = new Vector2( InputManager.Instance.GetInput(InputManager.Instance.settings.aimHorizontal), value );
 
         return true;
     }
