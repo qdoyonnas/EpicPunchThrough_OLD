@@ -8,6 +8,6 @@ public class JumpExit : ExitTechStrategy
     {
         Vector3 jumpVector = agent.aimDirection * 10f;
 
-        agent.rigidbody.velocity = agent.rigidbody.velocity + jumpVector;
+        agent.physicsBody.AddVelocity(jumpVector);
     }
 }

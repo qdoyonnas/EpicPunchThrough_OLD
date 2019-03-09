@@ -15,15 +15,11 @@ public class RunForwardUpdate : UpdateTechStrategy
 
     public void Update( Agent agent, GameManager.UpdateData data )
     {
-        Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime);
-        float directionalVelocity = agent.rigidbody.velocity.x + Mathf.Abs(agent.rigidbody.velocity.y);
+        if( agent.physicsBody.velocity.magnitude > maxSpeed ) { return; }
 
-        if( agent.isFacingRight ) {
-            if( directionalVelocity >= maxSpeed ) { return; }
-            agent.rigidbody.velocity += velDelta;
-        } else {
-            if( directionalVelocity <= -maxSpeed ) { return; }
-            agent.rigidbody.velocity -= velDelta;
-        }
+        Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime);
+        if( !agent.isFacingRight ) { velDelta = -velDelta; }
+
+        agent.physicsBody.AddVelocity(velDelta);
     }
 }

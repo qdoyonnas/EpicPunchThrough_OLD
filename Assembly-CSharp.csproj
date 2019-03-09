@@ -134,6 +134,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\DirectionIndicator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\UI\UICursor.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\Follow.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\PhysicsCollisionMatrix.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\TriggerCheck.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Utility\Utilities.cs" />
     <Compile Include="Assets\Wireframe\Examples\Scripts\AutoRotate.cs" />
