@@ -31,4 +31,9 @@ public class Environment
     public string sceneName;
     public Vector3 gravity;
     public WorldBounds agentBounds;
+
+    public float groundFriction;
+    public float airFriction;
+
+    public GameObject[] propPrefabs;
 }

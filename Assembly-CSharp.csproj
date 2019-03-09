@@ -99,6 +99,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\MenuManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\PlayManager.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\PropsManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\ExitControl.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\MenuControls\GameStartControl.cs" />
@@ -121,6 +122,8 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Transitional.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Agents\Agent.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Agents\PlayerAgent.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\PhysicsBody.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Props\Prop.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ActionValidateStrategies\EndTechValidate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ActivateStrategies\FlipDirectionActivate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ExitStrategies\JumpExit.cs" />

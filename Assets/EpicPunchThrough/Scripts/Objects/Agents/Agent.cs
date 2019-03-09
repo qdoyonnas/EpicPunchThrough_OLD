@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent( typeof(Animator), typeof(Rigidbody), typeof(CapsuleCollider) )]
+[RequireComponent( typeof(Animator), typeof(PhysicsBody), typeof(CapsuleCollider) )]
 public class Agent : MonoBehaviour
 {
     #region Animation Fields
@@ -24,6 +24,7 @@ public class Agent : MonoBehaviour
     protected string transitionStateName = "ControllerTransition";
     protected string transitionBool = "transitionController";
 
+    protected Transform graphicsChild;
     protected DirectionIndicator directionIndicator;
 
     #endregion
@@ -64,7 +65,7 @@ public class Agent : MonoBehaviour
         }
         set {
             _isFacingRight = value;
-            transform.localScale = new Vector3( isFacingRight ? -1 : 1, 1, 1 );
+            graphicsChild.localScale = new Vector3( isFacingRight ? -1 : 1, 1, 1 );
         }
     }
 
@@ -87,23 +88,22 @@ public class Agent : MonoBehaviour
             _state = value;
             switch( value ) {
                 case State.Grounded:
-                    xFriction = AgentManager.Instance.settings.groundFriction;
-                    yFriction = 0;
-                    rigidbody.useGravity = false;
-                    rigidbody.velocity = new Vector3( rigidbody.velocity.x, 0, 0 );
+                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().groundFriction, 0, 0);
+                    physicsBody.usesGravity = false;
+                    physicsBody.velocity = new Vector3( physicsBody.velocity.x, 0, 0 );
                     break;
                 case State.InAir:
-                    xFriction = AgentManager.Instance.settings.airFriction;
-                    yFriction = 0;
-                    rigidbody.useGravity = true;
+                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
+                    physicsBody.usesGravity = true;
                     break;
                 case State.WallSliding:
-                    yFriction = AgentManager.Instance.settings.wallFriction;
-                    rigidbody.velocity = new Vector3( 0, rigidbody.velocity.y, 0 );
+                    physicsBody.velocity = new Vector3( 0, physicsBody.velocity.y, 0 );
+                    physicsBody.usesGravity = true;
                     break;
                 case State.OnCeiling:
-                    xFriction = AgentManager.Instance.settings.airFriction;
-                    yFriction = 0;
+                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
+                    physicsBody.velocity = new Vector3( physicsBody.velocity.x, 0, 0 );
+                    physicsBody.usesGravity = true;
                     break;
                 case State.Flinched:
 
@@ -112,9 +112,8 @@ public class Agent : MonoBehaviour
 
                     break;
                 case State.Launched:
-                    xFriction = AgentManager.Instance.settings.airFriction;
-                    yFriction = 0;
-                    rigidbody.useGravity = true;
+                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
+                    physicsBody.usesGravity = true;
                     break;
             }
         }
@@ -162,7 +161,6 @@ public class Agent : MonoBehaviour
             _aimDirection = value.normalized;
 
             directionIndicator.transform.eulerAngles = new Vector3( 0, 0, Vector2.SignedAngle(Vector2.up, _aimDirection) );
-            Debug.Log( string.Format("AimDirection: {0}, Angle: {1}", _aimDirection, directionIndicator.transform.eulerAngles.z) );
         }
     }
 
@@ -170,13 +168,10 @@ public class Agent : MonoBehaviour
 
     #region Physics Fields
 
-    protected float xFriction = 0f;
-    protected float yFriction = 0f;
-
-    protected Rigidbody _rigidbody;
-    new public Rigidbody rigidbody {
+    protected PhysicsBody _physicsBody;
+    public PhysicsBody physicsBody {
         get {
-            return _rigidbody;
+            return _physicsBody;
         }
     }
     protected CapsuleCollider _collider;
@@ -227,7 +222,7 @@ public class Agent : MonoBehaviour
         animator = GetComponent<Animator>();
         animatorController = baseController;
 
-        _rigidbody = GetComponent<Rigidbody>();
+        _physicsBody = GetComponent<PhysicsBody>();
         _collider = GetComponent<CapsuleCollider>();
 
         _groundCheck = FindTriggerCheck( "GroundCheck", SetGroundFound );
@@ -235,6 +230,7 @@ public class Agent : MonoBehaviour
         _rightWallCheck = FindTriggerCheck( "RightWallCheck", SetWallFound );
         _ceilingCheck = FindTriggerCheck( "CeilingCheck", SetCeilingFound );
 
+        graphicsChild = transform.Find("Graphics");
         directionIndicator = GetComponentInChildren<DirectionIndicator>();
         directionIndicator.gameObject.SetActive(false);
 
@@ -340,12 +336,11 @@ public class Agent : MonoBehaviour
         CheckState();
 
         HandleTechniques();
-
         if( ValidActiveTechnique() ) {
             activeTechnique.Update(data);
-        } else {
-            HandlePhysics();
         }
+
+        physicsBody.DoUpdate(data);
     }
 
     protected virtual void HandleTechniques()
@@ -413,32 +408,6 @@ public class Agent : MonoBehaviour
         }
     }
 
-    public virtual void HandlePhysics()
-    {
-        HandleGravity();
-        HandleFriction();
-    }
-    public virtual void HandleGravity()
-    {
-
-    }
-    public virtual void HandleFriction()
-    {
-        if( xFriction > 0 ) {
-            rigidbody.velocity = new Vector3( rigidbody.velocity.x * (1 - xFriction), rigidbody.velocity.y, 0 );
-            if( Mathf.Abs(rigidbody.velocity.x) < AgentManager.Instance.settings.autoStopSpeed ) {
-                rigidbody.velocity = new Vector3( 0, rigidbody.velocity.y, 0);
-            }
-        }
-
-        if( yFriction > 0 ) {
-            rigidbody.velocity = new Vector3( rigidbody.velocity.y , rigidbody.velocity.y * (1 - yFriction), 0 );
-            if( Mathf.Abs(rigidbody.velocity.y) < AgentManager.Instance.settings.autoStopSpeed ) {
-                rigidbody.velocity = new Vector3( rigidbody.velocity.x, 0, 0);
-            }
-        }
-    }
-    
     #endregion
 
     #region Technique Methods

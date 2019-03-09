@@ -22,9 +22,6 @@ public class AgentManager
 
         [Header("Physic Settings")]
         public float autoStopSpeed;
-        public float airFriction;
-        public float groundFriction;
-        public float wallFriction;
         public Vector3 verticalBoundarySize;
         public Vector3 horizontalBoundarySize;
     }
@@ -92,14 +89,22 @@ public class AgentManager
         fighter,
         boss
     }
-    public struct SpawnData
+    public struct AgentSpawnData
     {
-        public Vector3 position;
-        public string name;
-        public AgentType type;
-        public int team;
+        public readonly Vector3 position;
+        public readonly string name;
+        public readonly AgentType type;
+        public readonly int team;
+
+        public AgentSpawnData( Vector3 position, string name, AgentType type, int team )
+        {
+            this.position = position;
+            this.name = name;
+            this.type = type;
+            this.team = team;
+        }
     }
-    public void SpawnAgent(SpawnData data)
+    public void SpawnAgent(AgentSpawnData data)
     {
         GetAgentsObject();
 

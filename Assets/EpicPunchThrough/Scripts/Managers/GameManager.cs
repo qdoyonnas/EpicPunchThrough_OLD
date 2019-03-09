@@ -119,8 +119,8 @@ public class GameManager : MonoBehaviour
 
     public struct UpdateData
     {
-        public float timeScale;
-        public float deltaTime;
+        public readonly float timeScale;
+        public readonly float deltaTime;
 
         public UpdateData(float timeScale, float deltaTime)
         {

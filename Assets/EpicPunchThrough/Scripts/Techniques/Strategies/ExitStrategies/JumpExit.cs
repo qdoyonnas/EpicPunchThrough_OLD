@@ -6,7 +6,8 @@ public class JumpExit : ExitTechStrategy
 {
     public void Exit( Agent agent )
     {
-        Debug.Log("In JumpExit.Exit");
-        agent.rigidbody.velocity = new Vector3( agent.rigidbody.velocity.x, agent.rigidbody.velocity.y + 10f, 0 );
+        Vector3 jumpVector = agent.aimDirection * 10f;
+
+        agent.rigidbody.velocity = agent.rigidbody.velocity + jumpVector;
     }
 }

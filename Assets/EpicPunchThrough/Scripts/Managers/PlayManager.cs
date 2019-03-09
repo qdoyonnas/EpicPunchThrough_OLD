@@ -115,11 +115,7 @@ public class PlayManager
 
     void SpawnPlayer(Scene scene, LoadSceneMode mode)
     {
-        AgentManager.SpawnData spawnData = new AgentManager.SpawnData();
-        spawnData.name = "Player";
-        spawnData.position = new Vector3(0, 5, 0);
-        spawnData.team = 0;
-        spawnData.type = AgentManager.AgentType.player;
+        AgentManager.AgentSpawnData spawnData = new AgentManager.AgentSpawnData(new Vector3(0, 5, 0), "Player", AgentManager.AgentType.player, 0);
         AgentManager.Instance.SpawnAgent(spawnData);
 
         SceneManager.sceneLoaded -= SpawnPlayer;

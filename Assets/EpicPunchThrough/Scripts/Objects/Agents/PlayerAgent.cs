@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerAgent : Agent
 {
+    public float mouseAimSmoothing = 15f;
+
     public override void Init()
     {
         base.Init();
@@ -68,19 +70,13 @@ public class PlayerAgent : Agent
 
     protected bool OnAimHorizontal( float value )
     {
-        if( Mathf.Abs(value) <= 0.1f ) { return false; }
-        value = (value < 0 ? -1: 1);
-
-        aimDirection = new Vector2( value, InputManager.Instance.GetInput(InputManager.Instance.settings.aimVertical) );
+        aimDirection = new Vector2(aimDirection.x + (value / mouseAimSmoothing), aimDirection.y);
 
         return true;
     }
     protected bool OnAimVertical( float value )
     {
-        if( Mathf.Abs(value) <= 0.1f ) { return false; }
-        value = (value < 0 ? -1: 1);
-
-        aimDirection = new Vector2( InputManager.Instance.GetInput(InputManager.Instance.settings.aimHorizontal), value );
+        aimDirection = new Vector2(aimDirection.x, aimDirection.y + (value / mouseAimSmoothing));
 
         return true;
     }
