@@ -88,32 +88,24 @@ public class Agent : MonoBehaviour
             _state = value;
             switch( value ) {
                 case State.Grounded:
-                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().groundFriction, 0, 0);
-                    physicsBody.usesGravity = false;
-                    physicsBody.velocity = new Vector3( physicsBody.velocity.x, 0, 0 );
+                    physicsBody.useGravity = false;
+                    physicsBody.velocity = new Vector3();
                     break;
                 case State.InAir:
-                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
-                    physicsBody.usesGravity = true;
+                    physicsBody.useGravity = true;
                     break;
                 case State.WallSliding:
-                    physicsBody.velocity = new Vector3( 0, physicsBody.velocity.y, 0 );
-                    physicsBody.usesGravity = true;
+                    physicsBody.useGravity = true;
                     break;
                 case State.OnCeiling:
-                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
-                    physicsBody.velocity = new Vector3( physicsBody.velocity.x, 0, 0 );
-                    physicsBody.usesGravity = true;
+                    physicsBody.useGravity = true;
                     break;
                 case State.Flinched:
-
                     break;
                 case State.Stunned:
-
                     break;
                 case State.Launched:
-                    physicsBody.frictionCoefficients = new Vector3(EnvironmentManager.Instance.GetEnvironment().airFriction, 0, 0);
-                    physicsBody.usesGravity = true;
+                    physicsBody.useGravity = true;
                     break;
             }
         }
@@ -338,9 +330,11 @@ public class Agent : MonoBehaviour
         HandleTechniques();
         if( ValidActiveTechnique() ) {
             activeTechnique.Update(data);
+        } else {
+            physicsBody.HandleFriction();
         }
 
-        physicsBody.DoUpdate(data);
+        //physicsBody.DoUpdate(data);
     }
 
     protected virtual void HandleTechniques()

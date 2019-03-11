@@ -102,6 +102,8 @@ public class GameManager : MonoBehaviour
 
     void InitializeManagers()
     {
+        PhysicsCollisionMatrix.Init();
+
         InputManager.Instance.Initialize(settings.inputSettings);
         MenuManager.Instance.Initialize(settings.menuSettings);
         SoundManager.Instance.Initialize(settings.soundSettings);

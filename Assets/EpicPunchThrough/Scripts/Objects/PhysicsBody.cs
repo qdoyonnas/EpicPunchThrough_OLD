@@ -7,7 +7,7 @@ public class PhysicsBody : MonoBehaviour
 {
     protected Vector3 _velocity;
     public Vector3 velocity {
-         get {
+        get {
             return _velocity;
         }
         set {
@@ -15,7 +15,14 @@ public class PhysicsBody : MonoBehaviour
         }
     }
     public Vector3 frictionCoefficients;
-    public bool usesGravity = true;
+    public bool useGravity {
+        get {
+            return rigidbody.useGravity;
+        }
+        set {
+            rigidbody.useGravity = value;
+        }
+    }
     public LayerMask layerMaskOverride;
 
     new protected Rigidbody rigidbody;
@@ -34,6 +41,8 @@ public class PhysicsBody : MonoBehaviour
         if( _velocity.magnitude < AgentManager.Instance.settings.autoStopSpeed ) {
             _velocity = Vector3.zero;
         }
+
+        rigidbody.velocity = _velocity;
     }
     public void AddVelocity( Vector3 inVelocity )
     {
@@ -45,26 +54,38 @@ public class PhysicsBody : MonoBehaviour
         HandleGravity( data );
         HandleFriction();
 
-        transform.position += _velocity * data.deltaTime;
-        HandleCollisions();
+        Vector3 newPosition = transform.position + (_velocity * data.deltaTime);
+        newPosition = HandleCollisions( newPosition );
+        transform.position = newPosition;
 
         lastPosition = transform.position;
     }
 
-    protected void HandleGravity( GameManager.UpdateData data )
+    public void HandleGravity( GameManager.UpdateData data )
     {
-        if( !usesGravity ) { return; }
+        if( !useGravity ) { return; }
         AddVelocity(EnvironmentManager.Instance.GetEnvironment().gravity * data.deltaTime);
     }
-    protected void HandleFriction()
+    public void HandleFriction()
     {
         velocity = new Vector3(velocity.x * (1 - frictionCoefficients.x), velocity.y * (1 - frictionCoefficients.y), velocity.z * (1 - frictionCoefficients.z));
     }
 
-    protected void HandleCollisions()
+    protected Vector3 HandleCollisions( Vector3 newPosition )
     {
-        int mask = ( (int)layerMaskOverride == 0 ? PhysicsCollisionMatrix.MaskForLayer(gameObject.layer) : (int)layerMaskOverride );
+        //int mask = ( (int)layerMaskOverride == 0 ? PhysicsCollisionMatrix.MaskForLayer(gameObject.layer) : (int)layerMaskOverride );
 
-        
+        Vector3 direction = (newPosition - transform.position);
+        RaycastHit hit;
+        if( rigidbody.SweepTest(direction.normalized, out hit, direction.magnitude) ) {
+            Vector3 closestPoint = rigidbody.ClosestPointOnBounds(hit.point);
+            Vector3 difference = hit.point - closestPoint;
+
+            velocity = velocity - ( hit.normal * Vector3.Dot(velocity, hit.normal) );
+
+            return transform.position + difference;
+        }
+
+        return newPosition;
     }
 }
