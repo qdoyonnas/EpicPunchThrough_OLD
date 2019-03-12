@@ -85,20 +85,23 @@ public class Agent : MonoBehaviour
             return _state;
         }
         set {
-            _state = value;
             switch( value ) {
                 case State.Grounded:
                     physicsBody.useGravity = false;
-                    physicsBody.velocity = new Vector3();
+                    physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
+                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().groundFriction;
                     break;
                 case State.InAir:
                     physicsBody.useGravity = true;
+                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().airFriction;
                     break;
                 case State.WallSliding:
                     physicsBody.useGravity = true;
+                    physicsBody.velocity = new Vector3(0, physicsBody.velocity.y, 0);
                     break;
                 case State.OnCeiling:
                     physicsBody.useGravity = true;
+                    physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
                     break;
                 case State.Flinched:
                     break;
@@ -106,8 +109,11 @@ public class Agent : MonoBehaviour
                     break;
                 case State.Launched:
                     physicsBody.useGravity = true;
+                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().airFriction;
                     break;
             }
+
+            _state = value;
         }
     }
 
@@ -330,11 +336,9 @@ public class Agent : MonoBehaviour
         HandleTechniques();
         if( ValidActiveTechnique() ) {
             activeTechnique.Update(data);
-        } else {
-            physicsBody.HandleFriction();
         }
-
-        //physicsBody.DoUpdate(data);
+         
+        physicsBody.HandleFriction();
     }
 
     protected virtual void HandleTechniques()

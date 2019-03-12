@@ -2,6 +2,3 @@ sceneSetups:
 - path: Assets/EpicPunchThrough/Scenes/Base.unity
   isLoaded: 1
   isActive: 1
-- path: Assets/EpicPunchThrough/Scenes/Environments/CityEnvironment.unity
-  isLoaded: 1
-  isActive: 0

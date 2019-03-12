@@ -688,7 +688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b583503d8f6b6f64088b961693a9c260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frictionCoefficients: {x: 0, y: 0, z: 0}
+  frictionCoefficients: {x: 0.1, y: 0, z: 0}
   layerMaskOverride:
     serializedVersion: 2
     m_Bits: 0

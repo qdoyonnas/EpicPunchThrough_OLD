@@ -113,8 +113,9 @@ public class TechniqueGenerator
             null,
             null,
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true) ),
-            new RunForwardUpdate(10f, 20f),
+                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true),
+                                new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
+            new RunForwardUpdate(10f, 40f),
             null
         );
         GenerateTechnique( agent, options );
@@ -127,8 +128,9 @@ public class TechniqueGenerator
             null,
             new FlipDirectionActivate(),
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, true),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, false) ),
-            new RunForwardUpdate(10f, 20f),
+                                new EndTechValidate.ActionState(Agent.Action.MoveBack, false),
+                                new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
+            new RunForwardUpdate(10f, 40f),
             null
         );
         GenerateTechnique( agent, options );

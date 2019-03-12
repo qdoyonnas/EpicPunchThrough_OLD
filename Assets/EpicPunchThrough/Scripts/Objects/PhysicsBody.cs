@@ -5,13 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PhysicsBody : MonoBehaviour
 {
-    protected Vector3 _velocity;
     public Vector3 velocity {
-        get {
-            return _velocity;
+         get {
+            return rigidbody.velocity;
         }
         set {
-            SetVelocity( value );
+            SetVelocity(value);
         }
     }
     public Vector3 frictionCoefficients;
@@ -28,7 +27,7 @@ public class PhysicsBody : MonoBehaviour
     new protected Rigidbody rigidbody;
     protected Vector3 lastPosition;
 
-    protected void Start()
+    protected void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
         lastPosition = transform.position;
@@ -36,25 +35,25 @@ public class PhysicsBody : MonoBehaviour
 
     public void SetVelocity( Vector3 inVelocity )
     {
-        _velocity = inVelocity;
+        rigidbody.velocity = inVelocity;
 
-        if( _velocity.magnitude < AgentManager.Instance.settings.autoStopSpeed ) {
-            _velocity = Vector3.zero;
+        if( velocity.magnitude < AgentManager.Instance.settings.autoStopSpeed ) {
+            rigidbody.velocity = Vector3.zero;
         }
-
-        rigidbody.velocity = _velocity;
     }
     public void AddVelocity( Vector3 inVelocity )
     {
-        velocity = _velocity + inVelocity;
+        velocity = velocity + inVelocity;
     }
 
     public void DoUpdate( GameManager.UpdateData data )
     {
+        if( !rigidbody.isKinematic ) { return; }
+
         HandleGravity( data );
         HandleFriction();
 
-        Vector3 newPosition = transform.position + (_velocity * data.deltaTime);
+        Vector3 newPosition = transform.position + (velocity * data.deltaTime);
         newPosition = HandleCollisions( newPosition );
         transform.position = newPosition;
 
@@ -63,7 +62,7 @@ public class PhysicsBody : MonoBehaviour
 
     public void HandleGravity( GameManager.UpdateData data )
     {
-        if( !useGravity ) { return; }
+        if( !rigidbody.isKinematic || !useGravity ) { return; }
         AddVelocity(EnvironmentManager.Instance.GetEnvironment().gravity * data.deltaTime);
     }
     public void HandleFriction()
@@ -73,6 +72,8 @@ public class PhysicsBody : MonoBehaviour
 
     protected Vector3 HandleCollisions( Vector3 newPosition )
     {
+        if( !rigidbody.isKinematic ) { return transform.position; }
+
         //int mask = ( (int)layerMaskOverride == 0 ? PhysicsCollisionMatrix.MaskForLayer(gameObject.layer) : (int)layerMaskOverride );
 
         Vector3 direction = (newPosition - transform.position);
