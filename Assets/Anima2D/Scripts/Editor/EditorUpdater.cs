@@ -59,9 +59,9 @@ namespace Anima2D
 		[UnityEditor.Callbacks.DidReloadScripts]
 		static void HierarchyChanged()
 		{
-			s_Ik2Ds = GameObject.FindObjectsOfType<Ik2D>().ToList();
-			s_Bones = GameObject.FindObjectsOfType<Bone2D>().ToList();
-			s_Controls = GameObject.FindObjectsOfType<Control>().ToList();
+			s_Ik2Ds = EditorExtra.FindComponentsOfType<Ik2D>().ToList();
+			s_Bones = EditorExtra.FindComponentsOfType<Bone2D>().ToList();
+			s_Controls = EditorExtra.FindComponentsOfType<Control>().ToList();
 		}
 
 		static void UndoRedoPerformed()
