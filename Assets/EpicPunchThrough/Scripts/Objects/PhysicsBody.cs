@@ -27,6 +27,7 @@ public class PhysicsBody : MonoBehaviour
     new protected Rigidbody rigidbody;
     protected Vector3 lastPosition;
 
+
     protected void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -68,6 +69,13 @@ public class PhysicsBody : MonoBehaviour
     public void HandleFriction()
     {
         velocity = new Vector3(velocity.x * (1 - frictionCoefficients.x), velocity.y * (1 - frictionCoefficients.y), velocity.z * (1 - frictionCoefficients.z));
+    }
+
+    public bool DetectCollisions( float delaTime, out RaycastHit[] hits )
+    {
+        hits = rigidbody.SweepTestAll( velocity, velocity.magnitude * delaTime );
+
+        return hits.Length > 0;
     }
 
     protected Vector3 HandleCollisions( Vector3 newPosition )

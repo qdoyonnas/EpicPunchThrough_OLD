@@ -17,6 +17,15 @@ public class TriggerCheck : MonoBehaviour
         }
     }
 
+    public bool doDetect {
+         get {
+            return collider.enabled;
+        }
+        set {
+            collider.enabled = value;
+        }
+    }
+
     private void Awake()
     {
         _collider = GetComponent<Collider>();

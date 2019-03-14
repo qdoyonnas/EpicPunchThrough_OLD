@@ -186,6 +186,8 @@ public class Agent : MonoBehaviour
 
     BoxCollider[] boundaryColliders;
 
+    List<Collider> ignoredColliders = new List<Collider>();
+
     #endregion
 
     #region Initialization
@@ -331,6 +333,7 @@ public class Agent : MonoBehaviour
 
     public virtual void DoUpdate(GameManager.UpdateData data)
     {
+        EnableTriggerChecks();
         CheckState();
 
         HandleTechniques();
@@ -339,34 +342,37 @@ public class Agent : MonoBehaviour
         }
          
         physicsBody.HandleFriction();
+
+        HandlePropCollisions( data.deltaTime );
     }
 
-    protected virtual void HandleTechniques()
+    protected virtual void EnableTriggerChecks()
     {
-        if( animator.GetBool(transitionBool) ) {
-            TransitionTechnique(activeTechnique, false);
+        if( state == State.WallSliding ) {
+            _leftWallCheck.doDetect= true;
+            _rightWallCheck.doDetect = true;
+        } else if( physicsBody.velocity.x > 0 ) {
+            _rightWallCheck.doDetect = true;
+            _leftWallCheck.doDetect= false;
+        } else if( physicsBody.velocity.x < 0 ) {
+            _leftWallCheck.doDetect = true;
+            _rightWallCheck.doDetect = false;
+        } else {
+            _leftWallCheck.doDetect= false;
+            _rightWallCheck.doDetect = false;
+            wallFound = false;
         }
-
-        if( activatingTechniques.Count == 1 ) {
-            TransitionTechnique(activatingTechniques[0], false);
-            activatingTechniques.Clear();
-        } else if( activatingTechniques.Count > 1 ) {
-            Technique chosenTech = null;
-            int longestSequence = 0;
-            foreach( Technique tech in activatingTechniques ) {
-                if( tech.techTrigger.sequence.Length > longestSequence ) {
-                    chosenTech = tech;
-                    longestSequence = tech.techTrigger.sequence.Length;
-                } else if( tech.techTrigger.sequence.Length == longestSequence ) {
-                    if( chosenTech.techTrigger.state == State.Any && tech.techTrigger.state != State.Any ) {
-                        chosenTech = tech;
-                        longestSequence = tech.techTrigger.sequence.Length;
-                    }
-                }
-            }
-
-            TransitionTechnique( chosenTech, false );
-            activatingTechniques.Clear();
+        if( state == State.OnCeiling || physicsBody.velocity.y > 0 ) {
+            _ceilingCheck.doDetect = true;
+        } else {
+            _ceilingCheck.doDetect = false;
+            ceilingFound = false;
+        }
+        if ( state == State.Grounded || physicsBody.velocity.y < 0 ) {
+            _groundCheck.doDetect = true;
+        } else {
+            _groundCheck.doDetect = false;
+            groundFound = false;
         }
     }
 
@@ -403,6 +409,81 @@ public class Agent : MonoBehaviour
                     state = State.InAir;
                 }
                 break;
+        }
+    }
+
+    protected virtual void HandleTechniques()
+    {
+        if( animator.GetBool(transitionBool) ) {
+            TransitionTechnique(activeTechnique, false);
+        }
+
+        if( activatingTechniques.Count == 1 ) {
+            TransitionTechnique(activatingTechniques[0], false);
+            activatingTechniques.Clear();
+        } else if( activatingTechniques.Count > 1 ) {
+            Technique chosenTech = null;
+            int longestSequence = 0;
+            foreach( Technique tech in activatingTechniques ) {
+                if( tech.techTrigger.sequence.Length > longestSequence ) {
+                    chosenTech = tech;
+                    longestSequence = tech.techTrigger.sequence.Length;
+                } else if( tech.techTrigger.sequence.Length == longestSequence ) {
+                    if( chosenTech.techTrigger.state == State.Any && tech.techTrigger.state != State.Any ) {
+                        chosenTech = tech;
+                        longestSequence = tech.techTrigger.sequence.Length;
+                    }
+                }
+            }
+
+            TransitionTechnique( chosenTech, false );
+            activatingTechniques.Clear();
+        }
+    }
+
+    protected virtual void HandlePropCollisions( float deltaTime )
+    {
+        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
+            if( !ignoredColliders[i].bounds.Intersects(collider.bounds) ) {
+                IgnoreCollider(ignoredColliders[i], false);
+            }
+        }
+
+        if( state == State.Grounded ) {
+            RaycastHit[] hits;
+            if( physicsBody.DetectCollisions( deltaTime, out hits ) ) {
+                foreach( RaycastHit hit in hits ) {
+                    Prop prop = hit.collider.GetComponent<Prop>();
+                    if( prop != null && prop.isPassable ) {
+                        IgnoreCollider(hit.collider);
+                    }
+                }
+            }
+        }
+    }
+
+    public virtual void IgnoreCollider(Collider other, bool doIgnore = true)
+    {
+        if( doIgnore ) {
+            if( ignoredColliders.Contains(other) ) { return; }
+
+            Physics.IgnoreCollision(collider, other);
+            Physics.IgnoreCollision(_groundCheck.collider, other);
+            Physics.IgnoreCollision(_ceilingCheck.collider, other);
+            Physics.IgnoreCollision(_leftWallCheck.collider, other);
+            Physics.IgnoreCollision(_rightWallCheck.collider, other);
+
+            ignoredColliders.Add(other);
+        } else {
+            if( !ignoredColliders.Contains(other) ) { return; }
+
+            Physics.IgnoreCollision(collider, other, false);
+            Physics.IgnoreCollision(_groundCheck.collider, other, false);
+            Physics.IgnoreCollision(_ceilingCheck.collider, other, false);
+            Physics.IgnoreCollision(_leftWallCheck.collider, other, false);
+            Physics.IgnoreCollision(_rightWallCheck.collider, other, false);
+
+            ignoredColliders.Remove(other);
         }
     }
 
@@ -580,10 +661,10 @@ public class Agent : MonoBehaviour
                                     collider.radius );
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere( _groundCheck.transform.position, ((SphereCollider)_groundCheck.collider).radius );
-        Gizmos.DrawWireCube( _rightWallCheck.transform.position, ((BoxCollider)_rightWallCheck.collider).size );
-        Gizmos.DrawWireCube( _leftWallCheck.transform.position, ((BoxCollider)_leftWallCheck.collider).size );
-        Gizmos.DrawWireSphere( _ceilingCheck.transform.position, ((SphereCollider)_ceilingCheck.collider).radius );
+        if( _groundCheck.enabled ) {  Gizmos.DrawWireSphere( _groundCheck.transform.position, ((SphereCollider)_groundCheck.collider).radius ); }
+        if( _rightWallCheck.enabled ) {  Gizmos.DrawWireCube( _rightWallCheck.transform.position, ((BoxCollider)_rightWallCheck.collider).size ); }
+        if( _leftWallCheck.enabled ) {  Gizmos.DrawWireCube( _leftWallCheck.transform.position, ((BoxCollider)_leftWallCheck.collider).size ); }
+        if( _ceilingCheck.enabled ) {  Gizmos.DrawWireSphere( _ceilingCheck.transform.position, ((SphereCollider)_ceilingCheck.collider).radius ); }
 
         if( boundaryColliders != null ) {
             for( int i = 0; i < boundaryColliders.Length; i++ ) {
