@@ -110,6 +110,9 @@ public class PlayManager
             SpawnPlayer(GetGameScene(), LoadSceneMode.Additive);
         }
 
+        FollowCamera followCamera = GameObject.Find("SceneEntrance").GetComponent<FollowCamera>();
+        if( followCamera != null ) { followCamera.target = AgentManager.Instance.playerAgent.transform; }
+
         GameManager.Instance.activeCamera.Fade(0, GameManager.Instance.settings.sceneTransitionFadeDuration, true);
     }
 
