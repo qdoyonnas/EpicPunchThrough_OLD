@@ -90,6 +90,8 @@ public class Agent : MonoBehaviour
                     physicsBody.useGravity = false;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
                     physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().groundFriction;
+                    PerformAction(Action.Land, 1);
+                    PerformAction(Action.Land, 0);
                     break;
                 case State.InAir:
                     physicsBody.useGravity = true;
@@ -98,10 +100,14 @@ public class Agent : MonoBehaviour
                 case State.WallSliding:
                     physicsBody.useGravity = true;
                     physicsBody.velocity = new Vector3(0, physicsBody.velocity.y, 0);
+                    PerformAction(Action.Land, 1);
+                    PerformAction(Action.Land, 0);
                     break;
                 case State.OnCeiling:
                     physicsBody.useGravity = true;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
+                    PerformAction(Action.Land, 1);
+                    PerformAction(Action.Land, 0);
                     break;
                 case State.Flinched:
                     break;
@@ -131,7 +137,8 @@ public class Agent : MonoBehaviour
         Block,
         Jump,
         Dash,
-        Clash
+        Clash,
+        Land
     }
     protected List<Action> actions = new List<Action>();
     public Action[] ActionSequence {
@@ -414,10 +421,18 @@ public class Agent : MonoBehaviour
 
     protected virtual void HandleTechniques()
     {
+        if( !ValidActiveTechnique() && _activeActionValue != 0 ) {
+            PerformAction(actions[actions.Count-1], _activeActionValue);
+        }
+
         if( animator.GetBool(transitionBool) ) {
             TransitionTechnique(activeTechnique, false);
         }
 
+        ActivateTechniques();
+    }
+    protected virtual void ActivateTechniques()
+    {
         if( activatingTechniques.Count == 1 ) {
             TransitionTechnique(activatingTechniques[0], false);
             activatingTechniques.Clear();
@@ -543,7 +558,15 @@ public class Agent : MonoBehaviour
     public delegate void ActionEvent();
     public event ActionEvent MoveForward;
     public event ActionEvent MoveBack;
+    public event ActionEvent AttackForward;
+    public event ActionEvent AttackDown;
+    public event ActionEvent AttackBack;
+    public event ActionEvent AttackUp;
+    public event ActionEvent Block;
     public event ActionEvent Jump;
+    public event ActionEvent Dash;
+    public event ActionEvent Clash;
+    public event ActionEvent Land;
 
     public void SubscribeToActionEvent(Action action, ActionEvent callback, bool unSubscribe = false)
     {
@@ -555,8 +578,32 @@ public class Agent : MonoBehaviour
                 case Action.MoveBack:
                     MoveBack += callback;
                     break;
+                case Action.AttackForward:
+                    AttackForward += callback;
+                    break;
+                case Action.AttackDown:
+                    AttackDown += callback;
+                    break;
+                case Action.AttackBack:
+                    AttackBack += callback;
+                    break;
+                case Action.AttackUp:
+                    AttackUp += callback;
+                    break;
+                case Action.Block:
+                    Block += callback;
+                    break;
                 case Action.Jump:
                     Jump += callback;
+                    break;
+                case Action.Dash:
+                    Dash += callback;
+                    break;
+                case Action.Clash:
+                    Clash += callback;
+                    break;
+                case Action.Land:
+                    Land += callback;
                     break;
                 default:
                     Debug.LogError("Action not implemented");
@@ -570,8 +617,32 @@ public class Agent : MonoBehaviour
                 case Action.MoveBack:
                     MoveBack -= callback;
                     break;
+                case Action.AttackForward:
+                    AttackForward -= callback;
+                    break;
+                case Action.AttackDown:
+                    AttackDown -= callback;
+                    break;
+                case Action.AttackBack:
+                    AttackBack -= callback;
+                    break;
+                case Action.AttackUp:
+                    AttackUp -= callback;
+                    break;
+                case Action.Block:
+                    Block -= callback;
+                    break;
                 case Action.Jump:
                     Jump -= callback;
+                    break;
+                case Action.Dash:
+                    Dash -= callback;
+                    break;
+                case Action.Clash:
+                    Clash -= callback;
+                    break;
+                case Action.Land:
+                    Land -= callback;
                     break;
                 default:
                     Debug.LogError("Action not implemented");
@@ -596,8 +667,32 @@ public class Agent : MonoBehaviour
             case Action.MoveBack:
                 handler = MoveBack;
                 break;
+            case Action.AttackForward:
+                handler = AttackForward;
+                break;
+            case Action.AttackDown:
+                handler = AttackDown;
+                break;
+            case Action.AttackBack:
+                handler = AttackBack;
+                break;
+            case Action.AttackUp:
+                handler = AttackUp;
+                break;
+            case Action.Block:
+                handler = Block;
+                break;
             case Action.Jump:
                 handler = Jump;
+                break;
+            case Action.Dash:
+                handler = Dash;
+                break;
+            case Action.Clash:
+                handler = Clash;
+                break;
+            case Action.Land:
+                handler = Land;
                 break;
             default:
                 Debug.LogError("Action not implemented: " + action);

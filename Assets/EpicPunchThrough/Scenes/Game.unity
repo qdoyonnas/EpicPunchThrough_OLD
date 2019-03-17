@@ -784,12 +784,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1065286093}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51868cc2dfa165843bb419a2a338124e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  offsetByTargetVelocity: 1
+  acceleration: 0.1
+  dampening: 0.05
+  friction: 0.01
+  stopSpeed: 0.001
+  deadZone: {x: 10, y: 10, z: 0}
 --- !u!1 &1128694486
 GameObject:
   m_ObjectHideFlags: 0

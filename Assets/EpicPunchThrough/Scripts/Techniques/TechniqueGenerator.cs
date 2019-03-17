@@ -147,5 +147,18 @@ public class TechniqueGenerator
             new JumpExit()
         );
         GenerateTechnique( agent, options );
+
+        options = new TechniqueOptions(
+            "WallSlide",
+            "Base/BasicWallSlide",
+            Agent.State.WallSliding,
+            new Agent.Action[] { Agent.Action.Land },
+            null,
+            null,
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.Jump, false) ),
+            new WallSlideUpdate(),
+            null
+        );
+        GenerateTechnique( agent, options );
     }
 }
