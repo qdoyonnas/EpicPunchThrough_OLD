@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class WallSlideUpdate : UpdateTechStrategy
 {
-    public void Update( Agent agent, GameManager.UpdateData data )
+    public void Update( Technique tech, GameManager.UpdateData data )
     {
-        
+        tech.owner.HandlePhysics( data );
+
+        tech.owner.physicsBody.SetVelocity( new Vector3(tech.owner.physicsBody.velocity.x, 0, 0) );
     }
 }

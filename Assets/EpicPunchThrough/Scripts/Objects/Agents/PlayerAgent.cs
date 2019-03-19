@@ -64,6 +64,19 @@ public class PlayerAgent : Agent
     }
     protected bool OnVertical( float value )
     {
+        if( value == 0 ) {
+            if( actions[actions.Count - 1] == Action.MoveUp ) {
+                PerformAction(Action.MoveUp, 0);
+            } else if( actions[actions.Count - 1] == Action.MoveDown ) {
+                PerformAction(Action.MoveDown, 0);
+            }
+        }else {
+            if( value > 0 ) {
+                PerformAction( Action.MoveUp, value );
+            } else {
+                PerformAction( Action.MoveDown, value );
+            }
+        }
 
         return true;
     }

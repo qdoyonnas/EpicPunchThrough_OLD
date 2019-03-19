@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FlipDirectionActivate : ActivateTechStrategy
 {
-    public void Activate( Agent agent )
+    public void Activate( Technique tech )
     {
-        agent.isFacingRight = !agent.isFacingRight;
+        tech.owner.isFacingRight = !tech.owner.isFacingRight;
     }
 }

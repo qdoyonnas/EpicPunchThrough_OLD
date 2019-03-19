@@ -2,24 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RunForwardUpdate : UpdateTechStrategy
+public class MoveForwardUpdate : UpdateTechStrategy
 {
     float maxSpeed;
     float acceleration;
 
-    public RunForwardUpdate(float maxSpeed, float acceleration)
+    public MoveForwardUpdate(float maxSpeed, float acceleration)
     {
         this.maxSpeed = maxSpeed;
         this.acceleration = acceleration;
     }
 
-    public void Update( Agent agent, GameManager.UpdateData data )
+    public void Update( Technique tech, GameManager.UpdateData data )
     {
-        if( agent.physicsBody.velocity.magnitude > maxSpeed ) { return; }
+        if( tech.owner.physicsBody.velocity.magnitude > maxSpeed ) { return; }
 
         Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime);
-        if( !agent.isFacingRight ) { velDelta = -velDelta; }
+        if( !tech.owner.isFacingRight ) { velDelta = -velDelta; }
 
-        agent.physicsBody.AddVelocity(velDelta);
+        tech.owner.physicsBody.AddVelocity(velDelta);
+        tech.owner.HandlePhysics( data );
     }
 }

@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class JumpExit : ExitTechStrategy
 {
-    public void Exit( Agent agent )
+    public void Exit( Technique tech )
     {
-        Vector3 jumpVector = agent.aimDirection * 10f;
+        Vector3 jumpVector = tech.owner.aimDirection * 10f;
 
-        agent.physicsBody.AddVelocity(jumpVector);
+        tech.owner.physicsBody.AddVelocity(jumpVector);
     }
 }

@@ -3,57 +3,68 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface TriggerTechStrategy {
-    bool Trigger(Agent agent);
+    bool Trigger(Technique tech);
 }
 public class NoTrigger: TriggerTechStrategy {
-    public bool Trigger(Agent agent)
+    public bool Trigger(Technique tech)
     {
         return true;
     }
 }
 
 public interface ActivateTechStrategy {
-    void Activate(Agent agent);
+    void Activate(Technique tech);
 }
 public class NoActivate : ActivateTechStrategy
 {
-    public void Activate( Agent agent )
+    public void Activate( Technique tech )
     {
         return;
     }
 }
 
 public interface ActionValidateTechStrategy {
-    bool Validate(Agent agent, Agent.Action action, float value);
+    bool Validate(Technique tech, Agent.Action action, float value);
 }
 public class NoValidate: ActionValidateTechStrategy {
-    public bool Validate(Agent agent, Agent.Action action, float value)
+    public bool Validate(Technique tech, Agent.Action action, float value)
     {
         return false;
     }
 }
 public class AllValidate: ActionValidateTechStrategy {
-    public bool Validate(Agent agent, Agent.Action action, float value)
+    public bool Validate(Technique tech, Agent.Action action, float value)
     {
         return true;
     }
 }
 
+public interface StateChangeStrategy {
+    void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState );
+}
+public class EndTechStateStrategy: StateChangeStrategy {
+    public void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState )
+    {
+        tech.owner.TransitionTechnique(null, false);
+    }
+}
+
 public interface UpdateTechStrategy {
-    void Update(Agent agent, GameManager.UpdateData data);
+    void Update(Technique tech, GameManager.UpdateData data);
 }
 public class NoUpdate: UpdateTechStrategy {
-    public void Update(Agent agent, GameManager.UpdateData data)
+    public void Update(Technique tech, GameManager.UpdateData data)
     {
+        tech.owner.HandlePhysics( data );
         return;
     }
 }
 
 public interface ExitTechStrategy {
-    void Exit( Agent agent );
+    void Exit( Technique tech );
 }
 public class NoExit : ExitTechStrategy {
-    public void Exit( Agent agent ) {
+    public void Exit( Technique tech ) {
         return;
     }
 }

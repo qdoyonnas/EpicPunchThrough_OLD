@@ -7,7 +7,12 @@ using UnityEngine;
 public class Technique
 {
     public string name;
-    protected Agent owner;
+    protected Agent _owner;
+    public Agent owner {
+        get {
+            return _owner;
+        }
+    }
     protected RuntimeAnimatorController _animatorController;
     public RuntimeAnimatorController animatorController {
         get {
@@ -40,6 +45,7 @@ public class Technique
 
     protected TriggerTechStrategy triggerStrategy = new NoTrigger();
     protected ActivateTechStrategy activateStrategy  = new NoActivate();
+    protected StateChangeStrategy stateStrategy = new EndTechStateStrategy();
     protected ActionValidateTechStrategy validateStrategy = new NoValidate();
     protected UpdateTechStrategy updateStrategy = new NoUpdate();
     protected ExitTechStrategy exitStrategy = new NoExit();
@@ -47,7 +53,7 @@ public class Technique
     #endregion
 
     public Technique( Agent owner, string name, RuntimeAnimatorController animCtrl, TechTrigger techTrgr, 
-        TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy, 
+        TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy, StateChangeStrategy stateStrategy,
         ActionValidateTechStrategy validateStrategy, UpdateTechStrategy updateStrategy, ExitTechStrategy exitStrategy )
     {
         if( owner == null || animCtrl == null ) { 
@@ -57,12 +63,13 @@ public class Technique
 
         this.name = name;
 
-        this.owner = owner;
+        this._owner = owner;
         _techTrigger = techTrgr;
         _animatorController = animCtrl;
 
         this.triggerStrategy = triggerStrategy;
         this.activateStrategy = activateStrategy;
+        this.stateStrategy = stateStrategy;
         this.validateStrategy = validateStrategy;
         this.updateStrategy = updateStrategy;
         this.exitStrategy = exitStrategy;
@@ -82,9 +89,8 @@ public class Technique
     {
         if( validateStrategy == null ) { return true; }
 
-        return validateStrategy.Validate(owner, action, value);
+        return validateStrategy.Validate(this, action, value);
     }
-
     public virtual void OnTrigger()
     {
         if( owner.ValidActiveTechnique()
@@ -100,29 +106,32 @@ public class Technique
             }
         }
 
-        if( triggerStrategy == null || !triggerStrategy.Trigger(owner) ) { return; }
+        if( triggerStrategy == null || !triggerStrategy.Trigger(this) ) { return; }
         owner.AddActivatingTechnique(this);
     }
+    public virtual void OnStateChange( Agent.State previousState, Agent.State newState )
+    {
+        if( stateStrategy == null ) { return; }
 
+        stateStrategy.OnStateChange( this, previousState, newState );
+    }
     public virtual void Activate()
     {
         if( activateStrategy == null ) { return; }
 
-        activateStrategy.Activate(owner);
+        activateStrategy.Activate(this);
     }
-
     public virtual void Update(GameManager.UpdateData data)
     {
         if( updateStrategy == null ) { return; }
 
-        updateStrategy.Update(owner, data);
+        updateStrategy.Update(this, data);
     }
-
     public virtual void Exit()
     {
         if( exitStrategy == null ) { return; }
 
-        exitStrategy.Exit(owner);
+        exitStrategy.Exit(this);
     }
 
     #endregion

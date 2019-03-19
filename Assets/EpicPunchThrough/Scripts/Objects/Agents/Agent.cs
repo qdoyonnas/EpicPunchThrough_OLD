@@ -85,13 +85,15 @@ public class Agent : MonoBehaviour
             return _state;
         }
         set {
+            if( ValidActiveTechnique() ) {
+                _activeTechnique.OnStateChange( _state, value );
+            }
+
             switch( value ) {
                 case State.Grounded:
                     physicsBody.useGravity = false;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
                     physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().groundFriction;
-                    PerformAction(Action.Land, 1);
-                    PerformAction(Action.Land, 0);
                     break;
                 case State.InAir:
                     physicsBody.useGravity = true;
@@ -100,14 +102,10 @@ public class Agent : MonoBehaviour
                 case State.WallSliding:
                     physicsBody.useGravity = true;
                     physicsBody.velocity = new Vector3(0, physicsBody.velocity.y, 0);
-                    PerformAction(Action.Land, 1);
-                    PerformAction(Action.Land, 0);
                     break;
                 case State.OnCeiling:
                     physicsBody.useGravity = true;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
-                    PerformAction(Action.Land, 1);
-                    PerformAction(Action.Land, 0);
                     break;
                 case State.Flinched:
                     break;
@@ -130,6 +128,8 @@ public class Agent : MonoBehaviour
     public enum Action {
         MoveForward,
         MoveBack,
+        MoveUp,
+        MoveDown,
         AttackForward,
         AttackDown,
         AttackBack,
@@ -137,8 +137,7 @@ public class Agent : MonoBehaviour
         Block,
         Jump,
         Dash,
-        Clash,
-        Land
+        Clash
     }
     protected List<Action> actions = new List<Action>();
     public Action[] ActionSequence {
@@ -338,7 +337,7 @@ public class Agent : MonoBehaviour
 
     #region Update
 
-    public virtual void DoUpdate(GameManager.UpdateData data)
+    public virtual void DoUpdate( GameManager.UpdateData data )
     {
         EnableTriggerChecks();
         CheckState();
@@ -346,11 +345,35 @@ public class Agent : MonoBehaviour
         HandleTechniques();
         if( ValidActiveTechnique() ) {
             activeTechnique.Update(data);
+        } else {
+            HandlePhysics(data);
         }
-         
+    }
+    public virtual void HandlePhysics( GameManager.UpdateData data )
+    {
         physicsBody.HandleFriction();
-
         HandlePropCollisions( data.deltaTime );
+    }
+
+    protected virtual void HandlePropCollisions( float deltaTime )
+    {
+        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
+            if( !ignoredColliders[i].bounds.Intersects(collider.bounds) ) {
+                IgnoreCollider(ignoredColliders[i], false);
+            }
+        }
+
+        if( state == State.Grounded ) {
+            RaycastHit[] hits;
+            if( physicsBody.DetectCollisions( deltaTime, out hits ) ) {
+                foreach( RaycastHit hit in hits ) {
+                    Prop prop = hit.collider.GetComponent<Prop>();
+                    if( prop != null && prop.isPassable ) {
+                        IgnoreCollider(hit.collider);
+                    }
+                }
+            }
+        }
     }
 
     protected virtual void EnableTriggerChecks()
@@ -382,7 +405,6 @@ public class Agent : MonoBehaviour
             groundFound = false;
         }
     }
-
     public virtual void CheckState()
     {
         switch( state ) {
@@ -456,52 +478,6 @@ public class Agent : MonoBehaviour
         }
     }
 
-    protected virtual void HandlePropCollisions( float deltaTime )
-    {
-        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
-            if( !ignoredColliders[i].bounds.Intersects(collider.bounds) ) {
-                IgnoreCollider(ignoredColliders[i], false);
-            }
-        }
-
-        if( state == State.Grounded ) {
-            RaycastHit[] hits;
-            if( physicsBody.DetectCollisions( deltaTime, out hits ) ) {
-                foreach( RaycastHit hit in hits ) {
-                    Prop prop = hit.collider.GetComponent<Prop>();
-                    if( prop != null && prop.isPassable ) {
-                        IgnoreCollider(hit.collider);
-                    }
-                }
-            }
-        }
-    }
-
-    public virtual void IgnoreCollider(Collider other, bool doIgnore = true)
-    {
-        if( doIgnore ) {
-            if( ignoredColliders.Contains(other) ) { return; }
-
-            Physics.IgnoreCollision(collider, other);
-            Physics.IgnoreCollision(_groundCheck.collider, other);
-            Physics.IgnoreCollision(_ceilingCheck.collider, other);
-            Physics.IgnoreCollision(_leftWallCheck.collider, other);
-            Physics.IgnoreCollision(_rightWallCheck.collider, other);
-
-            ignoredColliders.Add(other);
-        } else {
-            if( !ignoredColliders.Contains(other) ) { return; }
-
-            Physics.IgnoreCollision(collider, other, false);
-            Physics.IgnoreCollision(_groundCheck.collider, other, false);
-            Physics.IgnoreCollision(_ceilingCheck.collider, other, false);
-            Physics.IgnoreCollision(_leftWallCheck.collider, other, false);
-            Physics.IgnoreCollision(_rightWallCheck.collider, other, false);
-
-            ignoredColliders.Remove(other);
-        }
-    }
-
     #endregion
 
     #region Technique Methods
@@ -558,6 +534,8 @@ public class Agent : MonoBehaviour
     public delegate void ActionEvent();
     public event ActionEvent MoveForward;
     public event ActionEvent MoveBack;
+    public event ActionEvent MoveUp;
+    public event ActionEvent MoveDown;
     public event ActionEvent AttackForward;
     public event ActionEvent AttackDown;
     public event ActionEvent AttackBack;
@@ -566,7 +544,6 @@ public class Agent : MonoBehaviour
     public event ActionEvent Jump;
     public event ActionEvent Dash;
     public event ActionEvent Clash;
-    public event ActionEvent Land;
 
     public void SubscribeToActionEvent(Action action, ActionEvent callback, bool unSubscribe = false)
     {
@@ -577,6 +554,12 @@ public class Agent : MonoBehaviour
                     break;
                 case Action.MoveBack:
                     MoveBack += callback;
+                    break;
+                case Action.MoveUp:
+                    MoveUp += callback;
+                    break;
+                case Action.MoveDown:
+                    MoveDown += callback;
                     break;
                 case Action.AttackForward:
                     AttackForward += callback;
@@ -602,9 +585,6 @@ public class Agent : MonoBehaviour
                 case Action.Clash:
                     Clash += callback;
                     break;
-                case Action.Land:
-                    Land += callback;
-                    break;
                 default:
                     Debug.LogError("Action not implemented");
                     break;
@@ -616,6 +596,12 @@ public class Agent : MonoBehaviour
                     break;
                 case Action.MoveBack:
                     MoveBack -= callback;
+                    break;
+                case Action.MoveUp:
+                    MoveUp -= callback;
+                    break;
+                case Action.MoveDown:
+                    MoveDown -= callback;
                     break;
                 case Action.AttackForward:
                     AttackForward -= callback;
@@ -641,9 +627,6 @@ public class Agent : MonoBehaviour
                 case Action.Clash:
                     Clash -= callback;
                     break;
-                case Action.Land:
-                    Land -= callback;
-                    break;
                 default:
                     Debug.LogError("Action not implemented");
                     break;
@@ -666,6 +649,12 @@ public class Agent : MonoBehaviour
                 break;
             case Action.MoveBack:
                 handler = MoveBack;
+                break;
+            case Action.MoveUp:
+                handler = MoveUp;
+                break;
+            case Action.MoveDown:
+                handler = MoveDown;
                 break;
             case Action.AttackForward:
                 handler = AttackForward;
@@ -690,9 +679,6 @@ public class Agent : MonoBehaviour
                 break;
             case Action.Clash:
                 handler = Clash;
-                break;
-            case Action.Land:
-                handler = Land;
                 break;
             default:
                 Debug.LogError("Action not implemented: " + action);
@@ -740,6 +726,31 @@ public class Agent : MonoBehaviour
     void SetCeilingFound( bool state )
     {
         ceilingFound = state;
+    }
+
+    public virtual void IgnoreCollider(Collider other, bool doIgnore = true)
+    {
+        if( doIgnore ) {
+            if( ignoredColliders.Contains(other) ) { return; }
+
+            Physics.IgnoreCollision(collider, other);
+            Physics.IgnoreCollision(_groundCheck.collider, other);
+            Physics.IgnoreCollision(_ceilingCheck.collider, other);
+            Physics.IgnoreCollision(_leftWallCheck.collider, other);
+            Physics.IgnoreCollision(_rightWallCheck.collider, other);
+
+            ignoredColliders.Add(other);
+        } else {
+            if( !ignoredColliders.Contains(other) ) { return; }
+
+            Physics.IgnoreCollision(collider, other, false);
+            Physics.IgnoreCollision(_groundCheck.collider, other, false);
+            Physics.IgnoreCollision(_ceilingCheck.collider, other, false);
+            Physics.IgnoreCollision(_leftWallCheck.collider, other, false);
+            Physics.IgnoreCollision(_rightWallCheck.collider, other, false);
+
+            ignoredColliders.Remove(other);
+        }
     }
 
     #endregion
