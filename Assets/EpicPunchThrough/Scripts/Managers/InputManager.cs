@@ -175,7 +175,10 @@ public class InputManager
         float value = 0;
         foreach( Axis axis in axes ) {
             float axisValue = Input.GetAxisRaw(axis.ToString());
-            if( Mathf.Abs(axisValue) >= 1 ) { return axisValue; }
+            if( Mathf.Abs(axisValue) >= 1 ) {
+                activeControlType = GetInputType(axis);
+                return axisValue;
+            }
             if( Mathf.Abs(axisValue) > Mathf.Abs(value) ) {
                 value = axisValue;
                 activeControlType = GetInputType(axis);

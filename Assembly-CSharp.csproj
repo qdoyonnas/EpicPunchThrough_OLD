@@ -120,6 +120,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Menus\MenuDecorators\MenuDecorator.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Selector.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Menu\Transitional.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\MusicPlayer.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Agents\Agent.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\Agents\PlayerAgent.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Objects\PhysicsBody.cs" />
@@ -128,7 +129,7 @@
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ActivateStrategies\FlipDirectionActivate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\ExitStrategies\JumpExit.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\Strategies.cs" />
-    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\RunForwardUpdate.cs" />
+    <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\MoveForwardUpdate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Strategies\UpdateStrategies\WallSlideUpdate.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\Technique.cs" />
     <Compile Include="Assets\EpicPunchThrough\Scripts\Techniques\TechniqueGenerator.cs" />
