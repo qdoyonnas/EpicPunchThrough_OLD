@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface TriggerTechStrategy {
-    bool Trigger(Technique tech);
+    bool Trigger(Technique tech, float value );
 }
 public class NoTrigger: TriggerTechStrategy {
-    public bool Trigger(Technique tech)
+    public bool Trigger(Technique tech, float value )
     {
         return true;
     }
@@ -50,10 +50,10 @@ public class EndTechStateStrategy: StateChangeStrategy {
 }
 
 public interface UpdateTechStrategy {
-    void Update(Technique tech, GameManager.UpdateData data);
+    void Update(Technique tech, GameManager.UpdateData data, float value );
 }
 public class NoUpdate: UpdateTechStrategy {
-    public void Update(Technique tech, GameManager.UpdateData data)
+    public void Update(Technique tech, GameManager.UpdateData data, float value )
     {
         tech.owner.HandlePhysics( data );
         return;

@@ -91,7 +91,7 @@ public class Technique
 
         return validateStrategy.Validate(this, action, value);
     }
-    public virtual void OnTrigger()
+    public virtual void OnTrigger( float value )
     {
         if( owner.ValidActiveTechnique()
             || ( techTrigger.state != Agent.State.Any 
@@ -106,7 +106,7 @@ public class Technique
             }
         }
 
-        if( triggerStrategy == null || !triggerStrategy.Trigger(this) ) { return; }
+        if( triggerStrategy == null || !triggerStrategy.Trigger(this, value) ) { return; }
         owner.AddActivatingTechnique(this);
     }
     public virtual void OnStateChange( Agent.State previousState, Agent.State newState )
@@ -121,11 +121,11 @@ public class Technique
 
         activateStrategy.Activate(this);
     }
-    public virtual void Update(GameManager.UpdateData data)
+    public virtual void Update( GameManager.UpdateData data, float value )
     {
         if( updateStrategy == null ) { return; }
 
-        updateStrategy.Update(this, data);
+        updateStrategy.Update( this, data, value );
     }
     public virtual void Exit()
     {

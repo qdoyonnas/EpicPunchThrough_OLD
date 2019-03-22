@@ -126,8 +126,8 @@ public class Agent : MonoBehaviour
     bool ceilingFound = false;
 
     public enum Action {
-        MoveForward,
-        MoveBack,
+        MoveRight,
+        MoveLeft,
         MoveUp,
         MoveDown,
         AttackForward,
@@ -344,7 +344,7 @@ public class Agent : MonoBehaviour
 
         HandleTechniques();
         if( ValidActiveTechnique() ) {
-            activeTechnique.Update(data);
+            activeTechnique.Update(data, _activeActionValue);
         } else {
             HandlePhysics(data);
         }
@@ -531,9 +531,9 @@ public class Agent : MonoBehaviour
 
     #region Action Methods
 
-    public delegate void ActionEvent();
-    public event ActionEvent MoveForward;
-    public event ActionEvent MoveBack;
+    public delegate void ActionEvent( float value );
+    public event ActionEvent MoveRight;
+    public event ActionEvent MoveLeft;
     public event ActionEvent MoveUp;
     public event ActionEvent MoveDown;
     public event ActionEvent AttackForward;
@@ -549,11 +549,11 @@ public class Agent : MonoBehaviour
     {
         if( !unSubscribe ) {
             switch( action ) {
-                case Action.MoveForward:
-                    MoveForward += callback;
+                case Action.MoveRight:
+                    MoveRight += callback;
                     break;
-                case Action.MoveBack:
-                    MoveBack += callback;
+                case Action.MoveLeft:
+                    MoveLeft += callback;
                     break;
                 case Action.MoveUp:
                     MoveUp += callback;
@@ -591,11 +591,11 @@ public class Agent : MonoBehaviour
             }
         } else {
             switch( action ) {
-                case Action.MoveForward:
-                    MoveForward -= callback;
+                case Action.MoveRight:
+                    MoveRight -= callback;
                     break;
-                case Action.MoveBack:
-                    MoveBack -= callback;
+                case Action.MoveLeft:
+                    MoveLeft -= callback;
                     break;
                 case Action.MoveUp:
                     MoveUp -= callback;
@@ -644,11 +644,11 @@ public class Agent : MonoBehaviour
 
         ActionEvent handler;
         switch( action ) {
-            case Action.MoveForward:
-                handler = MoveForward;
+            case Action.MoveRight:
+                handler = MoveRight;
                 break;
-            case Action.MoveBack:
-                handler = MoveBack;
+            case Action.MoveLeft:
+                handler = MoveLeft;
                 break;
             case Action.MoveUp:
                 handler = MoveUp;
@@ -695,7 +695,7 @@ public class Agent : MonoBehaviour
         _activeActionValue = value;
 
         if( handler != null ) {
-            handler();
+            handler( value );
         }
     }
 

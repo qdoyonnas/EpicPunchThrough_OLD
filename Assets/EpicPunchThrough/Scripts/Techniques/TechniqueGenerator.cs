@@ -112,12 +112,12 @@ public class TechniqueGenerator
             "Run Forward",
             "Base/Move",
             Agent.State.Grounded,
-            new Agent.Action[] { Agent.Action.MoveForward },
+            new Agent.Action[] { Agent.Action.MoveRight },
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, false),
+                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, true),
                                 new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
             new MoveForwardUpdate(10f, 40f),
             null
@@ -128,12 +128,12 @@ public class TechniqueGenerator
             "Run Back",
             "Base/Move",
             Agent.State.Grounded,
-            new Agent.Action[] { Agent.Action.MoveBack },
+            new Agent.Action[] { Agent.Action.MoveLeft },
             null,
-            new FlipDirectionActivate(),
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, true),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, false),
+            null,
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true),
+                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, false),
                                 new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
             new MoveForwardUpdate(10f, 40f),
             null
@@ -155,37 +155,37 @@ public class TechniqueGenerator
         GenerateTechnique( agent, options );
 
         options = new TechniqueOptions(
-            "AirMoveForward",
+            "Air Move Forward",
             "Base/AirMove",
             Agent.State.InAir,
-            new Agent.Action[] { Agent.Action.MoveForward },
+            new Agent.Action[] { Agent.Action.MoveRight },
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, false),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, true) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, false),
+                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, true) ),
             new MoveForwardUpdate(3f, 10f),
             null
         );
         GenerateTechnique( agent, options );
 
         options = new TechniqueOptions(
-            "AirMoveForward",
+            "Air Move Back",
             "Base/AirMove",
             Agent.State.InAir,
-            new Agent.Action[] { Agent.Action.MoveBack },
+            new Agent.Action[] { Agent.Action.MoveLeft },
             null,
-            new FlipDirectionActivate(),
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveForward, true),
-                                new EndTechValidate.ActionState(Agent.Action.MoveBack, false) ),
+            null,
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true),
+                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, false) ),
             new MoveForwardUpdate(3f, 10f),
             null
         );
         GenerateTechnique( agent, options );
 
         options = new TechniqueOptions(
-            "WallSlide",
+            "Wall Slide",
             "Base/WallSlide",
             Agent.State.WallSliding,
             new Agent.Action[] { Agent.Action.MoveUp },

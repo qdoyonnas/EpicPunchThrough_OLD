@@ -39,24 +39,16 @@ public class PlayerAgent : Agent
     protected bool OnHorizontal( float value )
     {
         if( value == 0 ) {
-            if( actions[actions.Count - 1] == Action.MoveForward ) {
-                PerformAction(Action.MoveForward, 0);
-            } else if( actions[actions.Count - 1] == Action.MoveBack ) {
-                PerformAction(Action.MoveBack, 0);
+            if( actions[actions.Count - 1] == Action.MoveRight ) {
+                PerformAction(Action.MoveRight, 0);
+            } else if( actions[actions.Count - 1] == Action.MoveLeft ) {
+                PerformAction(Action.MoveLeft, 0);
             }
-        } else {
+        }else {
             if( value > 0 ) {
-                if( isFacingRight ) {
-                    PerformAction(Action.MoveForward, value);
-                } else {
-                    PerformAction(Action.MoveBack, value);
-                }
+                PerformAction( Action.MoveRight, value );
             } else {
-                if( isFacingRight ) {
-                    PerformAction(Action.MoveBack, value);
-                } else {
-                    PerformAction(Action.MoveForward, value);
-                }
+                PerformAction( Action.MoveLeft, value );
             }
         }
 

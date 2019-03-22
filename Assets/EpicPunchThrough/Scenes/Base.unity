@@ -317,7 +317,7 @@ MonoBehaviour:
         propPrefabs: []
   activeCamera: {fileID: 0}
   DebugOn: 0
-  initialState: 1
+  initialState: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
