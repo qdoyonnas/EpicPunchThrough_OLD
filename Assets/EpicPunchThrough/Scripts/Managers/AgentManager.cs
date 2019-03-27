@@ -24,6 +24,8 @@ public class AgentManager
         public float autoStopSpeed;
         public Vector3 verticalBoundarySize;
         public Vector3 horizontalBoundarySize;
+        public bool defaultIgnorePropCollisions;
+        public Agent.Action[] propInteractActions;
     }
 
     #endregion

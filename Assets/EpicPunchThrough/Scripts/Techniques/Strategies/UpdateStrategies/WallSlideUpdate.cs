@@ -5,17 +5,27 @@ using UnityEngine;
 
 public class WallSlideUpdate : UpdateTechStrategy
 {
-    float friction;
+    float frictionMultiplier;
+    float gravityMultiplier;
 
-    public WallSlideUpdate( float friction )
+    public WallSlideUpdate( float frictionMultiplier, float gravityMultiplier )
     {
-        this.friction = friction;
+        this.frictionMultiplier = frictionMultiplier;
+        this.gravityMultiplier = gravityMultiplier;
     }
 
     public void Update( Technique tech, GameManager.UpdateData data, float value )
     {
-        tech.owner.HandlePhysics( data );
-
-        tech.owner.physicsBody.SetVelocity( new Vector3(tech.owner.physicsBody.velocity.x, tech.owner.physicsBody.velocity.y * (1 - friction), 0) );
+        Vector3? friction = new Vector3();
+        Vector3? gravity = null;
+        if( tech.owner.physicsBody.velocity.y >= 0 ) {
+            gravity = EnvironmentManager.Instance.GetEnvironment().gravity * gravityMultiplier;
+            tech.owner.animator.SetBool("WallRunning", true);
+        } else {
+            friction = tech.owner.physicsBody.frictionCoefficients * frictionMultiplier;
+            tech.owner.animator.SetBool("WallRunning", false);
+        }
+        
+        tech.owner.HandlePhysics( data, friction, gravity );
     }
 }

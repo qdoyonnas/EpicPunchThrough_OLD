@@ -298,6 +298,8 @@ MonoBehaviour:
       autoStopSpeed: 0.01
       verticalBoundarySize: {x: 2, y: 5, z: 1}
       horizontalBoundarySize: {x: 5, y: 2, z: 1}
+      defaultIgnorePropCollisions: 1
+      propInteractActions: 0200000003000000
     environmentSettings:
       environments:
       - name: City
@@ -312,8 +314,9 @@ MonoBehaviour:
           maxX: 0
           minY: 3
           maxY: 0
-        groundFriction: 0.1
-        airFriction: 0
+        groundFriction: {x: 0.1, y: 0, z: 0}
+        airFriction: {x: 0, y: 0, z: 0}
+        wallFriction: {x: 0, y: 0.01, z: 0}
         propPrefabs: []
   activeCamera: {fileID: 0}
   DebugOn: 0

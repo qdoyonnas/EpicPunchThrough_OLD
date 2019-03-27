@@ -15,13 +15,17 @@ public class MoveForwardUpdate : UpdateTechStrategy
 
     public void Update( Technique tech, GameManager.UpdateData data, float value )
     {
-        if( tech.owner.physicsBody.velocity.magnitude > maxSpeed ) { return; }
+        if( Mathf.Abs(tech.owner.physicsBody.velocity.x) < maxSpeed
+            || Mathf.Sign(value) != Mathf.Sign(tech.owner.physicsBody.velocity.x) )
+        {
+            if( value < 0 && tech.owner.isFacingRight ) { tech.owner.isFacingRight = false; }
+            else if( value > 0 && !tech.owner.isFacingRight ) { tech.owner.isFacingRight = true; }
+            Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime * value);
 
-        if( value < 0 && tech.owner.isFacingRight ) { tech.owner.isFacingRight = false; }
-        else if( value > 0 && !tech.owner.isFacingRight ) { tech.owner.isFacingRight = true; }
-        Vector3 velDelta = Vector3.right * (acceleration * data.deltaTime * value);
+            tech.owner.physicsBody.AddVelocity(velDelta);
+        }
 
-        tech.owner.physicsBody.AddVelocity(velDelta);
         tech.owner.HandlePhysics( data );
+        tech.owner.HandleAnimation();
     }
 }

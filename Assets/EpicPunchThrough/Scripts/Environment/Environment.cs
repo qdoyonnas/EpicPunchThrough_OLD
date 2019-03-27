@@ -32,8 +32,9 @@ public class Environment
     public Vector3 gravity;
     public WorldBounds agentBounds;
 
-    public float groundFriction;
-    public float airFriction;
+    public Vector3 groundFriction;
+    public Vector3 airFriction;
+    public Vector3 wallFriction;
 
     public GameObject[] propPrefabs;
 }

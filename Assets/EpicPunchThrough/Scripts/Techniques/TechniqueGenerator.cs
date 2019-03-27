@@ -149,14 +149,14 @@ public class TechniqueGenerator
             null,
             null,
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.Jump, false) ),
-            null,
-            new JumpExit()
+            new ChargeUpdate(0.2f, 10f, 16f, 200f),
+            new JumpExit(0.5f)
         );
         GenerateTechnique( agent, options );
 
         options = new TechniqueOptions(
             "Air Move Forward",
-            "Base/AirMove",
+            "Base/BaseCharacter",
             Agent.State.InAir,
             new Agent.Action[] { Agent.Action.MoveRight },
             null,
@@ -171,7 +171,7 @@ public class TechniqueGenerator
 
         options = new TechniqueOptions(
             "Air Move Back",
-            "Base/AirMove",
+            "Base/BaseCharacter",
             Agent.State.InAir,
             new Agent.Action[] { Agent.Action.MoveLeft },
             null,
@@ -179,7 +179,7 @@ public class TechniqueGenerator
             null,
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true),
                                 new EndTechValidate.ActionState(Agent.Action.MoveLeft, false) ),
-            new MoveForwardUpdate(3f, 10f),
+            new MoveForwardUpdate(2f, 6f),
             null
         );
         GenerateTechnique( agent, options );
@@ -194,8 +194,22 @@ public class TechniqueGenerator
             null,
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveUp, false),
                                 new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
-            new WallSlideUpdate(),
+            new WallSlideUpdate(10f, 0.25f),
             null
+        );
+        GenerateTechnique( agent, options );
+
+        options = new TechniqueOptions(
+            "Wall Jump",
+            "Base/WallSlide",
+            Agent.State.WallSliding,
+            new Agent.Action[] { Agent.Action.Jump },
+            null,
+            null,
+            null,
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.Jump, false) ),
+            new ChargeUpdate(10f, 10f, 16f, 200f),
+            new JumpExit(0.5f)
         );
         GenerateTechnique( agent, options );
     }

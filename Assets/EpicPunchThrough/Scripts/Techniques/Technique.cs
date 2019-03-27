@@ -20,6 +20,8 @@ public class Technique
         }
     }
 
+    protected Dictionary<string, object> blackboard = new Dictionary<string, object>();
+
     #region TechTrigger
 
     public struct TechTrigger {
@@ -135,6 +137,27 @@ public class Technique
     }
 
     #endregion
+
+    public void SetBlackboardData( string key, object data )
+    {
+        string l_key = key.ToLower();
+        blackboard[l_key] = data;
+    }
+    public object GetBlackboardData( string key )
+    {
+        string l_key = key.ToLower();
+
+        if( !blackboard.ContainsKey(l_key) ) {
+            SetBlackboardData( l_key, null );
+        }
+
+        return blackboard[l_key];
+    }
+    public void ClearBlackboardData( string key )
+    {
+        string l_key = key.ToLower();
+        blackboard.Remove(l_key);
+    }
 
     #region Utility
 

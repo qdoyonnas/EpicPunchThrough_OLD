@@ -10,7 +10,12 @@ public class Agent : MonoBehaviour
 
     [SerializeField] protected RuntimeAnimatorController baseController;
 
-    protected Animator animator;
+    protected Animator _animator;
+    public Animator animator {
+         get {
+            return _animator;
+        }
+    }
     public RuntimeAnimatorController animatorController {
         get {
             return animator.runtimeAnimatorController;
@@ -93,15 +98,16 @@ public class Agent : MonoBehaviour
                 case State.Grounded:
                     physicsBody.useGravity = false;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
-                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().groundFriction;
+                    physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().groundFriction;
                     break;
                 case State.InAir:
                     physicsBody.useGravity = true;
-                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().airFriction;
+                    physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().airFriction;
                     break;
                 case State.WallSliding:
                     physicsBody.useGravity = true;
                     physicsBody.velocity = new Vector3(0, physicsBody.velocity.y, 0);
+                    physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().wallFriction;
                     break;
                 case State.OnCeiling:
                     physicsBody.useGravity = true;
@@ -113,7 +119,7 @@ public class Agent : MonoBehaviour
                     break;
                 case State.Launched:
                     physicsBody.useGravity = true;
-                    physicsBody.frictionCoefficients.x = EnvironmentManager.Instance.GetEnvironment().airFriction;
+                    physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().airFriction;
                     break;
             }
 
@@ -192,7 +198,23 @@ public class Agent : MonoBehaviour
 
     BoxCollider[] boundaryColliders;
 
+    public Vector3[] boundingPoints {
+        get {
+            return new Vector3[8] {
+                new Vector3( transform.position.x, _collider.bounds.center.y + (_collider.bounds.extents.y * 1.1f), transform.position.z ),
+                new Vector3(  _collider.bounds.center.x + (_collider.bounds.extents.x * 0.9f),  _collider.bounds.center.y + (_collider.bounds.extents.y * 0.9f), transform.position.z ),
+                new Vector3( _collider.bounds.center.x + (_collider.bounds.extents.x * 1.2f), transform.position.y, transform.position.z ),
+                new Vector3( _collider.bounds.center.x + (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y - (_collider.bounds.extents.y * 0.9f), transform.position.z ),
+                new Vector3( transform.position.x, _collider.bounds.center.y - (_collider.bounds.extents.y * 1.1f), transform.position.z ),
+                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y - (_collider.bounds.extents.y * 0.9f), transform.position.z ),
+                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 1.2f), transform.position.y, transform.position.z ),
+                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y + (_collider.bounds.extents.y * 0.9f), transform.position.z )
+            };
+        }
+    }
+
     List<Collider> ignoredColliders = new List<Collider>();
+    int frontCollisionLayer = int.MaxValue;
 
     #endregion
 
@@ -225,7 +247,7 @@ public class Agent : MonoBehaviour
     }
     public virtual void Init()
     {
-        animator = GetComponent<Animator>();
+        _animator = GetComponent<Animator>();
         animatorController = baseController;
 
         _physicsBody = GetComponent<PhysicsBody>();
@@ -249,7 +271,7 @@ public class Agent : MonoBehaviour
 
         didInit = true;
     }
-    protected virtual TriggerCheck FindTriggerCheck( string name, UnityAction<bool> action )
+    protected virtual TriggerCheck FindTriggerCheck( string name, UnityAction<bool, Collider> action )
     {
         Transform colliderTransform = transform.Find(name);
         TriggerCheck check = null;
@@ -339,7 +361,7 @@ public class Agent : MonoBehaviour
 
     public virtual void DoUpdate( GameManager.UpdateData data )
     {
-        EnableTriggerChecks();
+        //EnableTriggerChecks();
         CheckState();
 
         HandleTechniques();
@@ -347,35 +369,9 @@ public class Agent : MonoBehaviour
             activeTechnique.Update(data, _activeActionValue);
         } else {
             HandlePhysics(data);
+            HandleAnimation();
         }
     }
-    public virtual void HandlePhysics( GameManager.UpdateData data )
-    {
-        physicsBody.HandleFriction();
-        HandlePropCollisions( data.deltaTime );
-    }
-
-    protected virtual void HandlePropCollisions( float deltaTime )
-    {
-        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
-            if( !ignoredColliders[i].bounds.Intersects(collider.bounds) ) {
-                IgnoreCollider(ignoredColliders[i], false);
-            }
-        }
-
-        if( state == State.Grounded ) {
-            RaycastHit[] hits;
-            if( physicsBody.DetectCollisions( deltaTime, out hits ) ) {
-                foreach( RaycastHit hit in hits ) {
-                    Prop prop = hit.collider.GetComponent<Prop>();
-                    if( prop != null && prop.isPassable ) {
-                        IgnoreCollider(hit.collider);
-                    }
-                }
-            }
-        }
-    }
-
     protected virtual void EnableTriggerChecks()
     {
         if( state == State.WallSliding ) {
@@ -475,6 +471,94 @@ public class Agent : MonoBehaviour
 
             TransitionTechnique( chosenTech, false );
             activatingTechniques.Clear();
+        }
+    }
+
+    public virtual void HandlePhysics( GameManager.UpdateData data )
+    {
+        HandlePhysics(data, null, null);
+    }
+    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride )
+    {
+        HandlePhysics(data, frictionOverride, null);
+    }
+    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride, Vector3? gravityOverride )
+    {
+        physicsBody.HandleGravity( data, gravityOverride );
+        physicsBody.HandleFriction( frictionOverride );
+        HandlePropCollisions( data.deltaTime );
+    }
+
+    protected virtual void HandlePropCollisions( float deltaTime )
+    {
+        CheckIgnoredCollisionBounds();
+
+        RaycastHit[] hits;
+        if( physicsBody.DetectCollisions(deltaTime, out hits) ) {
+
+            foreach( RaycastHit hit in hits ) {
+                bool doCollide = HitCollideLogic(hit);
+                if( !doCollide ) {
+                    IgnoreCollider(hit.collider, true);
+                }
+            }
+        }
+    }
+    protected virtual void CheckIgnoredCollisionBounds()
+    {
+        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
+            bool contained = false;
+            foreach( Vector3 boundPoint in boundingPoints ) {
+                if( ignoredColliders[i].bounds.Contains(boundPoint) ) {
+                    contained = true;
+                    break;
+                }
+            }
+            if( !contained ) {
+                IgnoreCollider(ignoredColliders[i], false);
+            }
+        }
+    }
+    protected virtual bool HitCollideLogic(RaycastHit hit)
+    {
+        Prop prop = hit.collider.GetComponent<Prop>();
+        if( prop == null || !prop.isPassable ) { return true; }
+        if( prop.physicsBody.layer > frontCollisionLayer ) { return false; }
+
+        bool invertDown = false;
+        foreach( Action action in AgentManager.Instance.settings.propInteractActions ) {
+            if( actions[actions.Count - 1] == action && Mathf.Abs(_activeActionValue) > 0 ) {
+                invertDown = true;
+                break;
+            } 
+        }
+
+        if( state == State.Grounded ) {
+            if( prop.physicsBody.layer <= physicsBody.layer ) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if( hit.point.y >= hit.collider.bounds.max.y ) {
+                return invertDown ? false : true;
+            }
+
+            return invertDown ? AgentManager.Instance.settings.defaultIgnorePropCollisions
+                : !AgentManager.Instance.settings.defaultIgnorePropCollisions;
+        }
+
+    }
+
+    public virtual void HandleAnimation()
+    {
+        if( state == State.Grounded ) {
+            animator.SetBool("Grounded", true );
+        } else {
+            animator.SetBool("Grounded", false );
+            float yVelocity = (physicsBody.velocity.y / 10f);
+            yVelocity = yVelocity > 0 ? Mathf.Clamp(yVelocity, 0.5f, 1f): Mathf.Clamp(yVelocity + 1, 0, 0.5f);
+            animator.SetFloat("YDirection", yVelocity);
         }
     }
 
@@ -715,17 +799,43 @@ public class Agent : MonoBehaviour
         }
     }
 
-    void SetGroundFound( bool state )
+    void SetGroundFound( bool state, Collider other )
     {
         groundFound = state;
+
+        if( state ) {
+            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
+        }
     }
-    void SetWallFound( bool state )
+    void SetWallFound( bool state, Collider other )
     {
         wallFound = state;
+
+        if( other.transform.position.x < transform.position.x ) {
+            if( isFacingRight != true ) { isFacingRight = true; }
+        } else {
+            if( isFacingRight == true ) { isFacingRight = false; }
+        }
+
+        if( state ) {
+            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
+        }
     }
-    void SetCeilingFound( bool state )
+    void SetCeilingFound( bool state, Collider other )
     {
         ceilingFound = state;
+
+        if( state ) {
+            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
+        }
+    }
+    void SetPhysicsLayer( PhysicsBody body )
+    {
+        if( body != null ) {
+            physicsBody.layer = body.layer;
+        } else {
+            physicsBody.layer = 0;
+        }
     }
 
     public virtual void IgnoreCollider(Collider other, bool doIgnore = true)
@@ -740,6 +850,12 @@ public class Agent : MonoBehaviour
             Physics.IgnoreCollision(_rightWallCheck.collider, other);
 
             ignoredColliders.Add(other);
+
+            PhysicsBody body = other.GetComponent<PhysicsBody>();
+            if( body != null ) {
+                frontCollisionLayer = body.layer < frontCollisionLayer ? body.layer : frontCollisionLayer;
+            }
+
         } else {
             if( !ignoredColliders.Contains(other) ) { return; }
 
@@ -750,6 +866,14 @@ public class Agent : MonoBehaviour
             Physics.IgnoreCollision(_rightWallCheck.collider, other, false);
 
             ignoredColliders.Remove(other);
+
+            frontCollisionLayer = int.MaxValue;
+            foreach( Collider col in ignoredColliders ) {
+                PhysicsBody body = col.GetComponent<PhysicsBody>();
+                if( body != null ) {
+                    frontCollisionLayer = body.layer < frontCollisionLayer ? body.layer : frontCollisionLayer;
+                }
+            }
         }
     }
 
@@ -767,10 +891,15 @@ public class Agent : MonoBehaviour
                                     collider.radius );
 
         Gizmos.color = Color.blue;
-        if( _groundCheck.enabled ) {  Gizmos.DrawWireSphere( _groundCheck.transform.position, ((SphereCollider)_groundCheck.collider).radius ); }
-        if( _rightWallCheck.enabled ) {  Gizmos.DrawWireCube( _rightWallCheck.transform.position, ((BoxCollider)_rightWallCheck.collider).size ); }
-        if( _leftWallCheck.enabled ) {  Gizmos.DrawWireCube( _leftWallCheck.transform.position, ((BoxCollider)_leftWallCheck.collider).size ); }
-        if( _ceilingCheck.enabled ) {  Gizmos.DrawWireSphere( _ceilingCheck.transform.position, ((SphereCollider)_ceilingCheck.collider).radius ); }
+        if( _groundCheck.doDetect ) {  Gizmos.DrawWireSphere( _groundCheck.transform.position, ((SphereCollider)_groundCheck.collider).radius ); }
+        if( _rightWallCheck.doDetect ) {  Gizmos.DrawWireCube( _rightWallCheck.transform.position, ((BoxCollider)_rightWallCheck.collider).size ); }
+        if( _leftWallCheck.doDetect ) {  Gizmos.DrawWireCube( _leftWallCheck.transform.position, ((BoxCollider)_leftWallCheck.collider).size ); }
+        if( _ceilingCheck.doDetect ) {  Gizmos.DrawWireSphere( _ceilingCheck.transform.position, ((SphereCollider)_ceilingCheck.collider).radius ); }
+
+        Gizmos.color = Color.red;
+        foreach( Vector3 boundPoint in boundingPoints ) {
+            Gizmos.DrawSphere( boundPoint, 0.02f );
+        }
 
         if( boundaryColliders != null ) {
             for( int i = 0; i < boundaryColliders.Length; i++ ) {

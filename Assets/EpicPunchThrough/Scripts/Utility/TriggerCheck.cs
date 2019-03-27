@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class TriggerCheck : MonoBehaviour
 {
     [Serializable]
-    public class TriggerAction : UnityEvent<bool> {}
+    public class TriggerAction : UnityEvent<bool, Collider> {}
     public TriggerAction onTrigger;
 
     Collider _collider;
@@ -23,6 +23,9 @@ public class TriggerCheck : MonoBehaviour
         }
         set {
             collider.enabled = value;
+            if( !value ) {
+                onTrigger.Invoke( false, null );
+            }
         }
     }
 
@@ -33,10 +36,10 @@ public class TriggerCheck : MonoBehaviour
 
     private void OnTriggerEnter( Collider other )
     {
-        onTrigger.Invoke( true );
+        onTrigger.Invoke( true, other );
     }
     private void OnTriggerExit( Collider other )
     {
-        onTrigger.Invoke( false );
+        onTrigger.Invoke( false, other );
     }
 }

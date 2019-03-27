@@ -6,7 +6,7 @@ using UnityEngine;
 public class PhysicsBody : MonoBehaviour
 {
     public Vector3 velocity {
-         get {
+        get {
             return rigidbody.velocity;
         }
         set {
@@ -14,23 +14,18 @@ public class PhysicsBody : MonoBehaviour
         }
     }
     public Vector3 frictionCoefficients;
-    public bool useGravity {
-        get {
-            return rigidbody.useGravity;
-        }
-        set {
-            rigidbody.useGravity = value;
-        }
-    }
+    public bool useGravity = true;
     public LayerMask layerMaskOverride;
+
+    public int layer = 0;
 
     new protected Rigidbody rigidbody;
     protected Vector3 lastPosition;
 
-
     protected void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
+        rigidbody.useGravity = false;
         lastPosition = transform.position;
     }
 
@@ -51,8 +46,8 @@ public class PhysicsBody : MonoBehaviour
     {
         if( !rigidbody.isKinematic ) { return; }
 
-        HandleGravity( data );
-        HandleFriction();
+        HandleGravity( data, null );
+        HandleFriction( null );
 
         Vector3 newPosition = transform.position + (velocity * data.deltaTime);
         newPosition = HandleCollisions( newPosition );
@@ -61,20 +56,39 @@ public class PhysicsBody : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    public void HandleGravity( GameManager.UpdateData data )
+    public void HandleGravity( GameManager.UpdateData data, Vector3? gravityOverride )
     {
-        if( !rigidbody.isKinematic || !useGravity ) { return; }
-        AddVelocity(EnvironmentManager.Instance.GetEnvironment().gravity * data.deltaTime);
+        if( !useGravity ) { return; }
+
+        Vector3 gravity = gravityOverride ?? EnvironmentManager.Instance.GetEnvironment().gravity;
+        AddVelocity(gravity * data.deltaTime);
     }
-    public void HandleFriction()
+    public void HandleFriction( Vector3? frictionOverride )
     {
-        velocity = new Vector3(velocity.x * (1 - frictionCoefficients.x), velocity.y * (1 - frictionCoefficients.y), velocity.z * (1 - frictionCoefficients.z));
+        Vector3 friction = frictionOverride ?? frictionCoefficients;
+
+        velocity = new Vector3(velocity.x * (1 - friction.x), velocity.y * (1 - friction.y), velocity.z * (1 - friction.z));
     }
 
     public bool DetectCollisions( float delaTime, out RaycastHit[] hits )
     {
-        hits = rigidbody.SweepTestAll( velocity, velocity.magnitude * delaTime );
+        RaycastHit[] allHits = rigidbody.SweepTestAll( velocity, velocity.magnitude * delaTime );
 
+        List<RaycastHit> hitList = new List<RaycastHit>();
+        for( int i = 0; i < allHits.Length; i++ ) {
+            bool newHit = true;
+            foreach( RaycastHit b in hitList ) {
+                if( allHits[i].collider == b.collider ) {
+                    newHit = false;
+                    break;
+                }
+            }
+            if( newHit ) {
+                hitList.Add(allHits[i]);
+            }
+        }
+
+        hits = hitList.ToArray();
         return hits.Length > 0;
     }
 

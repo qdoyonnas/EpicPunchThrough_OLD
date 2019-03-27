@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PhysicsBody))]
 public class Prop : MonoBehaviour
 {
     public bool isPassable = true;
 
-    protected Rigidbody rigidBody;
+    protected PhysicsBody _physicsBody;
+    public PhysicsBody physicsBody {
+         get {
+            return _physicsBody;
+        }
+    }
     protected Collider[] colliders;
 
     protected void Start()
     {
         colliders = GetComponentsInChildren<Collider>();
 
-        rigidBody = GetComponent<Rigidbody>();
+        _physicsBody = GetComponent<PhysicsBody>();
 
         PropsManager.Instance.RegisterProp(this);
     }
