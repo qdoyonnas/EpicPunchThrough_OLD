@@ -24,11 +24,9 @@ public class CameraControl : MonoBehaviour
     }
     private void OnDisable()
     {
-        GameManager.Instance.fixedUpdated -= DoFixedUpdate;
-    }
-    private void OnDestroy()
-    {
-        GameManager.Instance.fixedUpdated -= DoFixedUpdate;
+        if( GameManager.Instance != null ) {
+            GameManager.Instance.fixedUpdated -= DoFixedUpdate;
+        }
     }
     private void OnEnable()
     {

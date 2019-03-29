@@ -500,7 +500,10 @@ public class Agent : MonoBehaviour
                 bool doCollide = HitCollideLogic(hit);
                 if( !doCollide ) {
                     IgnoreCollider(hit.collider, true);
-                }
+                }/* else {
+                    ParticleOptions options = new ParticleOptions();
+                    ParticleManager.Instance.CreateEmitter(hit.point, null, options);
+                }*/
             }
         }
     }

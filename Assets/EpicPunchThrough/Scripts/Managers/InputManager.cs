@@ -5,36 +5,6 @@ using UnityEngine;
 
 public class InputManager
 {
-    #region Settings
-
-    [Serializable]
-    public class InputSettings
-    {
-        [Header("Input Settings")]
-        public bool mouseEnabled;
-        public float activateMouseThreshold;
-        public float pointerSensitivity;
-
-        [Header("General Inputs")]
-        public Axis[] horizontal;
-        public Axis[] vertical;
-
-        [Header("Menu Inputs")]
-        public KeyCode[] confirmKey;
-        public KeyCode[] cancelKey;
-        public Axis[] pointerHorizontal;
-        public Axis[] pointerVertical;
-
-        [Header("Player Inputs")]
-        public KeyCode[] attackKey;
-        public KeyCode[] blockKey;
-        public KeyCode[] jumpKey;
-        public Axis[] aimHorizontal;
-        public Axis[] aimVertical;
-    }
-
-    #endregion
-
     #region Static
 
     private static InputManager instance;
@@ -43,7 +13,7 @@ public class InputManager
         get {
             if( instance == null ) {
                 instance = new InputManager();
-                instance.Initialize(new InputSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<InputSettings>());
             }
             return instance;
         }

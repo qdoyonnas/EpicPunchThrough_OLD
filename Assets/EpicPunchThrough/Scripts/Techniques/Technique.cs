@@ -47,7 +47,7 @@ public class Technique
 
     protected TriggerTechStrategy triggerStrategy = new NoTrigger();
     protected ActivateTechStrategy activateStrategy  = new NoActivate();
-    protected StateChangeStrategy stateStrategy = new EndTechStateStrategy();
+    protected StateChangeStrategy stateStrategy = new EndTechStateChange();
     protected ActionValidateTechStrategy validateStrategy = new NoValidate();
     protected UpdateTechStrategy updateStrategy = new NoUpdate();
     protected ExitTechStrategy exitStrategy = new NoExit();

@@ -6,30 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class AgentManager
 {
-    #region Settings
-
-    [Serializable]
-    public class AgentSettings
-    {
-        [Header("Agent Settings")]
-        public Agent.State initialAgentState = Agent.State.Grounded;
-
-        [Header("Animator Controllers")]
-        public bool useController;
-        public GameObject baseCharacterPrefab;
-        public RuntimeAnimatorController baseCharacterController;
-        public int actionSequenceLength;
-
-        [Header("Physic Settings")]
-        public float autoStopSpeed;
-        public Vector3 verticalBoundarySize;
-        public Vector3 horizontalBoundarySize;
-        public bool defaultIgnorePropCollisions;
-        public Agent.Action[] propInteractActions;
-    }
-
-    #endregion
-
     #region Static
 
     private static AgentManager instance;
@@ -38,13 +14,14 @@ public class AgentManager
         get {
             if( instance == null ) {
                 instance = new AgentManager();
-                instance.Initialize(new AgentSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<AgentSettings>());
             }
             return instance;
         }
     }
 
     #endregion
+
     public AgentSettings settings;
 
     private List<Agent> agents = new List<Agent>();

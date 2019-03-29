@@ -6,15 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class PropsManager : MonoBehaviour
 {
-    #region Settings
-
-    [Serializable]
-    public class PropsManagerSettings
-    {
-    }
-
-    #endregion
-
     #region Static
 
     private static PropsManager instance;
@@ -23,7 +14,7 @@ public class PropsManager : MonoBehaviour
         get {
             if( instance == null ) {
                 instance = new PropsManager();
-                instance.Initialize(new PropsManagerSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<PropSettings>());
             }
             return instance;
         }
@@ -31,13 +22,13 @@ public class PropsManager : MonoBehaviour
 
     #endregion
 
-    public PropsManagerSettings settings;
+    public PropSettings settings;
 
     private Transform propsObject;
     private List<Prop> props =  new List<Prop>();
 
     private bool isInitialized = false;
-    public bool Initialize(PropsManagerSettings settings)
+    public bool Initialize(PropSettings settings)
     {
         this.settings = settings;
 
@@ -68,6 +59,7 @@ public class PropsManager : MonoBehaviour
             this.prefab = prefab;
         }
     }
+    /*
     public void SpawnProp( PropSpawnData data )
     {
         GetPropsObject();
@@ -84,7 +76,7 @@ public class PropsManager : MonoBehaviour
         }
 
         Prop spawnedProp = Instantiate<GameObject>(selectedPrefab, data.position, Quaternion.identity, propsObject).GetComponent<Prop>();
-    }
+    }*/
     public Transform GetPropsObject()
     {
         if( propsObject != null && propsObject.gameObject.activeInHierarchy ) { return propsObject; }

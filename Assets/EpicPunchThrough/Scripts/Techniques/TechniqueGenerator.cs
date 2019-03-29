@@ -62,7 +62,7 @@ public class TechniqueGenerator
 
         TriggerTechStrategy triggerStrategy = options.triggerStrategy == null ? new NoTrigger() : options.triggerStrategy;
         ActivateTechStrategy activateStrategy = options.activateStrategy == null ? new NoActivate() : options.activateStrategy;
-        StateChangeStrategy stateStrategy = options.stateStrategy == null ? new EndTechStateStrategy() : options.stateStrategy;
+        StateChangeStrategy stateStrategy = options.stateStrategy == null ? new EndTechStateChange() : options.stateStrategy;
         ActionValidateTechStrategy actionValidateStrategy = options.actionValidateStrategy == null ? new NoValidate() : options.actionValidateStrategy;
         UpdateTechStrategy updateStrategy = options.updateStrategy == null ? new NoUpdate() : options.updateStrategy;
         ExitTechStrategy exitStrategy = options.exitStrategy == null ? new NoExit() : options.exitStrategy;

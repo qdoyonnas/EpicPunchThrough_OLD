@@ -7,33 +7,12 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    #region Settings
-
-    [Serializable]
-    public class GameOptions
-    {
-        public float sceneTransitionFadeDuration;
-	    public WorldBounds cameraBounds;
-        public MenuManager.MenuSettings menuSettings;
-        public InputManager.InputSettings inputSettings;
-        public SoundManager.SoundManagerSettings soundSettings;
-        public PlayManager.PlayManagerSettings playSettings;
-        public AgentManager.AgentSettings agentSettings;
-        public EnvironmentManager.EnvironmentSettings environmentSettings;
-    }
-
-    #endregion
-
     #region Static
 
     private static GameManager instance;
     public static GameManager Instance
     {
         get {
-            if( instance == null ) {
-                Debug.LogError("Call to GameManager Instance before initialization. Will have default settings.");
-                instance = new GameObject().AddComponent<GameManager>();
-            }
             return instance;
         }
     }
@@ -46,7 +25,7 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    public GameOptions settings;
+    public GameManagerSettings settings;
     public CameraBase activeCamera;
 
     public bool DebugOn = false;
@@ -110,6 +89,8 @@ public class GameManager : MonoBehaviour
         AgentManager.Instance.Initialize(settings.agentSettings);
         PlayManager.Instance.Initialize(settings.playSettings);
         EnvironmentManager.Instance.Initialize(settings.environmentSettings);
+        ParticleManager.Instance.Initialize(settings.particleSettings);
+        PropsManager.Instance.Initialize(settings.propSettings);
     }
 
     public string GetManagerSceneName()

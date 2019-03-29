@@ -24,10 +24,9 @@ public class WorldBounds
 	}
 }
 
-[Serializable]
-public class Environment
+[CreateAssetMenu(menuName = "Project/Environment")]
+public class Environment : ScriptableObject
 {
-    public string name;
     public string sceneName;
     public Vector3 gravity;
     public WorldBounds agentBounds;
@@ -35,6 +34,4 @@ public class Environment
     public Vector3 groundFriction;
     public Vector3 airFriction;
     public Vector3 wallFriction;
-
-    public GameObject[] propPrefabs;
 }

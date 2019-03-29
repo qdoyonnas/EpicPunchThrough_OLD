@@ -7,17 +7,6 @@ using UnityEngine.EventSystems;
 
 public class MenuManager
 {
-    #region Settings
-
-    [Serializable]
-    public class MenuSettings
-    {
-        public bool useController;
-        public string pauseMenuName;
-    }
-
-    #endregion
-
     #region Static
 
     private static MenuManager instance;
@@ -26,7 +15,7 @@ public class MenuManager
         get {
             if( instance == null ) {
                 instance = new MenuManager();
-                instance.Initialize(new MenuSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<MenuSettings>());
             }
             return instance;
         }

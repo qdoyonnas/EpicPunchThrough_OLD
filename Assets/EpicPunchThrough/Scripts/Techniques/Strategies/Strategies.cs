@@ -42,7 +42,7 @@ public class AllValidate: ActionValidateTechStrategy {
 public interface StateChangeStrategy {
     void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState );
 }
-public class EndTechStateStrategy: StateChangeStrategy {
+public class EndTechStateChange: StateChangeStrategy {
     public void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState )
     {
         tech.owner.TransitionTechnique(null, false);

@@ -76,6 +76,8 @@ public class SpriteScroll : MonoBehaviour
 
     void HandleSubscriptions(bool state)
     {
+        if( GameManager.Instance == null ) { return; }
+
         if( state ) {
             GameManager.Instance.activeCamera.Moved += CameraMoved;
 		    GameManager.Instance.activeCamera.Zoomed += CameraZoomed;

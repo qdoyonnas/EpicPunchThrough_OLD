@@ -6,15 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class PlayManager
 {
-    #region Settings
-
-    [Serializable]
-    public class PlayManagerSettings
-    {
-    }
-
-    #endregion
-
     #region Static
 
     private static PlayManager instance;
@@ -23,7 +14,7 @@ public class PlayManager
         get {
             if( instance == null ) {
                 instance = new PlayManager();
-                instance.Initialize(new PlayManagerSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<PlaySettings>());
             }
             return instance;
         }
@@ -31,12 +22,12 @@ public class PlayManager
 
     #endregion
 
-    public PlayManagerSettings settings;
+    public PlaySettings settings;
 
     [SerializeField] private string gameSceneName = "Game";
 
     private bool isInitialized = false;
-    public bool Initialize(PlayManagerSettings settings)
+    public bool Initialize(PlaySettings settings)
     {
         this.settings = settings;
 

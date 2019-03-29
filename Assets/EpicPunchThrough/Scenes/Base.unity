@@ -255,69 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bffbf29323fdc9a4486d7e1d0b39b856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings:
-    sceneTransitionFadeDuration: 1
-    cameraBounds:
-      leftBound: 0
-      rightBound: 0
-      topBound: 0
-      bottombound: 1
-      minX: 0
-      maxX: 0
-      minY: 0
-      maxY: 0
-    menuSettings:
-      useController: 0
-      pauseMenuName: PauseMenu
-    inputSettings:
-      mouseEnabled: 1
-      activateMouseThreshold: 10
-      pointerSensitivity: 2.5
-      horizontal: 00000000020000000d000000
-      vertical: 01000000030000000e000000
-      confirmKey: 0d0000002000000043010000
-      cancelKey: 1b0000000800000044010000
-      pointerHorizontal: 09000000
-      pointerVertical: 0a000000
-      attackKey: 43010000
-      blockKey: 44010000
-      jumpKey: 20000000
-      aimHorizontal: 090000000d000000
-      aimVertical: 0a0000000e000000
-    soundSettings:
-      musicOn: 1
-      soundOn: 1
-    agentSettings:
-      initialAgentState: 2
-      useController: 0
-      baseCharacterPrefab: {fileID: 1178119509965772, guid: fe5aad4221830944bb2740a26db35969,
-        type: 3}
-      baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
-        type: 2}
-      actionSequenceLength: 10
-      autoStopSpeed: 0.01
-      verticalBoundarySize: {x: 2, y: 5, z: 1}
-      horizontalBoundarySize: {x: 5, y: 2, z: 1}
-      defaultIgnorePropCollisions: 1
-      propInteractActions: 0200000003000000
-    environmentSettings:
-      environments:
-      - name: City
-        sceneName: CityEnvironment
-        gravity: {x: 0, y: -9.8, z: 0}
-        agentBounds:
-          leftBound: 0
-          rightBound: 0
-          topBound: 0
-          bottombound: 1
-          minX: 0
-          maxX: 0
-          minY: 3
-          maxY: 0
-        groundFriction: {x: 0.1, y: 0, z: 0}
-        airFriction: {x: 0, y: 0, z: 0}
-        wallFriction: {x: 0, y: 0.01, z: 0}
-        propPrefabs: []
+  settings: {fileID: 11400000, guid: 403e06653e4bf28458ca075fd9b3f04d, type: 2}
   activeCamera: {fileID: 0}
   DebugOn: 0
   initialState: 2

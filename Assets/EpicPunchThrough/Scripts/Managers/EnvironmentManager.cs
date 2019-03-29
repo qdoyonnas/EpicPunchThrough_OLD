@@ -6,17 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class EnvironmentManager
 {
-    #region Settings
-
-    [Serializable]
-    public class EnvironmentSettings
-    {
-        public Environment[] environments;
-    }
-    public EnvironmentSettings settings;
-
-    #endregion
-
     #region Static
 
     private static EnvironmentManager instance;
@@ -25,13 +14,15 @@ public class EnvironmentManager
         get {
             if( instance == null ) {
                 instance = new EnvironmentManager();
-                instance.Initialize(new EnvironmentSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<EnvironmentSettings>());
             }
             return instance;
         }
     }
 
     #endregion
+
+    public EnvironmentSettings settings;
 
     public delegate void EnvironmentChangeDelegate(Environment previousEnvironment, Environment nextEnvironment);
     public event EnvironmentChangeDelegate environmentChanged;
@@ -78,12 +69,6 @@ public class EnvironmentManager
     }
     public Environment GetEnvironment( string environmentName )
     {
-        foreach( Environment env in settings.environments ) {
-            if( env.name == environmentName ) {
-                return env;
-            }
-        }
-
-        return null;
+        return settings.environments[environmentName];
     }
 }

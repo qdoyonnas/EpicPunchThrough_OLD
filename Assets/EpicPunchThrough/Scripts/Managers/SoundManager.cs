@@ -5,17 +5,6 @@ using UnityEngine;
 
 public class SoundManager
 {
-    #region Settings
-
-    [Serializable]
-    public class SoundManagerSettings
-    {
-        public bool musicOn;
-        public bool soundOn;
-    }
-
-    #endregion
-
     #region Static
 
     private static SoundManager instance;
@@ -24,7 +13,7 @@ public class SoundManager
         get {
             if( instance == null ) {
                 instance = new SoundManager();
-                instance.Initialize(new SoundManagerSettings());
+                instance.Initialize(ScriptableObject.CreateInstance<SoundSettings>());
             }
             return instance;
         }
@@ -40,12 +29,12 @@ public class SoundManager
         layerCount
     }
 
-    public SoundManagerSettings settings;
+    public SoundSettings settings;
 
     List<AudioSource> sources = new List<AudioSource>();
 
     private bool isInitialized = false;
-    public bool Initialize(SoundManagerSettings settings)
+    public bool Initialize(SoundSettings settings)
     {
         this.settings = settings;
         

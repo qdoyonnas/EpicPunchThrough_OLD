@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b62aaef4184424199478c48c1421e4, type: 3}
+  m_Name: City
+  m_EditorClassIdentifier: 
+  sceneName: CityEnvironment
+  gravity: {x: 0, y: -9.8, z: 0}
+  agentBounds:
+    leftBound: 0
+    rightBound: 0
+    topBound: 0
+    bottombound: 1
+    minX: 0
+    maxX: 0
+    minY: 3
+    maxY: 0
+  groundFriction: {x: 0.05, y: 0, z: 0}
+  airFriction: {x: 0, y: 0, z: 0}
+  wallFriction: {x: 0, y: 0.005, z: 0}

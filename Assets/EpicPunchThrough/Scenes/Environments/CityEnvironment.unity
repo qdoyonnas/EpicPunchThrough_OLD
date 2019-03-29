@@ -252,9 +252,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 1
 --- !u!1 &447876711
 GameObject:
@@ -395,9 +392,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 4
 --- !u!1 &637307296
 GameObject:
@@ -607,9 +601,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 2
 --- !u!1 &808627037
 GameObject:
@@ -884,9 +875,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 1
 --- !u!1 &1861406101
 GameObject:
@@ -1027,9 +1015,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 3
 --- !u!1 &2054495913
 GameObject:
@@ -1170,7 +1155,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frictionCoefficients: {x: 0, y: 0, z: 0}
   useGravity: 1
-  layerMaskOverride:
-    serializedVersion: 2
-    m_Bits: 0
   layer: 2

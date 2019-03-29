@@ -100,6 +100,8 @@ public class UICursor : MonoBehaviour
 
     void HandleSubscriptions(bool state)
     {
+        if( InputManager.Instance == null || GameManager.Instance == null ) { return; }
+
         if( state ) {
             InputManager.Instance.PointerHorizontal += OnHorizontal;
             InputManager.Instance.PointerVertical += OnVertical;
