@@ -18,6 +18,8 @@ MonoBehaviour:
     type: 3}
   baseCharacterController: {fileID: 9100000, guid: 2228a36b707dfa742b07385092387f2b,
     type: 2}
+  baseParticleController: {fileID: 11400000, guid: 5818f32beb53dc54397e2101a50ae43d,
+    type: 2}
   actionSequenceLength: 10
   autoStopSpeed: 0.01
   verticalBoundarySize: {x: 2, y: 5, z: 1}

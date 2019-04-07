@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class JumpExit : ExitTechStrategy
 {
@@ -19,5 +20,10 @@ public class JumpExit : ExitTechStrategy
         tech.owner.physicsBody.AddVelocity(jumpVector);
 
         tech.SetBlackboardData("charge", 0f);
+    }
+
+    public void InspectorDraw()
+    {
+        EditorGUILayout.LabelField("JumpExit Fields");
     }
 }

@@ -32,6 +32,8 @@ public class Agent : MonoBehaviour
     protected Transform graphicsChild;
     protected DirectionIndicator directionIndicator;
 
+    protected ParticleController particleController;
+
     #endregion
 
     #region Technique Fields
@@ -238,9 +240,10 @@ public class Agent : MonoBehaviour
         }
     }
 
-    public virtual void Init( RuntimeAnimatorController baseController, int team )
+    public virtual void Init( RuntimeAnimatorController baseController, ParticleController particleController, int team )
     {
         this.baseController = baseController;
+        this.particleController = particleController;
         this._team = team;
 
         Init();
@@ -500,10 +503,12 @@ public class Agent : MonoBehaviour
                 bool doCollide = HitCollideLogic(hit);
                 if( !doCollide ) {
                     IgnoreCollider(hit.collider, true);
-                }/* else {
-                    ParticleOptions options = new ParticleOptions();
-                    ParticleManager.Instance.CreateEmitter(hit.point, null, options);
-                }*/
+                } else {
+                    ParticleEmitter emitter = CreateParticle( "impact", hit.point, Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward) );
+                    if( emitter != null ) {
+                        emitter.Expand(_physicsBody.velocity.magnitude / 12f);
+                    }
+                }
             }
         }
     }
@@ -802,7 +807,7 @@ public class Agent : MonoBehaviour
         }
     }
 
-    void SetGroundFound( bool state, Collider other )
+    protected virtual void SetGroundFound( bool state, Collider other )
     {
         groundFound = state;
 
@@ -810,7 +815,7 @@ public class Agent : MonoBehaviour
             SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
         }
     }
-    void SetWallFound( bool state, Collider other )
+    protected virtual void SetWallFound( bool state, Collider other )
     {
         wallFound = state;
 
@@ -824,7 +829,7 @@ public class Agent : MonoBehaviour
             SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
         }
     }
-    void SetCeilingFound( bool state, Collider other )
+    protected virtual void SetCeilingFound( bool state, Collider other )
     {
         ceilingFound = state;
 
@@ -832,7 +837,7 @@ public class Agent : MonoBehaviour
             SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
         }
     }
-    void SetPhysicsLayer( PhysicsBody body )
+    protected virtual void SetPhysicsLayer( PhysicsBody body )
     {
         if( body != null ) {
             physicsBody.layer = body.layer;
@@ -878,6 +883,16 @@ public class Agent : MonoBehaviour
                 }
             }
         }
+    }
+
+    protected virtual ParticleEmitter CreateParticle( string particleName, Vector3 pos, float angle )
+    {
+        if( particleController == null ) { return null; }
+
+        ParticleEmitter emitter = ParticleManager.Instance.CreateEmitter( pos, angle, null, particleController.GetParticles(particleName) );
+        if( emitter == null ) { return null; }
+
+        return emitter;
     }
 
     #endregion

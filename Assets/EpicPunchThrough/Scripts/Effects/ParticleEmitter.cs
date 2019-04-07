@@ -13,39 +13,47 @@ public class ParticleEmitter : MonoBehaviour
 
     #region Modules
 
-    ParticleSystemRenderer particleRenderer;
-    ParticleSystem.MainModule mainModule;
-    ParticleSystem.CollisionModule collisionModule;
-    ParticleSystem.ColorBySpeedModule colorBySpeedModule;
-    ParticleSystem.ColorOverLifetimeModule colorOverTimeModule;
-    ParticleSystem.CustomDataModule customDataModule;
-    ParticleSystem.EmissionModule emissionModule;
-    ParticleSystem.ExternalForcesModule externalForcesModule;
-    ParticleSystem.ForceOverLifetimeModule forceOverTimeModule;
-    ParticleSystem.InheritVelocityModule inheritVelocityModule;
-    ParticleSystem.LightsModule lightsModule;
-    ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityOverTimeModule;
-    ParticleSystem.NoiseModule noiseModule;
-    ParticleSystem.RotationBySpeedModule rotationBySpeedModule;
-    ParticleSystem.SizeBySpeedModule sizeBySpeedModule;
-    ParticleSystem.SizeOverLifetimeModule sizeOverTimeModule;
-    ParticleSystem.TrailModule trailModule;
-    ParticleSystem.TriggerModule triggerModule;
-    ParticleSystem.ShapeModule shapeModule;
-    ParticleSystem.VelocityOverLifetimeModule velOverTimeModule;
+    public ParticleSystemRenderer particleRenderer;
+    public ParticleSystem.MainModule mainModule;
+    public ParticleSystem.CollisionModule collisionModule;
+    public ParticleSystem.ColorBySpeedModule colorBySpeedModule;
+    public ParticleSystem.ColorOverLifetimeModule colorOverTimeModule;
+    public ParticleSystem.CustomDataModule customDataModule;
+    public ParticleSystem.EmissionModule emissionModule;
+    public ParticleSystem.ExternalForcesModule externalForcesModule;
+    public ParticleSystem.ForceOverLifetimeModule forceOverTimeModule;
+    public ParticleSystem.InheritVelocityModule inheritVelocityModule;
+    public ParticleSystem.LightsModule lightsModule;
+    public ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityOverTimeModule;
+    public ParticleSystem.NoiseModule noiseModule;
+    public ParticleSystem.RotationBySpeedModule rotationBySpeedModule;
+    public ParticleSystem.SizeBySpeedModule sizeBySpeedModule;
+    public ParticleSystem.SizeOverLifetimeModule sizeOverTimeModule;
+    public ParticleSystem.TrailModule trailModule;
+    public ParticleSystem.TriggerModule triggerModule;
+    public ParticleSystem.ShapeModule shapeModule;
+    public ParticleSystem.VelocityOverLifetimeModule velOverTimeModule;
 
     #endregion
 
     float lifeStamp;
 
-    private void Awake()
+    private void OnDestroy()
     {
-        CreateParticleSystem();
+        ParticleManager.Instance.RemoveEmitter(this);
     }
-    protected virtual void CreateParticleSystem()
+
+    public void Init(GameObject particleSystem)
     {
-        _particleSystem = gameObject.AddComponent<ParticleSystem>();
-        particleRenderer = GetComponent<ParticleSystemRenderer>();
+        GameObject particleObject = Instantiate<GameObject>(particleSystem, transform);
+        GetParticleSystem();
+
+        ParticleManager.Instance.AddEmitter(this);
+    }
+    protected virtual void GetParticleSystem()
+    {
+        _particleSystem = GetComponentInChildren<ParticleSystem>();
+        particleRenderer = GetComponentInChildren<ParticleSystemRenderer>();
 
         // Modules - for ease of access
         mainModule = _particleSystem.main;
@@ -67,53 +75,47 @@ public class ParticleEmitter : MonoBehaviour
         triggerModule = _particleSystem.trigger;
         shapeModule = _particleSystem.shape;
         velOverTimeModule = _particleSystem.velocityOverLifetime;
-
-        // Default overrides
-        mainModule.startSpeed = 0f;
-
-        shapeModule.shapeType = ParticleSystemShapeType.Box;
-        shapeModule.boxThickness = new Vector3(1, 1, 0);
-
-        velOverTimeModule.enabled = true;
-        velOverTimeModule.zMultiplier = 0f;
-    }
-
-    private void OnDestroy()
-    {
-        ParticleManager.Instance.RemoveEmitter(this);
-    }
-
-    public void Init()
-    {
-        /*lifeStamp = Time.time + options.lifeTime;
-        particleRenderer.material = Resources.Load<Material>(options.material);
-        SetPreset(options.preset);*/
-
-        ParticleManager.Instance.AddEmitter(this);
-    }
-
-    public ParticleEmitter SetPreset( string preset )
-    {
-        
-
-        return this;
-    }
-    protected virtual void SetDefaultPreset()
-    {
-        mainModule.startSpeed = 0f;
-
-        shapeModule.shapeType = ParticleSystemShapeType.Box;
-        shapeModule.boxThickness = new Vector3(1, 1, 0);
-
-        velOverTimeModule.enabled = true;
-        velOverTimeModule.zMultiplier = 0f;
     }
 
     public void DoUpdate( GameManager.UpdateData data )
     {
-        if( Time.time >= lifeStamp ) {
+        if( !_particleSystem.IsAlive() ) {
             Destroy(gameObject);
             return;
         }
     }
+
+    #region Modication Methods
+
+    public ParticleEmitter Expand( float multiplier )
+    {
+        shapeModule.radius *= multiplier;
+        shapeModule.boxThickness *= multiplier;
+
+        emissionModule.rateOverTime = MultiplyCurve(emissionModule.rateOverTime, multiplier);
+        emissionModule.rateOverDistance = MultiplyCurve(emissionModule.rateOverTime, multiplier);
+
+        for( int i = 0; i < emissionModule.burstCount; i++ ) {
+            ParticleSystem.Burst burst = emissionModule.GetBurst(i);
+            burst.count = MultiplyCurve(burst.count, multiplier);
+            emissionModule.SetBurst(i, burst);
+        }
+
+        mainModule.startSize = MultiplyCurve( mainModule.startSize, Mathf.Pow(multiplier, 0.6f) );
+        mainModule.startLifetime = MultiplyCurve( mainModule.startLifetime, Mathf.Pow(multiplier, 0.3f) );
+
+        return this;
+    }
+    
+    protected virtual ParticleSystem.MinMaxCurve MultiplyCurve( ParticleSystem.MinMaxCurve curve, float multiplier )
+    {
+        curve.constantMin *= multiplier;
+        curve.constantMax *= multiplier;
+
+        curve.curveMultiplier *= multiplier;
+
+        return curve;
+    }
+
+    #endregion
 }

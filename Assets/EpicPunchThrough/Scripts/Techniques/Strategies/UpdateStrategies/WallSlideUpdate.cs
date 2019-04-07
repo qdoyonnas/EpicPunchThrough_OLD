@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class WallSlideUpdate : UpdateTechStrategy
 {
@@ -27,5 +28,10 @@ public class WallSlideUpdate : UpdateTechStrategy
         }
         
         tech.owner.HandlePhysics( data, friction, gravity );
+    }
+
+    public void InspectorDraw()
+    {
+        EditorGUILayout.LabelField("WallSlideUpdate Fields");
     }
 }

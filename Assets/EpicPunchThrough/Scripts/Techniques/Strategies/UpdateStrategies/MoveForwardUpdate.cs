@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class MoveForwardUpdate : UpdateTechStrategy
 {
@@ -27,5 +28,10 @@ public class MoveForwardUpdate : UpdateTechStrategy
 
         tech.owner.HandlePhysics( data );
         tech.owner.HandleAnimation();
+    }
+
+    public void InspectorDraw()
+    {
+        EditorGUILayout.LabelField("MoveForwardUpdate Fields");
     }
 }

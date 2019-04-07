@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class EndTechValidate : ActionValidateTechStrategy
 {
@@ -32,5 +33,10 @@ public class EndTechValidate : ActionValidateTechStrategy
         }
 
         return false;
+    }
+
+    public void InspectorDraw()
+    {
+        EditorGUILayout.LabelField("EndTechValidate Fields");
     }
 }

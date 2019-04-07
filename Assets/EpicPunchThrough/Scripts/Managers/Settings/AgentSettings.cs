@@ -12,6 +12,7 @@ public class AgentSettings : ScriptableObject
     [Header("Animator Controllers")]
     public GameObject baseCharacterPrefab;
     public RuntimeAnimatorController baseCharacterController;
+    public ParticleController baseParticleController;
     public int actionSequenceLength;
 
     [Header("Physic Settings")]

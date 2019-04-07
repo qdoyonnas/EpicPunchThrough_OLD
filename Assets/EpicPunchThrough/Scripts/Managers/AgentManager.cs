@@ -99,7 +99,7 @@ public class AgentManager
                 agent = agentObject.AddComponent<Agent>();
                 break;
         }
-        agent.Init(settings.baseCharacterController, data.team);
+        agent.Init(settings.baseCharacterController, settings.baseParticleController, data.team);
         agent.SetName(data.name);
         TechniqueGenerator.Instance.AddBaseMovementTechniques(agent);
     }

@@ -23,6 +23,6 @@ MonoBehaviour:
     maxX: 0
     minY: 3
     maxY: 0
-  groundFriction: {x: 0.05, y: 0, z: 0}
+  groundFriction: {x: 0.08, y: 0, z: 0}
   airFriction: {x: 0, y: 0, z: 0}
-  wallFriction: {x: 0, y: 0.005, z: 0}
+  wallFriction: {x: 0, y: 0.01, z: 0}

@@ -22,36 +22,6 @@ public class TechniqueGenerator
     public string animatorControllerFolderPath = "AnimatorControllers/";
     public string baseAnimatorControllerPath = "Base/BaseCharacter";
 
-    public class TechniqueOptions {
-        public string name;
-        public string animatorControllerPath;
-               
-        public Agent.State state;
-        public Agent.Action[] actions;
-               
-        public TriggerTechStrategy triggerStrategy;
-        public ActivateTechStrategy activateStrategy;
-        public StateChangeStrategy stateStrategy;
-        public ActionValidateTechStrategy actionValidateStrategy;
-        public UpdateTechStrategy updateStrategy;
-        public ExitTechStrategy exitStrategy;
-
-        public TechniqueOptions( string name, string animatorControllerPath, Agent.State state, Agent.Action[] actions, TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy,
-                    StateChangeStrategy stateStrategy, ActionValidateTechStrategy actionValidateStrategy, UpdateTechStrategy updateStrategy, ExitTechStrategy exitStrategy )
-        {
-            this.name = name;
-            this.animatorControllerPath = animatorControllerPath;
-            this.state = state;
-            this.actions = actions;
-            this.triggerStrategy = triggerStrategy;
-            this.activateStrategy = activateStrategy;
-            this.stateStrategy = stateStrategy;
-            this.actionValidateStrategy = actionValidateStrategy;
-            this.updateStrategy = updateStrategy;
-            this.exitStrategy = exitStrategy;
-        }
-    }
-
     public void GenerateTechnique( Agent agent, TechniqueOptions options )
     {
         RuntimeAnimatorController animController = RetrieveAnimatorController(options.animatorControllerPath);
@@ -67,7 +37,7 @@ public class TechniqueGenerator
         UpdateTechStrategy updateStrategy = options.updateStrategy == null ? new NoUpdate() : options.updateStrategy;
         ExitTechStrategy exitStrategy = options.exitStrategy == null ? new NoExit() : options.exitStrategy;
 
-        Technique tech = new Technique(agent, options.name,  animController, techTrigger, 
+        Technique tech = new Technique(agent, options.techniqueName,  animController, techTrigger, 
                                 triggerStrategy, activateStrategy, stateStrategy, actionValidateStrategy, 
                                 updateStrategy, exitStrategy);
         agent.AddTechnique(tech);
@@ -132,9 +102,7 @@ public class TechniqueGenerator
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true),
-                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, false),
-                                new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true), new EndTechValidate.ActionState(Agent.Action.MoveLeft, false), new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
             new MoveForwardUpdate(10f, 40f),
             null
         );
@@ -149,7 +117,7 @@ public class TechniqueGenerator
             null,
             null,
             new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.Jump, false) ),
-            new ChargeUpdate(0.2f, 10f, 16f, 200f),
+            new ChargeUpdate(0.4f, 10f, 16f, 200f),
             new JumpExit(0.5f)
         );
         GenerateTechnique( agent, options );
@@ -162,8 +130,7 @@ public class TechniqueGenerator
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, false),
-                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, true) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, false), new EndTechValidate.ActionState(Agent.Action.MoveLeft, true) ),
             new MoveForwardUpdate(3f, 10f),
             null
         );
@@ -177,8 +144,7 @@ public class TechniqueGenerator
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true),
-                                new EndTechValidate.ActionState(Agent.Action.MoveLeft, false) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveRight, true), new EndTechValidate.ActionState(Agent.Action.MoveLeft, false) ),
             new MoveForwardUpdate(2f, 6f),
             null
         );
@@ -192,8 +158,7 @@ public class TechniqueGenerator
             null,
             null,
             null,
-            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveUp, false),
-                                new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
+            new EndTechValidate( new EndTechValidate.ActionState(Agent.Action.MoveUp, false), new EndTechValidate.ActionState(Agent.Action.Jump, true) ),
             new WallSlideUpdate(10f, 0.25f),
             null
         );

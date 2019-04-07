@@ -1,18 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RotaryHeart.Lib.SerializableDictionary;
 
-public class ParticleController : MonoBehaviour
+[CreateAssetMenu(menuName = "Project/Effects/ParticleController")]
+public class ParticleController : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [Serializable]
+    public class ParticleDictionary : SerializableDictionaryBase<string, GameObject> { }
+    [SerializeField] protected ParticleDictionary particleSystems;
 
-    // Update is called once per frame
-    void Update()
+    public GameObject GetParticles(string name)
     {
-        
+        if( !particleSystems.ContainsKey(name) ) { return null; }
+        GameObject particles = particleSystems[name];
+        if( particles == null || particles.GetComponent<ParticleSystem>() == null ) { return null; }
+
+        return particles;
     }
 }

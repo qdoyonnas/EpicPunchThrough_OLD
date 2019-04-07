@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class ChargeUpdate : UpdateTechStrategy
 {
@@ -29,5 +30,10 @@ public class ChargeUpdate : UpdateTechStrategy
         }
 
         tech.owner.HandlePhysics( data, tech.owner.physicsBody.frictionCoefficients * frictionMultiplier );
+    }
+
+    public void InspectorDraw()
+    {
+        EditorGUILayout.LabelField("ChargeUpdate Fields");
     }
 }
