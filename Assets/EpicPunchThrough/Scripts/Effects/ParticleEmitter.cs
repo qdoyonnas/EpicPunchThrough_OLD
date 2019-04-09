@@ -106,7 +106,16 @@ public class ParticleEmitter : MonoBehaviour
 
         return this;
     }
-    
+
+    public ParticleEmitter Accelerate( float multiplier )
+    {
+        velOverTimeModule.x = MultiplyCurve( velOverTimeModule.x, multiplier );
+        velOverTimeModule.y = MultiplyCurve( velOverTimeModule.y, multiplier );
+        velOverTimeModule.z = MultiplyCurve( velOverTimeModule.z, multiplier );
+
+        return this;
+    }
+
     protected virtual ParticleSystem.MinMaxCurve MultiplyCurve( ParticleSystem.MinMaxCurve curve, float multiplier )
     {
         curve.constantMin *= multiplier;

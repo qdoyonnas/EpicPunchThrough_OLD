@@ -57,13 +57,13 @@ public class ParticleManager
 
         ParticleEmitter particle = new GameObject("Emitter").AddComponent<ParticleEmitter>();
         particle.transform.position = position;
+        particle.transform.localEulerAngles = new Vector3(0, 0, angle);
         if( parent != null ) {
             particle.transform.parent = parent;
         } else {
             particlesObject = GetParticlesObject();
             particle.transform.parent = particlesObject;
         }
-        particle.transform.localEulerAngles = new Vector3(0, 0, angle);
 
         particle.Init(particleSystem);
 

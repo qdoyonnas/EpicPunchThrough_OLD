@@ -8,6 +8,8 @@ public class TechniqueOptions// : ScriptableObject
 {
     public string techniqueName;
     public string animatorControllerPath;
+
+    public string particleControllerPath;
                
     public Agent.State state;
     public Agent.Action[] actions;
@@ -19,13 +21,15 @@ public class TechniqueOptions// : ScriptableObject
     public UpdateTechStrategy updateStrategy;
     public ExitTechStrategy exitStrategy;
 
-    public TechniqueOptions( string techniqueName, string animatorControllerPath, Agent.State state,
+    public TechniqueOptions( string techniqueName, string animatorControllerPath, string particleControllerPath, Agent.State state,
                 Agent.Action[] actions, TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy,
                 StateChangeStrategy stateStrategy, ActionValidateTechStrategy actionValidateStrategy,
                 UpdateTechStrategy updateStrategy, ExitTechStrategy exitStrategy )
     {
         this.techniqueName = techniqueName;
         this.animatorControllerPath = animatorControllerPath;
+
+        this.particleControllerPath = particleControllerPath;
         
         this.state = state;
         this.actions = actions;

@@ -18,6 +18,14 @@ public class JumpExit : ExitTechStrategy
         Vector3 jumpVector = tech.owner.aimDirection * ((float)charge * jumpMultiplier);
 
         tech.owner.physicsBody.AddVelocity(jumpVector);
+        Transform rightFootAnchor = tech.owner.GetAnchor("FootR");
+        Transform leftFootAnchor = tech.owner.GetAnchor("FootL");
+        Vector3 emitterPosition = ( rightFootAnchor.position + leftFootAnchor.position ) / 2f;
+        
+        float mult = ((float)charge * jumpMultiplier) / 15f;
+        tech.CreateEmitter("launch", emitterPosition, Vector3.SignedAngle(Vector3.up, jumpVector, Vector3.forward) )
+            .Expand(mult)
+            .Accelerate(mult);
 
         tech.SetBlackboardData("charge", 0f);
     }

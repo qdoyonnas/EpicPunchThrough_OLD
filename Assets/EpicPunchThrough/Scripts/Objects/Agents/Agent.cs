@@ -34,6 +34,8 @@ public class Agent : MonoBehaviour
 
     protected ParticleController particleController;
 
+    protected Dictionary<string, Transform> anchors = new Dictionary<string, Transform>();
+
     #endregion
 
     #region Technique Fields
@@ -252,6 +254,8 @@ public class Agent : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
         animatorController = baseController;
+
+        anchors["rig"] = FindChildByDepth(transform, "Rig");
 
         _physicsBody = GetComponent<PhysicsBody>();
         _collider = GetComponent<CapsuleCollider>();
@@ -504,7 +508,7 @@ public class Agent : MonoBehaviour
                 if( !doCollide ) {
                     IgnoreCollider(hit.collider, true);
                 } else {
-                    ParticleEmitter emitter = CreateParticle( "impact", hit.point, Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward) );
+                    ParticleEmitter emitter = CreateEmitter( "impact", hit.point, Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward) );
                     if( emitter != null ) {
                         emitter.Expand(_physicsBody.velocity.magnitude / 12f);
                     }
@@ -885,14 +889,38 @@ public class Agent : MonoBehaviour
         }
     }
 
-    protected virtual ParticleEmitter CreateParticle( string particleName, Vector3 pos, float angle )
+    public virtual ParticleEmitter CreateEmitter( string particleName, Vector3 pos, float angle, Transform parent = null )
     {
         if( particleController == null ) { return null; }
 
-        ParticleEmitter emitter = ParticleManager.Instance.CreateEmitter( pos, angle, null, particleController.GetParticles(particleName) );
-        if( emitter == null ) { return null; }
+        ParticleEmitter emitter = ParticleManager.Instance.CreateEmitter( pos, angle, parent, particleController.GetParticles(particleName) );
 
         return emitter;
+    }
+
+    public virtual Transform GetAnchor( string name )
+    {
+        string lowerName = name.ToLower();
+
+        if( anchors.ContainsKey(lowerName) ) { return anchors[lowerName]; }
+
+        Transform anchor = FindChildByDepth( anchors["rig"], name );
+        if( anchor != null ) { anchors[lowerName] = anchor; }
+
+        return anchor;
+    }
+    protected virtual Transform FindChildByDepth( Transform node, string name )
+    {
+        for( int i = 0; i < node.childCount; i++ ) {
+            if( node.GetChild(i).name == name ) {
+                return node.GetChild(i);
+            } else {
+                Transform found = FindChildByDepth(node.GetChild(i), name);
+                if( found != null ) { return found; }
+            }
+        }
+
+        return null;
     }
 
     #endregion

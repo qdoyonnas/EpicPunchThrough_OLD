@@ -20,6 +20,7 @@ public class TechniqueGenerator
     #endregion
 
     public string animatorControllerFolderPath = "AnimatorControllers/";
+    public string particleControllerFolderPath = "Particles/";
     public string baseAnimatorControllerPath = "Base/BaseCharacter";
 
     public void GenerateTechnique( Agent agent, TechniqueOptions options )
@@ -28,6 +29,9 @@ public class TechniqueGenerator
         if( animController == null ) {
             return;
         }
+
+        ParticleController particleController = RetrieveParticleController(options.particleControllerPath);
+
         Technique.TechTrigger techTrigger = GenerateTechTrigger(options);
 
         TriggerTechStrategy triggerStrategy = options.triggerStrategy == null ? new NoTrigger() : options.triggerStrategy;
@@ -37,7 +41,7 @@ public class TechniqueGenerator
         UpdateTechStrategy updateStrategy = options.updateStrategy == null ? new NoUpdate() : options.updateStrategy;
         ExitTechStrategy exitStrategy = options.exitStrategy == null ? new NoExit() : options.exitStrategy;
 
-        Technique tech = new Technique(agent, options.techniqueName,  animController, techTrigger, 
+        Technique tech = new Technique(agent, options.techniqueName,  animController, particleController, techTrigger, 
                                 triggerStrategy, activateStrategy, stateStrategy, actionValidateStrategy, 
                                 updateStrategy, exitStrategy);
         agent.AddTechnique(tech);
@@ -61,6 +65,14 @@ public class TechniqueGenerator
         return controller;
     }
 
+    ParticleController RetrieveParticleController( string path )
+    {
+        string controllerPath = particleControllerFolderPath + path;
+
+        ParticleController controller = Resources.Load<ParticleController>(controllerPath);
+        return controller;
+    }
+
     Technique.TechTrigger GenerateTechTrigger( TechniqueOptions options )
     {
         Technique.TechTrigger techTrigger;
@@ -81,6 +93,7 @@ public class TechniqueGenerator
         TechniqueOptions options = new TechniqueOptions(
             "Run Forward",
             "Base/Move",
+            "Dust",
             Agent.State.Grounded,
             new Agent.Action[] { Agent.Action.MoveRight },
             null,
@@ -97,6 +110,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Run Back",
             "Base/Move",
+            "Dust",
             Agent.State.Grounded,
             new Agent.Action[] { Agent.Action.MoveLeft },
             null,
@@ -111,6 +125,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Jump",
             "Base/Jump",
+            "Dust",
             Agent.State.Grounded,
             new Agent.Action[] { Agent.Action.Jump },
             null,
@@ -125,6 +140,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Air Move Forward",
             "Base/BaseCharacter",
+            "Dust",
             Agent.State.InAir,
             new Agent.Action[] { Agent.Action.MoveRight },
             null,
@@ -139,6 +155,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Air Move Back",
             "Base/BaseCharacter",
+            "Dust",
             Agent.State.InAir,
             new Agent.Action[] { Agent.Action.MoveLeft },
             null,
@@ -153,6 +170,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Wall Slide",
             "Base/WallSlide",
+            "Dust",
             Agent.State.WallSliding,
             new Agent.Action[] { Agent.Action.MoveUp },
             null,
@@ -167,6 +185,7 @@ public class TechniqueGenerator
         options = new TechniqueOptions(
             "Wall Jump",
             "Base/WallSlide",
+            "Dust",
             Agent.State.WallSliding,
             new Agent.Action[] { Agent.Action.Jump },
             null,

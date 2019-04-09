@@ -20,6 +20,13 @@ public class Technique
         }
     }
 
+    protected ParticleController _particleController;
+    public ParticleController particleController {
+        get {
+            return _particleController;
+        }
+    }
+
     protected Dictionary<string, object> blackboard = new Dictionary<string, object>();
 
     #region TechTrigger
@@ -54,7 +61,7 @@ public class Technique
 
     #endregion
 
-    public Technique( Agent owner, string name, RuntimeAnimatorController animCtrl, TechTrigger techTrgr, 
+    public Technique( Agent owner, string name, RuntimeAnimatorController animCtrl, ParticleController particleController, TechTrigger techTrgr, 
         TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy, StateChangeStrategy stateStrategy,
         ActionValidateTechStrategy validateStrategy, UpdateTechStrategy updateStrategy, ExitTechStrategy exitStrategy )
     {
@@ -68,6 +75,7 @@ public class Technique
         this._owner = owner;
         _techTrigger = techTrgr;
         _animatorController = animCtrl;
+        _particleController = particleController;
 
         this.triggerStrategy = triggerStrategy;
         this.activateStrategy = activateStrategy;
@@ -169,6 +177,15 @@ public class Technique
     public bool IsValid()
     {
         return owner != null;
+    }
+
+    public virtual ParticleEmitter CreateEmitter( string particleName, Vector3 position, float angle, Transform parent = null)
+    {
+        if( particleController == null ) { return null; }
+
+        ParticleEmitter emitter = ParticleManager.Instance.CreateEmitter( position, angle, parent, particleController.GetParticles(particleName) );
+
+        return emitter;
     }
 
     #endregion
