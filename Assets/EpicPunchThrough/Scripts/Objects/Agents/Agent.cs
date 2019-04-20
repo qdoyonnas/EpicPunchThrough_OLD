@@ -33,6 +33,7 @@ public class Agent : MonoBehaviour
     protected DirectionIndicator directionIndicator;
 
     protected ParticleController particleController;
+    public ParticleEmitter slideParticle;
 
     protected Dictionary<string, Transform> anchors = new Dictionary<string, Transform>();
 
