@@ -43,12 +43,28 @@ public class ParticleEmitter : MonoBehaviour
         ParticleManager.Instance.RemoveEmitter(this);
     }
 
+    private void OnEnable()
+    {
+        if( !didInit ) { return; }
+
+        emissionModule.enabled = true;
+    }
+    private void OnDisable()
+    {
+        if( !didInit ) { return; }
+
+        emissionModule.enabled = false;
+    }
+
+    bool didInit = false;
     public void Init(GameObject particleSystem)
     {
         GameObject particleObject = Instantiate<GameObject>(particleSystem, transform);
         GetParticleSystem();
 
         ParticleManager.Instance.AddEmitter(this);
+
+        didInit = true;
     }
     protected virtual void GetParticleSystem()
     {
@@ -87,8 +103,18 @@ public class ParticleEmitter : MonoBehaviour
 
     #region Modication Methods
 
+    public ParticleEmitter End()
+    {
+        if( !didInit ) { return this; }
+
+        mainModule.loop = false;
+
+        return this;
+    }
     public ParticleEmitter Expand( float multiplier )
     {
+        if( !didInit ) { return this; }
+
         shapeModule.radius *= multiplier;
         shapeModule.boxThickness *= multiplier;
 
@@ -106,9 +132,10 @@ public class ParticleEmitter : MonoBehaviour
 
         return this;
     }
-
     public ParticleEmitter Accelerate( float multiplier )
     {
+        if( !didInit ) { return this; }
+
         velOverTimeModule.x = MultiplyCurve( velOverTimeModule.x, multiplier );
         velOverTimeModule.y = MultiplyCurve( velOverTimeModule.y, multiplier );
         velOverTimeModule.z = MultiplyCurve( velOverTimeModule.z, multiplier );

@@ -29,6 +29,7 @@ public class ChargeUpdate : UpdateTechStrategy
             tech.SetBlackboardData("charge", charge + (chargeRate * data.deltaTime));
         }
 
+        if( tech.owner.slideParticle != null ) { tech.owner.slideParticle.enabled = true; }
         tech.owner.HandlePhysics( data, tech.owner.physicsBody.frictionCoefficients * frictionMultiplier );
     }
 

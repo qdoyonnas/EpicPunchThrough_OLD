@@ -104,10 +104,15 @@ public class Agent : MonoBehaviour
                     physicsBody.useGravity = false;
                     physicsBody.velocity = new Vector3(physicsBody.velocity.x, 0, 0);
                     physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().groundFriction;
+                    slideParticle = ParticleManager.Instance.CreateEmitter(GetAnchor("FloorAnchor").position, 0f, transform, particleController.GetParticles("slide"));
                     break;
                 case State.InAir:
                     physicsBody.useGravity = true;
                     physicsBody.frictionCoefficients = EnvironmentManager.Instance.GetEnvironment().airFriction;
+                    if( slideParticle != null ) {
+                        slideParticle.End();
+                        slideParticle.transform.parent = null;
+                    }
                     break;
                 case State.WallSliding:
                     physicsBody.useGravity = true;
@@ -369,13 +374,16 @@ public class Agent : MonoBehaviour
 
     public virtual void DoUpdate( GameManager.UpdateData data )
     {
-        //EnableTriggerChecks();
+        if( slideParticle != null ) {
+            slideParticle.enabled = false;
+        }
         CheckState();
 
         HandleTechniques();
         if( ValidActiveTechnique() ) {
             activeTechnique.Update(data, _activeActionValue);
         } else {
+            if( slideParticle != null ) { slideParticle.enabled = true; }
             HandlePhysics(data);
             HandleAnimation();
         }
@@ -492,6 +500,7 @@ public class Agent : MonoBehaviour
     }
     public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride, Vector3? gravityOverride )
     {
+
         physicsBody.HandleGravity( data, gravityOverride );
         physicsBody.HandleFriction( frictionOverride );
         HandlePropCollisions( data.deltaTime );
