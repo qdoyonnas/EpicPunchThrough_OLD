@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 939ed2f704c3fb648b2430488a53b8a2, type: 3}
+  m_Name: VatGrown_Player
+  m_EditorClassIdentifier: 
+  name: Vat Grown
+  Face: {fileID: 0}
+  Chest: {fileID: 11400000, guid: bae28089afe2a4544bec9e4c082722e1, type: 2}
+  Hip: {fileID: 11400000, guid: 4e3d00cd2f21eaa4da8832aa86dacffd, type: 2}
+  LeftShoulder: {fileID: 11400000, guid: e781c1462b1e1e94598926b2c54dd812, type: 2}
+  LeftArm: {fileID: 0}
+  LeftHand: {fileID: 11400000, guid: 85879fe87d2cfcf48871c3b9544daa6e, type: 2}
+  Fingers: {fileID: 11400000, guid: aa291225e72d53143b5f6e910a650340, type: 2}
+  RightShoulder: {fileID: 11400000, guid: 5931e092a2e735b4192c3279a392cb90, type: 2}
+  RightArm: {fileID: 0}
+  RightHand: {fileID: 11400000, guid: 920f9456de0e7344cb57ba3a463de844, type: 2}
+  LeftThigh: {fileID: 11400000, guid: 2f1f41643a2ede543b72260db77836d9, type: 2}
+  LeftLeg: {fileID: 11400000, guid: fdafd9e052ab4804f8ec473a9f4e3453, type: 2}
+  LeftFoot: {fileID: 11400000, guid: 5b9cd24ea2aa09e4f8c021e85fcb6004, type: 2}
+  RightThigh: {fileID: 11400000, guid: 75c9aea6593705a4ba31663aeff38eb7, type: 2}
+  RightLeg: {fileID: 11400000, guid: 98cd3813372b62d40aa6ddd8d94de7ae, type: 2}
+  RightFoot: {fileID: 11400000, guid: b4dfc83b7828a8d4ba67491a14d4cce5, type: 2}

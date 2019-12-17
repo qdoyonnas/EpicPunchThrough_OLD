@@ -109,7 +109,10 @@ public class PlayManager
 
     void SpawnPlayer(Scene scene, LoadSceneMode mode)
     {
-        AgentManager.AgentSpawnData spawnData = new AgentManager.AgentSpawnData(new Vector3(0, 5, 0), "Player", AgentManager.AgentType.player, 0);
+        AgentManager.AgentSpawnData spawnData = new AgentManager.AgentSpawnData(new Vector3(0, 5, -10), "Player", AgentManager.AgentType.player, 0, "Vat Grown");
+        AgentManager.Instance.SpawnAgent(spawnData);
+
+        spawnData = new AgentManager.AgentSpawnData(new Vector3(-20, 24, -10), "Enemy1", AgentManager.AgentType.fighter, 0, "Vat Grown Grunt");
         AgentManager.Instance.SpawnAgent(spawnData);
 
         SceneManager.sceneLoaded -= SpawnPlayer;

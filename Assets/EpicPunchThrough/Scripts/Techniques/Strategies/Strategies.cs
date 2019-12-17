@@ -1,105 +1,79 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public interface TriggerTechStrategy {
-    bool Trigger(Technique tech, float value );
-    void InspectorDraw();
-}
-public class NoTrigger: TriggerTechStrategy {
-    public bool Trigger(Technique tech, float value )
-    {
-        return true;
-    }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("NoTrigger Fields");
-    }
-}
-
-public interface ActivateTechStrategy {
-    void Activate(Technique tech);
-    void InspectorDraw();
-}
-public class NoActivate : ActivateTechStrategy
-{
-    public void Activate( Technique tech )
-    {
-        return;
-    }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("NoActivate Fields");
-    }
-}
-
-public interface ActionValidateTechStrategy {
-    bool Validate(Technique tech, Agent.Action action, float value);
-    void InspectorDraw();
-}
-public class NoValidate: ActionValidateTechStrategy {
-    public bool Validate(Technique tech, Agent.Action action, float value)
+public abstract class TechStrategy {
+    public virtual bool InspectorDraw()
     {
         return false;
     }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("NoValidate Fields");
-    }
 }
-public class AllValidate: ActionValidateTechStrategy {
-    public bool Validate(Technique tech, Agent.Action action, float value)
+
+public abstract class TriggerTechStrategy: TechStrategy {
+    public abstract bool Trigger(Technique tech, float value );
+}
+public class NoTrigger: TriggerTechStrategy {
+    public override bool Trigger(Technique tech, float value )
     {
         return true;
     }
-    public void InspectorDraw()
+}
+
+public abstract class ActivateTechStrategy: TechStrategy {
+    public abstract void Activate(Technique tech);
+}
+public class NoActivate : ActivateTechStrategy
+{
+    public override void Activate( Technique tech )
     {
-        EditorGUILayout.LabelField("AllValidate Fields");
+        return;
     }
 }
 
-public interface StateChangeStrategy {
-    void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState );
-    void InspectorDraw();
+public abstract class ActionValidateTechStrategy: TechStrategy {
+    public abstract bool Validate(Technique tech, Agent.Action action, float value);
+}
+public class NoValidate: ActionValidateTechStrategy {
+    public override bool Validate(Technique tech, Agent.Action action, float value)
+    {
+        return false;
+    }
+}
+public class AllValidate: ActionValidateTechStrategy {
+    public override bool Validate(Technique tech, Agent.Action action, float value)
+    {
+        return true;
+    }
+}
+
+public abstract class StateChangeStrategy: TechStrategy {
+    public abstract void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState );
 }
 public class EndTechStateChange: StateChangeStrategy {
-    public void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState )
+    public override void OnStateChange( Technique tech, Agent.State previousState, Agent.State newState )
     {
         tech.owner.TransitionTechnique(null, false);
     }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("EndTechStateChange Fields");
-    }
 }
 
-public interface UpdateTechStrategy {
-    void Update(Technique tech, GameManager.UpdateData data, float value );
-    void InspectorDraw();
+public abstract class UpdateTechStrategy: TechStrategy {
+    public abstract void Update(Technique tech, GameManager.UpdateData data, float value );
 }
 public class NoUpdate: UpdateTechStrategy {
-    public void Update(Technique tech, GameManager.UpdateData data, float value )
+    public override void Update(Technique tech, GameManager.UpdateData data, float value )
     {
         tech.owner.HandlePhysics( data );
         return;
     }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("NoUpdate Fields");
-    }
 }
 
-public interface ExitTechStrategy {
-    void Exit( Technique tech );
-    void InspectorDraw();
+public abstract class ExitTechStrategy: TechStrategy {
+    public abstract void Exit( Technique tech );
 }
 public class NoExit : ExitTechStrategy {
-    public void Exit( Technique tech ) {
+    public override void Exit( Technique tech ) {
         return;
-    }
-    public void InspectorDraw()
-    {
-        EditorGUILayout.LabelField("NoExit Fields");
     }
 }

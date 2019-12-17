@@ -15,7 +15,7 @@ public class WallSlideUpdate : UpdateTechStrategy
         this.gravityMultiplier = gravityMultiplier;
     }
 
-    public void Update( Technique tech, GameManager.UpdateData data, float value )
+    public override void Update( Technique tech, GameManager.UpdateData data, float value )
     {
         Vector3? friction = new Vector3();
         Vector3? gravity = null;
@@ -29,9 +29,37 @@ public class WallSlideUpdate : UpdateTechStrategy
         
         tech.owner.HandlePhysics( data, friction, gravity );
     }
+}
 
-    public void InspectorDraw()
+public class WallSlideUpdateOptions : UpdateTechStrategyOptions
+{
+    float frictionMultiplier;
+    float gravityMultiplier;
+
+    public override void InspectorDraw()
     {
-        EditorGUILayout.LabelField("WallSlideUpdate Fields");
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Friction Multiplier");
+        float friction = EditorGUILayout.FloatField(frictionMultiplier);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Gravity Multiplier");
+        float gravity = EditorGUILayout.FloatField(gravityMultiplier);
+        EditorGUILayout.EndHorizontal();
+
+        if( friction != frictionMultiplier ) {
+            frictionMultiplier = friction;
+            EditorUtility.SetDirty(this);
+        }
+        if( gravity != gravityMultiplier ) {
+            gravityMultiplier = gravity;
+            EditorUtility.SetDirty(this);
+        }
+    }
+
+    public override UpdateTechStrategy GenerateStrategy()
+    {
+        return new WallSlideUpdate(frictionMultiplier, gravityMultiplier);
     }
 }

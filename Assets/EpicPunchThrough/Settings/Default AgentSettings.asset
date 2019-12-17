@@ -24,5 +24,9 @@ MonoBehaviour:
   autoStopSpeed: 0.01
   verticalBoundarySize: {x: 2, y: 5, z: 1}
   horizontalBoundarySize: {x: 5, y: 2, z: 1}
-  defaultIgnorePropCollisions: 1
-  propInteractActions: 0200000003000000
+  propPassThroughAction: 4
+  propCollideAction: 3
+  skins:
+  - {fileID: 11400000, guid: 8786590dbc28c4947b4cf07c38f154d4, type: 2}
+  - {fileID: 11400000, guid: 6276fc760fb271d488fa50d56c73fba8, type: 2}
+  techniqueSettings: {fileID: 11400000, guid: 55e14b4f8d176304492ddc8a020c5f18, type: 2}

@@ -12,12 +12,13 @@ public class JumpExit : ExitTechStrategy
         this.jumpMultiplier = jumpMultiplier;
     }
 
-    public void Exit( Technique tech )
+    public override void Exit( Technique tech )
     {
         double charge = (tech.GetBlackboardData("charge") as double?) ?? 0.0;
         Vector3 jumpVector = tech.owner.aimDirection * ((float)charge * jumpMultiplier);
 
         tech.owner.physicsBody.AddVelocity(jumpVector);
+        tech.owner.onLayer = 1;
         Transform rightFootAnchor = tech.owner.GetAnchor("FootR");
         Transform leftFootAnchor = tech.owner.GetAnchor("FootL");
         Vector3 emitterPosition = ( rightFootAnchor.position + leftFootAnchor.position ) / 2f;
@@ -29,9 +30,27 @@ public class JumpExit : ExitTechStrategy
 
         tech.SetBlackboardData("charge", 0f);
     }
+}
 
-    public void InspectorDraw()
+public class JumpExitOptions : ExitTechStrategyOptions
+{
+    float jumpMultiplier;
+
+    public override void InspectorDraw()
     {
-        EditorGUILayout.LabelField("JumpExit Fields");
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Jump Multiplier");
+        float multi = EditorGUILayout.FloatField(jumpMultiplier);
+        EditorGUILayout.EndHorizontal();
+
+        if( multi != jumpMultiplier ) {
+            jumpMultiplier = multi;
+            EditorUtility.SetDirty(this);
+        }
+    }
+
+    public override ExitTechStrategy GenerateStrategy()
+    {
+        return new JumpExit(jumpMultiplier);
     }
 }

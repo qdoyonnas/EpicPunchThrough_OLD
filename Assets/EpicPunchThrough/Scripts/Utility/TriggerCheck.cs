@@ -18,7 +18,7 @@ public class TriggerCheck : MonoBehaviour
     }
 
     public bool doDetect {
-         get {
+        get {
             return collider.enabled;
         }
         set {
@@ -29,6 +29,13 @@ public class TriggerCheck : MonoBehaviour
         }
     }
 
+    protected int _triggerCount = 0;
+    public int triggerCount {
+        get {
+            return _triggerCount;
+        }
+    }
+
     private void Awake()
     {
         _collider = GetComponent<Collider>();
@@ -36,10 +43,12 @@ public class TriggerCheck : MonoBehaviour
 
     private void OnTriggerEnter( Collider other )
     {
+        _triggerCount++;
         onTrigger.Invoke( true, other );
     }
     private void OnTriggerExit( Collider other )
     {
+        _triggerCount--;
         onTrigger.Invoke( false, other );
     }
 }

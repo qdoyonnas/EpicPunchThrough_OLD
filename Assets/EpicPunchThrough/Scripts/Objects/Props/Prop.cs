@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PhysicsBody))]
+[RequireComponent(typeof(PhysicsBody), typeof(SpriteRenderer))]
 public class Prop : MonoBehaviour
 {
     public bool isPassable = true;

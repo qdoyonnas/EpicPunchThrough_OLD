@@ -29,10 +29,18 @@ public class AgentManager
 
     private Transform agentsObject;
 
+    public Dictionary<string, CharacterSkin> skins = new Dictionary<string, CharacterSkin>();
+
     private bool isInitialized = false;
     public bool Initialize(AgentSettings settings)
     {
         this.settings = settings;
+
+        if( this.settings.skins != null ) {
+            foreach( CharacterSkin skin in this.settings.skins ) {
+                skins.Add(skin.name, skin);
+            }
+        }
 
         GameManager.Instance.stateChanged += GameStateChanged;
         GameManager.Instance.fixedUpdated += DoUpdate;
@@ -74,13 +82,15 @@ public class AgentManager
         public readonly string name;
         public readonly AgentType type;
         public readonly int team;
+        public readonly string skin;
 
-        public AgentSpawnData( Vector3 position, string name, AgentType type, int team )
+        public AgentSpawnData( Vector3 position, string name, AgentType type, int team, string skin )
         {
             this.position = position;
             this.name = name;
             this.type = type;
             this.team = team;
+            this.skin = skin;
         }
     }
     public void SpawnAgent(AgentSpawnData data)
@@ -101,7 +111,12 @@ public class AgentManager
         }
         agent.Init(settings.baseCharacterController, settings.baseParticleController, data.team);
         agent.SetName(data.name);
-        TechniqueGenerator.Instance.AddBaseMovementTechniques(agent);
+        if( !string.IsNullOrEmpty(data.skin) ) {
+            if( skins.ContainsKey(data.skin) ) {
+                agent.SetSkin(skins[data.skin]);
+            }
+        }
+        TechniqueGenerator.Instance.AddTechniqueSet(agent, settings.techniqueSettings.baseMovementSet);
     }
     public Transform GetAgentsObject()
     {

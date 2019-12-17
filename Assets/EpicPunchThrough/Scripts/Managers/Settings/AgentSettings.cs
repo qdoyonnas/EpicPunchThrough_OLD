@@ -19,6 +19,12 @@ public class AgentSettings : ScriptableObject
     public float autoStopSpeed;
     public Vector3 verticalBoundarySize;
     public Vector3 horizontalBoundarySize;
-    public bool defaultIgnorePropCollisions;
-    public Agent.Action[] propInteractActions;
+    public Agent.Action propPassThroughAction;
+    public Agent.Action propCollideAction;
+
+    [Header("Skins")]
+    public CharacterSkin[] skins;
+
+    [Header("Techniques")]
+    public TechniqueSettings techniqueSettings;
 }

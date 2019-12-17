@@ -5,13 +5,17 @@ using UnityEditor;
 
 public class FlipDirectionActivate : ActivateTechStrategy
 {
-    public void Activate( Technique tech )
+    public override void Activate( Technique tech )
     {
         tech.owner.isFacingRight = !tech.owner.isFacingRight;
+        tech.owner.TransitionTechnique(null, false);
     }
+}
 
-    public void InspectorDraw()
+public class FlipDirectionActivateOptions : ActivateTechStrategyOptions
+{
+    public override ActivateTechStrategy GenerateStrategy()
     {
-        EditorGUILayout.LabelField("FlipDirectionActivate Fields");
+        return new FlipDirectionActivate();
     }
 }

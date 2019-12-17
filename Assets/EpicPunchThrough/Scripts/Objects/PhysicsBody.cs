@@ -16,8 +16,6 @@ public class PhysicsBody : MonoBehaviour
     public Vector3 frictionCoefficients;
     public bool useGravity = true;
 
-    public int layer = 0;
-
     new protected Rigidbody rigidbody;
 
     protected void Awake()

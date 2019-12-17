@@ -32,12 +32,12 @@ public class Technique
     #region TechTrigger
 
     public struct TechTrigger {
-        public readonly Agent.State state;
+        public readonly Agent.State[] states;
         public readonly Agent.Action[] sequence;
 
-        public TechTrigger(Agent.State state, params Agent.Action[] actions)
+        public TechTrigger(Agent.State[] states, params Agent.Action[] actions)
         {
-            this.state = state;
+            this.states = states;
             sequence = actions;
         }
     }
@@ -52,18 +52,18 @@ public class Technique
 
     #region Strategies
 
-    protected TriggerTechStrategy triggerStrategy = new NoTrigger();
-    protected ActivateTechStrategy activateStrategy  = new NoActivate();
-    protected StateChangeStrategy stateStrategy = new EndTechStateChange();
-    protected ActionValidateTechStrategy validateStrategy = new NoValidate();
-    protected UpdateTechStrategy updateStrategy = new NoUpdate();
-    protected ExitTechStrategy exitStrategy = new NoExit();
+    protected TriggerTechStrategy[] triggerStrategies;
+    protected ActivateTechStrategy[] activateStrategies;
+    protected StateChangeStrategy[] stateStrategies;
+    protected ActionValidateTechStrategy[] validateStrategies;
+    protected UpdateTechStrategy[] updateStrategies;
+    protected ExitTechStrategy[] exitStrategies;
 
     #endregion
 
     public Technique( Agent owner, string name, RuntimeAnimatorController animCtrl, ParticleController particleController, TechTrigger techTrgr, 
-        TriggerTechStrategy triggerStrategy, ActivateTechStrategy activateStrategy, StateChangeStrategy stateStrategy,
-        ActionValidateTechStrategy validateStrategy, UpdateTechStrategy updateStrategy, ExitTechStrategy exitStrategy )
+        TriggerTechStrategy[] triggerStrategy, ActivateTechStrategy[] activateStrategy, StateChangeStrategy[] stateStrategy,
+        ActionValidateTechStrategy[] validateStrategy, UpdateTechStrategy[] updateStrategy, ExitTechStrategy[] exitStrategy )
     {
         if( owner == null || animCtrl == null ) { 
             Debug.LogError("Technique generated with empty arguments");
@@ -77,35 +77,31 @@ public class Technique
         _animatorController = animCtrl;
         _particleController = particleController;
 
-        this.triggerStrategy = triggerStrategy;
-        this.activateStrategy = activateStrategy;
-        this.stateStrategy = stateStrategy;
-        this.validateStrategy = validateStrategy;
-        this.updateStrategy = updateStrategy;
-        this.exitStrategy = exitStrategy;
+        this.triggerStrategies = triggerStrategy;
+        this.activateStrategies = activateStrategy;
+        this.stateStrategies = stateStrategy;
+        this.validateStrategies = validateStrategy;
+        this.updateStrategies = updateStrategy;
+        this.exitStrategies = exitStrategy;
 
         owner.SubscribeToActionEvent(techTrigger.sequence[techTrigger.sequence.Length-1], OnTrigger);
     }
 
     #region Behaviour Methods
 
-    /// <summary>
-    /// Returns whether the technique allows the given action to take place during the techniques execution.
-    /// May cause additional behaviour to take place at the same time.
-    /// </summary>
-    /// <param name="action">The action in question</param>
-    /// <returns>Boolean indicating whether the action is allowed during the technique</returns>
-    public virtual bool ValidateAction(Agent.Action action, float value)
+    public virtual void Activate()
     {
-        if( validateStrategy == null ) { return true; }
+        if( activateStrategies == null ) { return; }
 
-        return validateStrategy.Validate(this, action, value);
+        foreach( ActivateTechStrategy strategy in activateStrategies ) {
+            strategy.Activate(this);
+        }
     }
     public virtual void OnTrigger( float value )
     {
         if( owner.ValidActiveTechnique()
-            || ( techTrigger.state != Agent.State.Any 
-                && owner.state != techTrigger.state ) ) 
+            || ( Array.IndexOf(techTrigger.states, Agent.State.Any) == -1
+                && Array.IndexOf(techTrigger.states, owner.state) == -1 ) ) 
         { return; }
 
         if( techTrigger.sequence.Length > 1 ) {
@@ -116,32 +112,55 @@ public class Technique
             }
         }
 
-        if( triggerStrategy == null || !triggerStrategy.Trigger(this, value) ) { return; }
+        if( triggerStrategies == null ) { return; }
+        foreach( TriggerTechStrategy strategy in triggerStrategies ) {
+            if( !strategy.Trigger(this, value) ) { return; }
+        }
+
         owner.AddActivatingTechnique(this);
     }
     public virtual void OnStateChange( Agent.State previousState, Agent.State newState )
     {
-        if( stateStrategy == null ) { return; }
+        if( stateStrategies == null ) { return; }
 
-        stateStrategy.OnStateChange( this, previousState, newState );
+        foreach( StateChangeStrategy strategy in stateStrategies ) {
+            strategy.OnStateChange(this, previousState, newState);
+        }
     }
-    public virtual void Activate()
+    /// <summary>
+    /// Returns whether the technique allows the given action to take place during the techniques execution.
+    /// May cause additional behaviour to take place at the same time.
+    /// </summary>
+    /// <param name="action">The action in question</param>
+    /// <returns>Boolean indicating whether the action is allowed during the technique</returns>
+    public virtual bool ValidateAction(Agent.Action action, float value)
     {
-        if( activateStrategy == null ) { return; }
+        if( validateStrategies == null ) { return true; }
 
-        activateStrategy.Activate(this);
+        bool valid = true;
+        foreach( ActionValidateTechStrategy strategy in validateStrategies ) {
+            if( !strategy.Validate(this, action, value) ) {
+                valid = false;
+            }
+        }
+
+        return valid;
     }
     public virtual void Update( GameManager.UpdateData data, float value )
     {
-        if( updateStrategy == null ) { return; }
+        if( updateStrategies == null ) { return; }
 
-        updateStrategy.Update( this, data, value );
+        foreach( UpdateTechStrategy strategy in updateStrategies ) {
+            strategy.Update( this, data, value );
+        }
     }
     public virtual void Exit()
     {
-        if( exitStrategy == null ) { return; }
+        if( exitStrategies == null ) { return; }
 
-        exitStrategy.Exit(this);
+        foreach(ExitTechStrategy strategy in exitStrategies ) {
+            strategy.Exit(this);
+        }
     }
 
     #endregion

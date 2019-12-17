@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Anima2D;
 
-[RequireComponent( typeof(Animator), typeof(PhysicsBody), typeof(CapsuleCollider) )]
+[RequireComponent( typeof(Animator), typeof(PhysicsBody))]
 public class Agent : MonoBehaviour
 {
     #region Animation Fields
@@ -30,6 +32,7 @@ public class Agent : MonoBehaviour
     protected string transitionBool = "transitionController";
 
     protected Transform graphicsChild;
+    protected Transform cosmetics;
     protected DirectionIndicator directionIndicator;
 
     protected ParticleController particleController;
@@ -142,8 +145,9 @@ public class Agent : MonoBehaviour
     bool ceilingFound = false;
 
     public enum Action {
-        MoveRight,
-        MoveLeft,
+        None,
+        MoveForward,
+        MoveBack,
         MoveUp,
         MoveDown,
         AttackForward,
@@ -159,6 +163,12 @@ public class Agent : MonoBehaviour
     public Action[] ActionSequence {
          get {
             return actions.ToArray();
+        }
+    }
+    public Action lastAction {
+         get {
+            if( actions.Count == 0 ) { return Action.None; }
+            return actions[actions.Count - 1];
         }
     }
 
@@ -194,37 +204,25 @@ public class Agent : MonoBehaviour
             return _physicsBody;
         }
     }
-    protected CapsuleCollider _collider;
-    new public CapsuleCollider collider {
+    protected Transform _environmentColliders;
+    public Transform environmentColliders {
         get {
-            return _collider;
+            return _environmentColliders;
         }
     }
 
+    protected BoxCollider _bodyCollider;
     protected TriggerCheck _groundCheck;
     protected TriggerCheck _rightWallCheck;
     protected TriggerCheck _leftWallCheck;
     protected TriggerCheck _ceilingCheck;
+    protected TriggerCheck _backgroundCheck;
 
-    BoxCollider[] boundaryColliders;
+    public float onLayer = 1;
+    protected float backgroundDistance = 1;
+    protected List<Collider> backgroundColliders = new List<Collider>();
 
-    public Vector3[] boundingPoints {
-        get {
-            return new Vector3[8] {
-                new Vector3( transform.position.x, _collider.bounds.center.y + (_collider.bounds.extents.y * 1.1f), transform.position.z ),
-                new Vector3(  _collider.bounds.center.x + (_collider.bounds.extents.x * 0.9f),  _collider.bounds.center.y + (_collider.bounds.extents.y * 0.9f), transform.position.z ),
-                new Vector3( _collider.bounds.center.x + (_collider.bounds.extents.x * 1.2f), transform.position.y, transform.position.z ),
-                new Vector3( _collider.bounds.center.x + (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y - (_collider.bounds.extents.y * 0.9f), transform.position.z ),
-                new Vector3( transform.position.x, _collider.bounds.center.y - (_collider.bounds.extents.y * 1.1f), transform.position.z ),
-                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y - (_collider.bounds.extents.y * 0.9f), transform.position.z ),
-                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 1.2f), transform.position.y, transform.position.z ),
-                new Vector3( _collider.bounds.center.x - (_collider.bounds.extents.x * 0.9f), _collider.bounds.center.y + (_collider.bounds.extents.y * 0.9f), transform.position.z )
-            };
-        }
-    }
-
-    List<Collider> ignoredColliders = new List<Collider>();
-    int frontCollisionLayer = int.MaxValue;
+    protected BoxCollider[] boundaryColliders;
 
     #endregion
 
@@ -264,14 +262,17 @@ public class Agent : MonoBehaviour
         anchors["rig"] = FindChildByDepth(transform, "Rig");
 
         _physicsBody = GetComponent<PhysicsBody>();
-        _collider = GetComponent<CapsuleCollider>();
+        _environmentColliders = transform.Find("EnvironmentColliders");
 
-        _groundCheck = FindTriggerCheck( "GroundCheck", SetGroundFound );
-        _leftWallCheck = FindTriggerCheck( "LeftWallCheck", SetWallFound );
-        _rightWallCheck = FindTriggerCheck( "RightWallCheck", SetWallFound );
-        _ceilingCheck = FindTriggerCheck( "CeilingCheck", SetCeilingFound );
+        _bodyCollider = environmentColliders.Find("BodyCollider").GetComponent<BoxCollider>();
+        _groundCheck = FindTriggerCheck( environmentColliders, "GroundCheck", SetGroundFound );
+        _leftWallCheck = FindTriggerCheck( environmentColliders, "LeftWallCheck", SetLeftWallFound );
+        _rightWallCheck = FindTriggerCheck( environmentColliders, "RightWallCheck", SetRightWallFound );
+        _ceilingCheck = FindTriggerCheck( environmentColliders, "CeilingCheck", SetCeilingFound );
+        _backgroundCheck = FindTriggerCheck( environmentColliders, "BackgroundCheck", BackgroundFound );
 
         graphicsChild = transform.Find("Graphics");
+        cosmetics = graphicsChild.Find("Cosmetics");
         directionIndicator = GetComponentInChildren<DirectionIndicator>();
         directionIndicator.gameObject.SetActive(false);
 
@@ -284,9 +285,9 @@ public class Agent : MonoBehaviour
 
         didInit = true;
     }
-    protected virtual TriggerCheck FindTriggerCheck( string name, UnityAction<bool, Collider> action )
+    protected virtual TriggerCheck FindTriggerCheck( Transform parent, string name, UnityAction<bool, Collider> action )
     {
-        Transform colliderTransform = transform.Find(name);
+        Transform colliderTransform = parent.Find(name);
         TriggerCheck check = null;
         if( colliderTransform != null ) {
             check = colliderTransform.GetComponent<TriggerCheck>();
@@ -456,7 +457,7 @@ public class Agent : MonoBehaviour
     protected virtual void HandleTechniques()
     {
         if( !ValidActiveTechnique() && _activeActionValue != 0 ) {
-            PerformAction(actions[actions.Count-1], _activeActionValue);
+            PerformAction(lastAction, _activeActionValue);
         }
 
         if( animator.GetBool(transitionBool) ) {
@@ -478,7 +479,7 @@ public class Agent : MonoBehaviour
                     chosenTech = tech;
                     longestSequence = tech.techTrigger.sequence.Length;
                 } else if( tech.techTrigger.sequence.Length == longestSequence ) {
-                    if( chosenTech.techTrigger.state == State.Any && tech.techTrigger.state != State.Any ) {
+                    if( Array.IndexOf(chosenTech.techTrigger.states, State.Any) != -1 && Array.IndexOf(tech.techTrigger.states, State.Any) == -1 ) {
                         chosenTech = tech;
                         longestSequence = tech.techTrigger.sequence.Length;
                     }
@@ -488,88 +489,6 @@ public class Agent : MonoBehaviour
             TransitionTechnique( chosenTech, false );
             activatingTechniques.Clear();
         }
-    }
-
-    public virtual void HandlePhysics( GameManager.UpdateData data )
-    {
-        HandlePhysics(data, null, null);
-    }
-    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride )
-    {
-        HandlePhysics(data, frictionOverride, null);
-    }
-    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride, Vector3? gravityOverride )
-    {
-
-        physicsBody.HandleGravity( data, gravityOverride );
-        physicsBody.HandleFriction( frictionOverride );
-        HandlePropCollisions( data.deltaTime );
-    }
-
-    protected virtual void HandlePropCollisions( float deltaTime )
-    {
-        CheckIgnoredCollisionBounds();
-
-        RaycastHit[] hits;
-        if( physicsBody.DetectCollisions(deltaTime, out hits) ) {
-
-            foreach( RaycastHit hit in hits ) {
-                bool doCollide = HitCollideLogic(hit);
-                if( !doCollide ) {
-                    IgnoreCollider(hit.collider, true);
-                } else {
-                    ParticleEmitter emitter = CreateEmitter( "impact", hit.point, Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward) );
-                    if( emitter != null ) {
-                        emitter.Expand(_physicsBody.velocity.magnitude / 12f);
-                    }
-                }
-            }
-        }
-    }
-    protected virtual void CheckIgnoredCollisionBounds()
-    {
-        for( int i = ignoredColliders.Count - 1; i >= 0; i-- ) {
-            bool contained = false;
-            foreach( Vector3 boundPoint in boundingPoints ) {
-                if( ignoredColliders[i].bounds.Contains(boundPoint) ) {
-                    contained = true;
-                    break;
-                }
-            }
-            if( !contained ) {
-                IgnoreCollider(ignoredColliders[i], false);
-            }
-        }
-    }
-    protected virtual bool HitCollideLogic(RaycastHit hit)
-    {
-        Prop prop = hit.collider.GetComponent<Prop>();
-        if( prop == null || !prop.isPassable ) { return true; }
-        if( prop.physicsBody.layer > frontCollisionLayer ) { return false; }
-
-        bool invertDown = false;
-        foreach( Action action in AgentManager.Instance.settings.propInteractActions ) {
-            if( actions[actions.Count - 1] == action && Mathf.Abs(_activeActionValue) > 0 ) {
-                invertDown = true;
-                break;
-            } 
-        }
-
-        if( state == State.Grounded ) {
-            if( prop.physicsBody.layer <= physicsBody.layer ) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            if( hit.point.y >= hit.collider.bounds.max.y ) {
-                return invertDown ? false : true;
-            }
-
-            return invertDown ? AgentManager.Instance.settings.defaultIgnorePropCollisions
-                : !AgentManager.Instance.settings.defaultIgnorePropCollisions;
-        }
-
     }
 
     public virtual void HandleAnimation()
@@ -586,7 +505,179 @@ public class Agent : MonoBehaviour
 
     #endregion
 
+    #region Physics Methods
+
+    public virtual void HandlePhysics( GameManager.UpdateData data )
+    {
+        HandlePhysics(data, null, null);
+    }
+    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride )
+    {
+        HandlePhysics(data, frictionOverride, null);
+    }
+    public virtual void HandlePhysics( GameManager.UpdateData data, Vector3? frictionOverride, Vector3? gravityOverride )
+    {
+        if( backgroundDistance < onLayer ) {
+            backgroundDistance = onLayer;
+        }
+        if( groundFound || wallFound ) {
+            _bodyCollider.transform.localScale = new Vector3(1, 1, onLayer);
+            _groundCheck.transform.localScale = new Vector3(1, 1, onLayer);
+            _rightWallCheck.transform.localScale = new Vector3(1, 1, onLayer);
+            _leftWallCheck.transform.localScale = new Vector3(1, 1, onLayer);
+            _ceilingCheck.transform.localScale = new Vector3(1, 1, onLayer);
+        } else {
+            bool passThrough = lastAction == AgentManager.Instance.settings.propPassThroughAction && activeActionValue > 0;
+            bool wallCollide = lastAction == AgentManager.Instance.settings.propCollideAction && activeActionValue > 0;
+            _bodyCollider.transform.localScale = new Vector3(1, 1, 1);
+            _groundCheck.transform.localScale = new Vector3(1, 1, (passThrough ? 1 : backgroundDistance) );
+            _rightWallCheck.transform.localScale = new Vector3(1, 1, (wallCollide ? backgroundDistance : 1) );
+            _leftWallCheck.transform.localScale = new Vector3(1, 1, (wallCollide ? backgroundDistance : 1) );
+            _ceilingCheck.transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        physicsBody.HandleGravity( data, gravityOverride );
+        physicsBody.HandleFriction( frictionOverride );
+    }
+
+    protected virtual void SetGroundFound( bool state, Collider other )
+    {
+        bool isBoundary = other.gameObject.layer == LayerMask.NameToLayer("Boundary");
+        if( isBoundary ) {
+            if( other.GetComponent<Follow>().target != transform ) {
+                return;
+            }
+        }
+
+        groundFound = _groundCheck.triggerCount > 0;
+        
+        if( state ) {
+            transform.position = new Vector3(transform.position.x, transform.position.y + (other.bounds.max.y - _groundCheck.transform.position.y), transform.position.z);
+            if( isBoundary ) {
+                onLayer = 1;
+            } else {
+                onLayer = (transform.position.z - other.transform.position.z) * -2;
+            }
+        }
+    }
+    protected virtual void SetLeftWallFound( bool state, Collider other )
+    {
+        bool isBoundary = other.gameObject.layer == LayerMask.NameToLayer("Boundary");
+        if( isBoundary ) {
+            if( other.GetComponent<Follow>().target != transform ) {
+                return;
+            }
+        }
+
+        wallFound = _leftWallCheck.triggerCount > 0;
+        if( isFacingRight != true ) { isFacingRight = true; }
+
+        if( state ) {
+            float offset = (other.bounds.max.x - _leftWallCheck.transform.position.x);
+            transform.position = new Vector3(transform.position.x  + offset, transform.position.y, transform.position.z);
+            if( isBoundary ) {
+                onLayer = 1;
+            } else {
+                onLayer = (transform.position.z - other.transform.position.z) * -2;
+            }
+        }
+    }
+    protected virtual void SetRightWallFound( bool state, Collider other )
+    {
+        bool isBoundary = other.gameObject.layer == LayerMask.NameToLayer("Boundary");
+        if( isBoundary ) {
+            if( other.GetComponent<Follow>().target != transform ) {
+                return;
+            }
+        }
+
+        wallFound = _rightWallCheck.triggerCount > 0;
+        if( isFacingRight == true ) { isFacingRight = false; }
+
+        if( state ) {
+            float offset = (other.bounds.min.x - _rightWallCheck.transform.position.x);
+            transform.position = new Vector3(transform.position.x  + offset, transform.position.y, transform.position.z);
+            if( isBoundary ) {
+                onLayer = 1;
+            } else {
+                onLayer = (transform.position.z - other.transform.position.z) * -2;
+            }
+        }
+    }
+    protected virtual void SetCeilingFound( bool state, Collider other )
+    {
+        bool isBoundary = other.gameObject.layer == LayerMask.NameToLayer("Boundary");
+        if( isBoundary ) {
+            if( other.GetComponent<Follow>().target != transform ) {
+                return;
+            }
+        }
+
+        ceilingFound = _ceilingCheck.triggerCount > 0;
+
+        if( state ) {
+            transform.position = new Vector3(transform.position.x, transform.position.y + (other.bounds.min.y - _ceilingCheck.transform.position.y), transform.position.z);
+            if( isBoundary ) {
+                onLayer = 1;
+            } else {
+                onLayer = (transform.position.z - other.transform.position.z) * -2;
+            }
+        }
+    }
+    protected virtual void BackgroundFound( bool state, Collider other )
+    {
+        if( other.gameObject.layer == LayerMask.NameToLayer("Boundary") ) {
+            return;
+        }
+
+        if( state ) {
+            backgroundColliders.Add(other);
+        } else {
+            backgroundColliders.Remove(other);
+        }
+
+        float foremost = 0f;
+        foreach( Collider background in backgroundColliders ) {
+            if( background.transform.position.z < foremost ) {
+                foremost = background.transform.position.z;
+            }
+        }
+        backgroundDistance = (transform.position.z - foremost + 1) * -2;
+        if( backgroundDistance < onLayer ) {
+            backgroundDistance = onLayer;
+        }
+    }
+
+    #endregion
+
+    #region Animation Methods
+
+    public void SetSkin( CharacterSkin skin )
+    {
+        cosmetics.Find("Face").GetComponent<SpriteMeshInstance>().spriteMesh = skin.Face;
+        cosmetics.Find("Chest").GetComponent<SpriteMeshInstance>().spriteMesh = skin.Chest;
+        cosmetics.Find("Hip").GetComponent<SpriteMeshInstance>().spriteMesh = skin.Hip;
+        cosmetics.Find("LeftShoulder").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftShoulder;
+        cosmetics.Find("LeftArm").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftArm;
+        cosmetics.Find("LeftHand").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftHand;
+        cosmetics.Find("Fingers").GetComponent<SpriteMeshInstance>().spriteMesh = skin.Fingers;
+        cosmetics.Find("RightShoulder").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightShoulder;
+        cosmetics.Find("RightArm").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightArm;
+        cosmetics.Find("RightHand").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightHand;
+        cosmetics.Find("LeftThigh").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftThigh;
+        cosmetics.Find("LeftLeg").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftLeg;
+        cosmetics.Find("LeftFoot").GetComponent<SpriteMeshInstance>().spriteMesh = skin.LeftFoot;
+        cosmetics.Find("RightThigh").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightThigh;
+        cosmetics.Find("RightLeg").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightLeg;
+        cosmetics.Find("RightFoot").GetComponent<SpriteMeshInstance>().spriteMesh = skin.RightFoot;
+    }
+
+    #endregion
+
     #region Technique Methods
+
+    public delegate void TechniqueEvent(Technique technique);
+    public event TechniqueEvent TechniqueChange;
 
     public virtual void AddTechnique( Technique technique )
     {
@@ -616,15 +707,19 @@ public class Agent : MonoBehaviour
 
         if( blend && !animator.GetCurrentAnimatorStateInfo(0).IsName(transitionStateName) ) {
             animator.SetBool(transitionBool, true);
-            return;
+        } else {
+            if( technique == null ) {
+                animatorController = baseController;
+                animator.SetBool(transitionBool, false);
+            } else {
+                animatorController = technique.animatorController;
+                animator.SetBool(transitionBool, false);
+            }
         }
 
-        if( technique == null ) {
-            animatorController = baseController;
-            animator.SetBool(transitionBool, false);
-        } else {
-            animatorController = technique.animatorController;
-            animator.SetBool(transitionBool, false);
+        TechniqueEvent handler = TechniqueChange;
+        if( handler != null ) {
+            handler(activeTechnique);
         }
     }
 
@@ -638,8 +733,8 @@ public class Agent : MonoBehaviour
     #region Action Methods
 
     public delegate void ActionEvent( float value );
-    public event ActionEvent MoveRight;
-    public event ActionEvent MoveLeft;
+    public event ActionEvent MoveForward;
+    public event ActionEvent MoveBack;
     public event ActionEvent MoveUp;
     public event ActionEvent MoveDown;
     public event ActionEvent AttackForward;
@@ -655,11 +750,11 @@ public class Agent : MonoBehaviour
     {
         if( !unSubscribe ) {
             switch( action ) {
-                case Action.MoveRight:
-                    MoveRight += callback;
+                case Action.MoveForward:
+                    MoveForward += callback;
                     break;
-                case Action.MoveLeft:
-                    MoveLeft += callback;
+                case Action.MoveBack:
+                    MoveBack += callback;
                     break;
                 case Action.MoveUp:
                     MoveUp += callback;
@@ -697,11 +792,11 @@ public class Agent : MonoBehaviour
             }
         } else {
             switch( action ) {
-                case Action.MoveRight:
-                    MoveRight -= callback;
+                case Action.MoveForward:
+                    MoveForward -= callback;
                     break;
-                case Action.MoveLeft:
-                    MoveLeft -= callback;
+                case Action.MoveBack:
+                    MoveBack -= callback;
                     break;
                 case Action.MoveUp:
                     MoveUp -= callback;
@@ -740,21 +835,21 @@ public class Agent : MonoBehaviour
         }
     }
 
-    public void PerformAction( Action action, float value )
+    public bool PerformAction( Action action, float value )
     {
         if( ValidActiveTechnique()
             && !activeTechnique.ValidateAction(action, value) )
-        { return; }
+        { return false; }
 
-        if( value == 0 ) { _activeActionValue = 0; return; }
+        if( value == 0 && action == lastAction) { _activeActionValue = 0; return true; }
 
         ActionEvent handler;
         switch( action ) {
-            case Action.MoveRight:
-                handler = MoveRight;
+            case Action.MoveForward:
+                handler = MoveForward;
                 break;
-            case Action.MoveLeft:
-                handler = MoveLeft;
+            case Action.MoveBack:
+                handler = MoveBack;
                 break;
             case Action.MoveUp:
                 handler = MoveUp;
@@ -788,10 +883,10 @@ public class Agent : MonoBehaviour
                 break;
             default:
                 Debug.LogError("Action not implemented: " + action);
-                return;
+                return true;
         }
 
-        if( actions.Count == 0 || actions[actions.Count - 1] != action ) {
+        if( actions.Count == 0 || lastAction != action ) {
             actions.Add(action);
 
             if( actions.Count > AgentManager.Instance.settings.actionSequenceLength ) {
@@ -803,6 +898,8 @@ public class Agent : MonoBehaviour
         if( handler != null ) {
             handler( value );
         }
+
+        return true;
     }
 
     #endregion
@@ -817,84 +914,6 @@ public class Agent : MonoBehaviour
                 string boundaryName = boundaryColliders[i].name;
                 int underScoreIndex = boundaryName.LastIndexOf("_");
                 boundaryColliders[i].name = gameObject.name + boundaryName.Substring( underScoreIndex + 1, boundaryName.Length - underScoreIndex - 1 );
-            }
-        }
-    }
-
-    protected virtual void SetGroundFound( bool state, Collider other )
-    {
-        groundFound = state;
-
-        if( state ) {
-            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
-        }
-    }
-    protected virtual void SetWallFound( bool state, Collider other )
-    {
-        wallFound = state;
-
-        if( other.transform.position.x < transform.position.x ) {
-            if( isFacingRight != true ) { isFacingRight = true; }
-        } else {
-            if( isFacingRight == true ) { isFacingRight = false; }
-        }
-
-        if( state ) {
-            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
-        }
-    }
-    protected virtual void SetCeilingFound( bool state, Collider other )
-    {
-        ceilingFound = state;
-
-        if( state ) {
-            SetPhysicsLayer( other.GetComponent<PhysicsBody>() );
-        }
-    }
-    protected virtual void SetPhysicsLayer( PhysicsBody body )
-    {
-        if( body != null ) {
-            physicsBody.layer = body.layer;
-        } else {
-            physicsBody.layer = 0;
-        }
-    }
-
-    public virtual void IgnoreCollider(Collider other, bool doIgnore = true)
-    {
-        if( doIgnore ) {
-            if( ignoredColliders.Contains(other) ) { return; }
-
-            Physics.IgnoreCollision(collider, other);
-            Physics.IgnoreCollision(_groundCheck.collider, other);
-            Physics.IgnoreCollision(_ceilingCheck.collider, other);
-            Physics.IgnoreCollision(_leftWallCheck.collider, other);
-            Physics.IgnoreCollision(_rightWallCheck.collider, other);
-
-            ignoredColliders.Add(other);
-
-            PhysicsBody body = other.GetComponent<PhysicsBody>();
-            if( body != null ) {
-                frontCollisionLayer = body.layer < frontCollisionLayer ? body.layer : frontCollisionLayer;
-            }
-
-        } else {
-            if( !ignoredColliders.Contains(other) ) { return; }
-
-            Physics.IgnoreCollision(collider, other, false);
-            Physics.IgnoreCollision(_groundCheck.collider, other, false);
-            Physics.IgnoreCollision(_ceilingCheck.collider, other, false);
-            Physics.IgnoreCollision(_leftWallCheck.collider, other, false);
-            Physics.IgnoreCollision(_rightWallCheck.collider, other, false);
-
-            ignoredColliders.Remove(other);
-
-            frontCollisionLayer = int.MaxValue;
-            foreach( Collider col in ignoredColliders ) {
-                PhysicsBody body = col.GetComponent<PhysicsBody>();
-                if( body != null ) {
-                    frontCollisionLayer = body.layer < frontCollisionLayer ? body.layer : frontCollisionLayer;
-                }
             }
         }
     }
@@ -941,28 +960,11 @@ public class Agent : MonoBehaviour
     {
         if( !GameManager.Instance.DebugOn ) { return; }
 
-        DebugExtension.DrawCapsule( new Vector3(transform.position.x, transform.position.y + collider.height / 2, transform.position.z), 
-                                    new Vector3(transform.position.x, transform.position.y - collider.height / 2, transform.position.z),
-                                    Color.green,
-                                    collider.radius );
-
         Gizmos.color = Color.blue;
-        if( _groundCheck.doDetect ) {  Gizmos.DrawWireSphere( _groundCheck.transform.position, ((SphereCollider)_groundCheck.collider).radius ); }
+        if( _groundCheck.doDetect ) {  Gizmos.DrawWireCube( _groundCheck.transform.position, ((BoxCollider)_groundCheck.collider).size ); }
         if( _rightWallCheck.doDetect ) {  Gizmos.DrawWireCube( _rightWallCheck.transform.position, ((BoxCollider)_rightWallCheck.collider).size ); }
         if( _leftWallCheck.doDetect ) {  Gizmos.DrawWireCube( _leftWallCheck.transform.position, ((BoxCollider)_leftWallCheck.collider).size ); }
-        if( _ceilingCheck.doDetect ) {  Gizmos.DrawWireSphere( _ceilingCheck.transform.position, ((SphereCollider)_ceilingCheck.collider).radius ); }
-
-        Gizmos.color = Color.red;
-        foreach( Vector3 boundPoint in boundingPoints ) {
-            Gizmos.DrawSphere( boundPoint, 0.02f );
-        }
-
-        if( boundaryColliders != null ) {
-            for( int i = 0; i < boundaryColliders.Length; i++ ) {
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireCube(boundaryColliders[i].transform.position, boundaryColliders[i].size);
-            }
-        }
+        if( _ceilingCheck.doDetect ) {  Gizmos.DrawWireCube( _ceilingCheck.transform.position, ((BoxCollider)_ceilingCheck.collider).size ); }
     }
 
     #endregion

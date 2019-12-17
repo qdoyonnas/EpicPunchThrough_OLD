@@ -33,7 +33,7 @@ public class CameraBase : MonoBehaviour
 		get { return transform.position.y - cameraSize.y; }
 	}
     
-    float cameraZDistance = -10;
+    float cameraZDistance = 0;
 
 	float shakeRadius = 0;
 	float shakeDuration = 0;
@@ -225,6 +225,7 @@ public class CameraBase : MonoBehaviour
 	void Awake()
 	{
 		_camera = gameObject.GetComponentInChildren<Camera>();
+        cameraZDistance = _camera.transform.position.z;
 
         if( screenFade == null ) {
             GameObject.Find("ScreenFade").GetComponent<Image>();

@@ -8,127 +8,222 @@ using UnityEditor;
 [CustomEditor(typeof(TechniqueOptions))]
 public class TechniqueOptionsEditor : Editor
 {
-    int triggerChoice = 0;
-    int activateChoice = 0;
-    int stateChoice = 0;
-    int actionChoice = 0;
-    int updateChoice = 0;
-    int exitChoice = 0;
-
-    Dictionary<string, Type> triggerStrats;
-    Dictionary<string, Type> activateStrats;
-    Dictionary<string, Type> stateChangeStrats;
-    Dictionary<string, Type> actionValidateStrats;
-    Dictionary<string, Type> updateStrats;
-    Dictionary<string, Type> exitStrats;
-
     TechniqueOptions options;
+    SerializedObject serializedOptions;
 
-    private void OnEnable()
-    {
-        //options = target as TechniqueOptions;
+    #region StrategyData
+    class StrategyData {
+        public Type baseType;
+        public string label;
+        public bool show = true;
 
-        GetAllDerivedTypes(typeof(TriggerTechStrategy), out triggerStrats);
-        GetAllDerivedTypes(typeof(ActivateTechStrategy), out activateStrats);
-        GetAllDerivedTypes(typeof(StateChangeStrategy), out stateChangeStrats);
-        GetAllDerivedTypes(typeof(ActionValidateTechStrategy), out actionValidateStrats);
-        GetAllDerivedTypes(typeof(UpdateTechStrategy), out updateStrats);
-        GetAllDerivedTypes(typeof(ExitTechStrategy), out exitStrats);
-    }
-    void GetAllDerivedTypes(Type baseType, out Dictionary<string, Type> dictionary)
-    {
-        Type[] types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from assemblyType in domainAssembly.GetExportedTypes()
-                    where baseType.IsAssignableFrom(assemblyType)
-                    select assemblyType).ToArray();
+        Dictionary<string, Type> types;
+        
+        public StrategyEntry[] strategies;
 
-        dictionary = new Dictionary<string, Type>();
-        foreach( Type type in types ) {
-            dictionary.Add(type.Name, type);
-        }
+        public StrategyData(TechniqueOptionsEditor window, Type baseType, string label, TechStrategyOptions[] strategies)
+        {
+            this.baseType = baseType;
+            this.label = label;
+            GetAllDerivedTypes();
 
-        switch( baseType.Name ) {
-            case "TriggerTechStrategy":
-                if( options.triggerStrategy == null ) {
-                    options.triggerStrategy = new NoTrigger();
+            this.strategies = new StrategyEntry[strategies.Length];
+            for( int i = 0; i < strategies.Length; i++ ) {
+                if( strategies[i] != null ) {
+                    int choice = Array.IndexOf(types.Keys.ToArray(), strategies[i].GetType().Name);
+                    this.strategies[i] = new StrategyEntry(choice, strategies[i]);
                 }
-                triggerChoice = Array.IndexOf(triggerStrats.Keys.ToArray(), options.triggerStrategy.GetType().Name);
-                break;
-            case "ActivateTechStrategy":
-                if( options.activateStrategy == null ) {
-                    options.activateStrategy = new NoActivate();
-                }
-                activateChoice = Array.IndexOf(activateStrats.Keys.ToArray(), options.activateStrategy.GetType().Name);
-                break;
-            case "StateChangeStrategy":
-                if( options.stateStrategy == null ) {
-                    options.stateStrategy = new EndTechStateChange();
-                }
-                stateChoice = Array.IndexOf(stateChangeStrats.Keys.ToArray(), options.stateStrategy.GetType().Name);
-                break;
-            case "ActionValidateTechStrategy":
-                if( options.actionValidateStrategy == null ) {
-                    options.actionValidateStrategy = new NoValidate();
-                }
-                actionChoice = Array.IndexOf(actionValidateStrats.Keys.ToArray(), options.actionValidateStrategy.GetType().Name);
-                break;
-            case "UpdateTechStrategy":
-                if( options.updateStrategy == null ) {
-                    options.updateStrategy = new NoUpdate();
-                }
-                updateChoice = Array.IndexOf(updateStrats.Keys.ToArray(), options.updateStrategy.GetType().Name);
-                break;
-            case "ExitTechStrategy":
-                if( options.exitStrategy == null ) {
-                    options.exitStrategy = new NoExit();
-                }
-                exitChoice = Array.IndexOf(exitStrats.Keys.ToArray(), options.exitStrategy.GetType().Name);
-                break;
-        }
-    }
-
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        EditorGUILayout.LabelField("Strategies", EditorStyles.boldLabel);
-
-        DrawStratType("Trigger", triggerStrats, ref triggerChoice);
-        DrawStratType("Activate", activateStrats, ref activateChoice);
-        DrawStratType("StateChange", stateChangeStrats, ref stateChoice);
-        DrawStratType("ActionValidate", actionValidateStrats, ref actionChoice);
-        DrawStratType("Update", updateStrats, ref updateChoice);
-        DrawStratType("Exit", exitStrats, ref exitChoice);
-    }
-    void DrawStratType(string label, Dictionary<string, Type> dictionary, ref int choice)
-    {
-        int oldChoice = choice;
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField( label, GUILayout.MaxWidth(100f) );
-        choice = EditorGUILayout.Popup(choice, dictionary.Keys.ToArray());
-        EditorGUILayout.EndHorizontal();
-
-        if( choice != oldChoice ) {
-            switch( label ) {
-                case "Trigger":
-
-                    break;
-                case "Activate":
-
-                    break;
-                case "StateChange":
-
-                    break;
-                case "ActionValidate":
-
-                    break;
-                case "Update":
-
-                    break;
-                case "Exit":
-
-                    break;
             }
         }
+
+        void GetAllDerivedTypes()
+        {
+            Type[] derivedTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                        from assemblyType in domainAssembly.GetExportedTypes()
+                        where baseType.IsAssignableFrom(assemblyType)
+                        select assemblyType).ToArray();
+
+            types = new Dictionary<string, Type>();
+            foreach( Type type in derivedTypes ) {
+                if( type == baseType ) { continue; }
+                types.Add(type.Name, type);
+            }
+        }
+
+        public bool DrawStratData()
+        {
+            bool update = false;
+
+            EditorGUILayout.BeginHorizontal();
+            show = EditorGUILayout.Foldout( show, label );
+            int length = EditorGUILayout.IntField(strategies.Length, GUILayout.MaxWidth(50));
+            EditorGUILayout.EndHorizontal();
+            if( show ) {
+                EditorGUILayout.BeginVertical();
+                if( strategies.Length > 0 ) {
+                    foreach( StrategyEntry entry in strategies ) {
+                        if( entry != null ) {
+                            if( entry.DrawStrategy(types) ) {
+                                update = true;
+                            }
+                        }
+                    }
+                } else {
+                    EditorGUILayout.LabelField("Default Strategy");
+                }
+                EditorGUILayout.EndVertical();
+            }
+
+            length = length == 0 ? 1 : length;
+            if( length != strategies.Length ) {
+                update = true;
+                StrategyEntry[] oldData = strategies;
+                strategies = new StrategyEntry[length];
+                for( int i = 0; i < length; i++ ) {
+                    if( i < oldData.Length ) {
+                        strategies[i] = oldData[i];
+                    } else {
+                        strategies[i] = new StrategyEntry(0, (TechStrategyOptions)ScriptableObject.CreateInstance(types[types.Keys.First()]) );
+                    }
+                }
+            }
+
+            return update;
+        }
+    }
+    #endregion
+
+    #region StrategyEntry
+    public class StrategyEntry {
+        public int choice;
+        public TechStrategyOptions strategy;
+        public StrategyEntry( int c, TechStrategyOptions s )
+        {
+            choice = c;
+            strategy = s;
+        }
+
+        public bool DrawStrategy(Dictionary<string, Type> types)
+        {
+            bool update = false;
+
+            EditorGUILayout.BeginVertical("Box");
+            int choice = EditorGUILayout.Popup(this.choice, types.Keys.ToArray());
+            EditorGUI.indentLevel++;
+            strategy.InspectorDraw();
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndVertical();
+
+            if( choice != this.choice ) {
+                string name = types.Keys.ToArray()[choice];
+                strategy = (TechStrategyOptions)ScriptableObject.CreateInstance( types[name] );
+                this.choice = choice;
+                update = true;
+            }
+
+            return update;
+        }
+    }
+    #endregion
+
+    StrategyData[] strategyDatas;
+
+    private void ValidateOptions()
+    {
+        if( target == null ) { return; }
+        options = (TechniqueOptions)target;
+        serializedOptions = new SerializedObject(target);
+
+        strategyDatas = new StrategyData[] {
+            GenerateStrategyData<TriggerTechStrategyOptions>( "Trigger Strategies", ref options.triggerStrategies, typeof(NoTriggerOptions) ),
+            GenerateStrategyData<ActivateTechStrategyOptions>( "Activate Strategies", ref options.activateStrategies, typeof(NoActivateOptions) ),
+            GenerateStrategyData<StateChangeStrategyOptions>( "State Strategies", ref options.stateStrategies, typeof(EndTechStateChangeOptions) ),
+            GenerateStrategyData<ActionValidateTechStrategyOptions>( "Action Strategies", ref options.actionValidateStrategies, typeof(NoValidateOptions) ),
+            GenerateStrategyData<UpdateTechStrategyOptions>( "Update Strategies", ref options.updateStrategies, typeof(NoUpdateOptions) ),
+            GenerateStrategyData<ExitTechStrategyOptions>( "Exit Strategies", ref options.exitStrategies, typeof(NoExitOptions) )
+        };
+    }
+    private StrategyData GenerateStrategyData<T>( string label, ref T[] strategyOptions, Type defaultStrat )
+        where T : TechStrategyOptions
+    {
+        if( strategyOptions == null ) {
+            strategyOptions = new T[1];
+        }
+
+        for( int i = 0; i < strategyOptions.Length; i++ ) {
+            if( strategyOptions[i] == null ) {
+                strategyOptions[i] = (T)ScriptableObject.CreateInstance(defaultStrat);
+            }
+        }
+
+        return new StrategyData( this, typeof(T), label, strategyOptions );
+    }
+    
+    public override void OnInspectorGUI()
+    {
+        if( strategyDatas == null ) {
+            ValidateOptions();
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Info", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField( serializedOptions.FindProperty("techniqueName") );
+        EditorGUILayout.PropertyField( serializedOptions.FindProperty("animatorController") );
+        EditorGUILayout.PropertyField( serializedOptions.FindProperty("particleController") );
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Trigger", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField( serializedOptions.FindProperty("states"), true );
+        EditorGUILayout.PropertyField( serializedOptions.FindProperty("actionSequence"), true );
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Strategies", EditorStyles.boldLabel);
+
+        foreach( StrategyData data in strategyDatas ) {
+            if( data.DrawStratData() ) {
+                switch(data.baseType.Name) {
+                    case "TriggerTechStrategyOptions":
+                        options.triggerStrategies = new TriggerTechStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.triggerStrategies[i] = (TriggerTechStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                    case "ActivateTechStrategyOptions":
+                        options.activateStrategies = new ActivateTechStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.activateStrategies[i] = (ActivateTechStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                    case "StateChangeStrategyOptions":
+                        options.stateStrategies = new StateChangeStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.stateStrategies[i] = (StateChangeStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                    case "ActionValidateTechStrategyOptions":
+                        options.actionValidateStrategies = new ActionValidateTechStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.actionValidateStrategies[i] = (ActionValidateTechStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                    case "UpdateTechStrategyOptions":
+                        options.updateStrategies = new UpdateTechStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.updateStrategies[i] = (UpdateTechStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                    case "ExitTechStrategyOptions":
+                        options.exitStrategies = new ExitTechStrategyOptions[data.strategies.Length];
+                        for( int i = 0; i < data.strategies.Length; i++ ) {
+                            options.exitStrategies[i] = (ExitTechStrategyOptions)data.strategies[i].strategy;
+                        }
+                        break;
+                }
+
+                options.SetDirtyRecursive();
+            }
+        }
+
+        serializedOptions.ApplyModifiedProperties();
     }
 }
