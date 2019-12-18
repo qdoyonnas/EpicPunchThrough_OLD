@@ -116,7 +116,9 @@ public class AgentManager
                 agent.SetSkin(skins[data.skin]);
             }
         }
-        TechniqueGenerator.Instance.AddTechniqueSet(agent, settings.techniqueSettings.baseMovementSet);
+        foreach( TechniqueSet set in settings.techniqueSettings.defaultSets ) {
+            TechniqueGenerator.Instance.AddTechniqueSet(agent, set);
+        }
     }
     public Transform GetAgentsObject()
     {

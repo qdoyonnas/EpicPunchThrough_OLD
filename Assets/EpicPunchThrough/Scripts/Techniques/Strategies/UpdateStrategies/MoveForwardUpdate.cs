@@ -37,17 +37,8 @@ public class MoveForwardUpdateOptions : UpdateTechStrategyOptions {
 
     public override void InspectorDraw()
     {
-        float speed = EditorGUILayout.FloatField("Max Speed", maxSpeed);
-        float accel = EditorGUILayout.FloatField("Acceleration", acceleration);
-
-        if( speed != maxSpeed ) {
-            maxSpeed = speed;
-            EditorUtility.SetDirty(this);
-        }
-        if( accel != acceleration ) {
-            acceleration = accel;
-            EditorUtility.SetDirty(this);
-        }
+        maxSpeed = EditorGUILayout.FloatField("Max Speed", maxSpeed);
+        acceleration = EditorGUILayout.FloatField("Acceleration", acceleration);
     }
 
     public override UpdateTechStrategy GenerateStrategy()

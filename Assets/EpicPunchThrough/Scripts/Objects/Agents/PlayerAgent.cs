@@ -10,7 +10,8 @@ public class PlayerAgent : Agent
     public enum Control {
         Horizontal,
         Vertical,
-        Jump
+        Jump,
+        Attack
     }
     protected Dictionary<Control, float> controlState = new Dictionary<Control, float>();
     protected List<Control> controlQueue = new List<Control>();
@@ -22,6 +23,7 @@ public class PlayerAgent : Agent
         controlState.Add(Control.Horizontal, 0);
         controlState.Add(Control.Vertical, 0);
         controlState.Add(Control.Jump, 0);
+        controlState.Add(Control.Attack, 0);
 
         directionIndicator.gameObject.SetActive(true);
 
@@ -36,6 +38,7 @@ public class PlayerAgent : Agent
             InputManager.Instance.HorizontalInput += OnHorizontal;
             InputManager.Instance.VerticalInput += OnVertical;
             InputManager.Instance.JumpInput += OnJump;
+            InputManager.Instance.AttackInput += OnAttack;
 
             InputManager.Instance.AimHorizontal += OnAimHorizontal;
             InputManager.Instance.AimVertical += OnAimVertical;
@@ -43,6 +46,7 @@ public class PlayerAgent : Agent
             InputManager.Instance.HorizontalInput -= OnHorizontal;
             InputManager.Instance.VerticalInput -= OnVertical;
             InputManager.Instance.JumpInput -= OnJump;
+            InputManager.Instance.AttackInput -= OnAttack;
 
             InputManager.Instance.AimHorizontal -= OnAimHorizontal;
             InputManager.Instance.AimVertical -= OnAimVertical;
@@ -80,6 +84,13 @@ public class PlayerAgent : Agent
     protected bool OnJump( float value )
     {
         UpdateControl(Control.Jump, value);
+
+        return true;
+    }
+
+    protected bool OnAttack( float value )
+    {
+        UpdateControl(Control.Attack, value);
 
         return true;
     }
@@ -126,6 +137,18 @@ public class PlayerAgent : Agent
                 case Action.Jump:
                     control = Control.Jump;
                     break;
+                case Action.AttackBack:
+                    control = Control.Attack;
+                    break;
+                case Action.AttackDown:
+                    control = Control.Attack;
+                    break;
+                case Action.AttackForward:
+                    control = Control.Attack;
+                    break;
+                case Action.AttackUp:
+                    control = Control.Attack;
+                    break;
             }
             if( controlState[control] == 0 ) {
                 PerformAction(lastAction, 0);
@@ -146,6 +169,9 @@ public class PlayerAgent : Agent
                 break;
             case Control.Jump:
                 SubmitAction(Action.Jump, controlState[Control.Jump]);
+                break;
+            case Control.Attack:
+                SubmitAttack();
                 break;
         }
     }
@@ -177,6 +203,20 @@ public class PlayerAgent : Agent
             SubmitAction(Action.MoveUp, controlState[Control.Vertical]);
         } else {
             SubmitAction(Action.MoveDown, -controlState[Control.Vertical]);
+        }
+    }
+    protected void SubmitAttack()
+    {
+        AimSegment segment = aimSegment;
+
+        if( segment == AimSegment.Up ) {
+            SubmitAction(Action.AttackUp, controlState[Control.Attack]);
+        } else if( segment == AimSegment.Forward ) {
+            SubmitAction(Action.AttackForward, controlState[Control.Attack]);
+        } else if( segment == AimSegment.Down ) {
+            SubmitAction(Action.AttackDown, controlState[Control.Attack]);
+        } else {
+            SubmitAction(Action.AttackBack, controlState[Control.Attack]);
         }
     }
 }

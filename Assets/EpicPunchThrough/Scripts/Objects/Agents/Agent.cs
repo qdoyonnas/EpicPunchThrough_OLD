@@ -193,6 +193,30 @@ public class Agent : MonoBehaviour
             directionIndicator.transform.eulerAngles = new Vector3( 0, 0, Vector2.SignedAngle(Vector2.up, _aimDirection) );
         }
     }
+    public enum AimSegment {
+        Up,
+        Forward,
+        Down,
+        Back
+    }
+    public AimSegment aimSegment {
+        get {
+            float angle = Vector2.SignedAngle(Vector2.up, aimDirection);
+
+            AimSegment segment;
+            if( angle >= -45 && angle <= 45 ) {
+                segment = AimSegment.Up;
+            } else if( angle >= 45 && angle <= 135 ) {
+                segment = ( isFacingRight ? AimSegment.Back : AimSegment.Forward );
+            } else if( angle <= -45 && angle >= -135 ) {
+                segment = ( isFacingRight ? AimSegment.Forward : AimSegment.Back );
+            } else {
+                segment = AimSegment.Down;
+            }
+
+            return segment;
+        }
+    }
 
     #endregion
 

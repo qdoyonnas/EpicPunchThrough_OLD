@@ -8,9 +8,15 @@ using UnityEditor;
 [Serializable]
 public class TechStrategyOptions : ScriptableObject
 {
+    private void OnEnable()
+    {
+        hideFlags = HideFlags.HideAndDontSave;
+    }
+
     public virtual void InspectorDraw() {}
 }
 
+[Serializable]
 public class TriggerTechStrategyOptions : TechStrategyOptions
 {
     public virtual TriggerTechStrategy GenerateStrategy()
@@ -18,6 +24,7 @@ public class TriggerTechStrategyOptions : TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class NoTriggerOptions : TriggerTechStrategyOptions
 {
     public override TriggerTechStrategy GenerateStrategy()
@@ -26,6 +33,7 @@ public class NoTriggerOptions : TriggerTechStrategyOptions
     }
 }
 
+[Serializable]
 public class ActivateTechStrategyOptions: TechStrategyOptions
 {
     public virtual ActivateTechStrategy GenerateStrategy()
@@ -33,6 +41,7 @@ public class ActivateTechStrategyOptions: TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class NoActivateOptions : ActivateTechStrategyOptions
 {
     public override ActivateTechStrategy GenerateStrategy()
@@ -41,6 +50,7 @@ public class NoActivateOptions : ActivateTechStrategyOptions
     }
 }
 
+[Serializable]
 public class ActionValidateTechStrategyOptions: TechStrategyOptions
 {
     public virtual ActionValidateTechStrategy GenerateStrategy()
@@ -48,6 +58,7 @@ public class ActionValidateTechStrategyOptions: TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class NoValidateOptions: ActionValidateTechStrategyOptions
 {
     public override ActionValidateTechStrategy GenerateStrategy()
@@ -55,6 +66,7 @@ public class NoValidateOptions: ActionValidateTechStrategyOptions
         return new NoValidate();
     }
 }
+[Serializable]
 public class AllValidateOptions: ActionValidateTechStrategyOptions
 {
     public override ActionValidateTechStrategy GenerateStrategy()
@@ -63,6 +75,7 @@ public class AllValidateOptions: ActionValidateTechStrategyOptions
     }
 }
 
+[Serializable]
 public class StateChangeStrategyOptions: TechStrategyOptions
 {
     public virtual StateChangeStrategy GenerateStrategy()
@@ -70,6 +83,7 @@ public class StateChangeStrategyOptions: TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class EndTechStateChangeOptions: StateChangeStrategyOptions
 {
     public override StateChangeStrategy GenerateStrategy()
@@ -86,6 +100,7 @@ public class UpdateTechStrategyOptions: TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class NoUpdateOptions: UpdateTechStrategyOptions
 {
     public override UpdateTechStrategy GenerateStrategy()
@@ -94,6 +109,7 @@ public class NoUpdateOptions: UpdateTechStrategyOptions
     }
 }
 
+[Serializable]
 public class ExitTechStrategyOptions: TechStrategyOptions
 {
     public virtual ExitTechStrategy GenerateStrategy()
@@ -101,6 +117,7 @@ public class ExitTechStrategyOptions: TechStrategyOptions
         return null;
     }
 }
+[Serializable]
 public class NoExitOptions : ExitTechStrategyOptions
 {
     public override ExitTechStrategy GenerateStrategy()

@@ -34,6 +34,7 @@ public class ChargeUpdate : UpdateTechStrategy
     }
 }
 
+[System.Serializable]
 public class ChargeUpdateOptions : UpdateTechStrategyOptions
 {
     float frictionMultiplier;
@@ -43,42 +44,10 @@ public class ChargeUpdateOptions : UpdateTechStrategyOptions
 
     public override void InspectorDraw()
     {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Friction Multiplier");
-        float friction = EditorGUILayout.FloatField(frictionMultiplier);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Charge Rate");
-        double charge = EditorGUILayout.DoubleField(chargeRate);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Minimum Charge");
-        double min = EditorGUILayout.DoubleField(minimumCharge);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Maximum Charge");
-        double max = EditorGUILayout.DoubleField(maximumCharge);
-        EditorGUILayout.EndHorizontal();
-
-        if( friction != frictionMultiplier ) {
-            frictionMultiplier = friction;
-            EditorUtility.SetDirty(this);
-        }
-        if( charge != chargeRate ) {
-            chargeRate = charge;
-            EditorUtility.SetDirty(this);
-        }
-        if( min != minimumCharge ) {
-            minimumCharge = min;
-            EditorUtility.SetDirty(this);
-        }
-        if( max != maximumCharge ) {
-            maximumCharge = max;
-            EditorUtility.SetDirty(this);
-        }
+        frictionMultiplier = EditorGUILayout.FloatField("Friction Multiplier", frictionMultiplier);
+        chargeRate = EditorGUILayout.DoubleField("Charge Rate", chargeRate);
+        minimumCharge = EditorGUILayout.DoubleField("Minimum Charge", minimumCharge);
+        maximumCharge = EditorGUILayout.DoubleField("Maximum Charge", maximumCharge);
     }
 
     public override UpdateTechStrategy GenerateStrategy()

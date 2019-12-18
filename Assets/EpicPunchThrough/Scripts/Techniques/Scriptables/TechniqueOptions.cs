@@ -20,7 +20,7 @@ public class TechniqueOptions : ScriptableObject
     [SerializeField] public ActionValidateTechStrategyOptions[] actionValidateStrategies;
     [SerializeField] public UpdateTechStrategyOptions[] updateStrategies;
     [SerializeField] public ExitTechStrategyOptions[] exitStrategies;
-
+    
     public void SetDirtyRecursive()
     {
         EditorUtility.SetDirty(this);

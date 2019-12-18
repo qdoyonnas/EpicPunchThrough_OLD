@@ -32,21 +32,14 @@ public class JumpExit : ExitTechStrategy
     }
 }
 
+[System.Serializable]
 public class JumpExitOptions : ExitTechStrategyOptions
 {
     float jumpMultiplier;
 
     public override void InspectorDraw()
     {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Jump Multiplier");
-        float multi = EditorGUILayout.FloatField(jumpMultiplier);
-        EditorGUILayout.EndHorizontal();
-
-        if( multi != jumpMultiplier ) {
-            jumpMultiplier = multi;
-            EditorUtility.SetDirty(this);
-        }
+        jumpMultiplier = EditorGUILayout.FloatField("Jump Multiplier", jumpMultiplier);
     }
 
     public override ExitTechStrategy GenerateStrategy()

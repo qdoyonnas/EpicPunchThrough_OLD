@@ -25,9 +25,6 @@ MonoBehaviour:
   - {fileID: 0}
   actionValidateStrategies:
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   updateStrategies:
   - {fileID: 0}
   exitStrategies:

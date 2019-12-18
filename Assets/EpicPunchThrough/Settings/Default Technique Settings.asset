@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c2870c391b673429fdaec1a3dae1da, type: 3}
   m_Name: Default Technique Settings
   m_EditorClassIdentifier: 
+  defaultSets:
+  - {fileID: 11400000, guid: a752d318c72fc2d438835f59063593ac, type: 2}
+  - {fileID: 11400000, guid: 29772c9ccf22bc5479b9d6b92a2ccf6c, type: 2}
   baseMovementSet: {fileID: 11400000, guid: a752d318c72fc2d438835f59063593ac, type: 2}
-  baseAttackSet: {fileID: 0}
+  baseAttackSet: {fileID: 11400000, guid: 29772c9ccf22bc5479b9d6b92a2ccf6c, type: 2}

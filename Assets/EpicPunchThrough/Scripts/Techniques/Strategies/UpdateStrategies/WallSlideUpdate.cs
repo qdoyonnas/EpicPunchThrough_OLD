@@ -31,6 +31,7 @@ public class WallSlideUpdate : UpdateTechStrategy
     }
 }
 
+[Serializable]
 public class WallSlideUpdateOptions : UpdateTechStrategyOptions
 {
     float frictionMultiplier;
@@ -38,24 +39,8 @@ public class WallSlideUpdateOptions : UpdateTechStrategyOptions
 
     public override void InspectorDraw()
     {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Friction Multiplier");
-        float friction = EditorGUILayout.FloatField(frictionMultiplier);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Gravity Multiplier");
-        float gravity = EditorGUILayout.FloatField(gravityMultiplier);
-        EditorGUILayout.EndHorizontal();
-
-        if( friction != frictionMultiplier ) {
-            frictionMultiplier = friction;
-            EditorUtility.SetDirty(this);
-        }
-        if( gravity != gravityMultiplier ) {
-            gravityMultiplier = gravity;
-            EditorUtility.SetDirty(this);
-        }
+        frictionMultiplier = EditorGUILayout.FloatField("Friction Multiplier", frictionMultiplier);
+        gravityMultiplier = EditorGUILayout.FloatField("Gravity Multiplier", gravityMultiplier);
     }
 
     public override UpdateTechStrategy GenerateStrategy()

@@ -6,18 +6,6 @@ using UnityEditor;
 
 public class EndTechValidate : ActionValidateTechStrategy
 {
-    [Serializable]
-    public struct ActionState {
-        public Agent.Action action;
-        public bool state;
-
-        public ActionState(Agent.Action action, bool state)
-        {
-            this.action = action;
-            this.state = state;
-        }
-    }
-
     public ActionState[] actionStates;
 
     public EndTechValidate(params ActionState[] actionStates)
@@ -38,22 +26,48 @@ public class EndTechValidate : ActionValidateTechStrategy
     }
 }
 
+[Serializable]
+public class ActionState {
+    public Agent.Action action;
+    public bool state;
+}
+
+[Serializable]
 public class EndTechValidateOptions: ActionValidateTechStrategyOptions
 {
-    [SerializeField]
-    public EndTechValidate.ActionState[] actionStates;
+    public ActionState[] actionStates = new ActionState[0];
 
-    private SerializedObject serialized;
+    private bool show = true;
 
     public override void InspectorDraw()
     {
-        if( serialized == null ) {
-            serialized = new SerializedObject(this);
+        EditorGUILayout.BeginHorizontal();
+        show = EditorGUILayout.Foldout(show ,"Actions");
+        int length = EditorGUILayout.IntField(actionStates.Length);
+        EditorGUILayout.EndHorizontal();
+
+        if( show ) {
+            EditorGUILayout.BeginVertical();
+            for( int i = 0; i < actionStates.Length; i++ ) {
+                EditorGUILayout.BeginHorizontal();
+                actionStates[i].action = (Agent.Action)EditorGUILayout.EnumPopup(actionStates[i].action);
+                actionStates[i].state = EditorGUILayout.Toggle(actionStates[i].state);
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndVertical();
         }
 
-        EditorGUILayout.PropertyField(serialized.FindProperty("actionStates"), true);
-
-        serialized.ApplyModifiedProperties();
+        if( length != actionStates.Length ) {
+            ActionState[] actions = actionStates;
+            actionStates = new ActionState[length];
+            for(int i = 0; i < length; i++) {
+                if( i < actions.Length ) {
+                    actionStates[i] = actions[i];
+                } else {
+                    actionStates[i] = new ActionState();
+                }
+            }
+        }
     }
 
     public override ActionValidateTechStrategy GenerateStrategy()

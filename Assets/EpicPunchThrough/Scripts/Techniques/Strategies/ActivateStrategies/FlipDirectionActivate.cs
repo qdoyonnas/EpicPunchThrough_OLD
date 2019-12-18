@@ -12,6 +12,7 @@ public class FlipDirectionActivate : ActivateTechStrategy
     }
 }
 
+[System.Serializable]
 public class FlipDirectionActivateOptions : ActivateTechStrategyOptions
 {
     public override ActivateTechStrategy GenerateStrategy()
